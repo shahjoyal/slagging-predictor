@@ -829,6 +829,11 @@
                 }
 
                 const scaleBarsContainer = document.getElementById("scaleBarsContainer");
+                if (!scaleBarsContainer) {
+                    console.error("Scale bars container not found. Cannot display scale bars.");
+                    return;
+                }
+
                 scaleBarsContainer.innerHTML = ""; // Clear previous content
 
                 const blends = [
@@ -878,16 +883,16 @@
             }
 
             document.addEventListener('DOMContentLoaded', () => {
-                const tableElement = document.querySelector("#optimization-result table");
+                const optimizationResult = document.getElementById("optimization-result");
                 const scaleBarsContainer = document.createElement("div");
                 scaleBarsContainer.id = "scaleBarsContainer";
                 scaleBarsContainer.style.marginTop = "20px";
                 scaleBarsContainer.style.width = "100%";
 
-                if (tableElement) {
-                    tableElement.parentNode.insertBefore(scaleBarsContainer, tableElement.nextSibling);
+                if (optimizationResult) {
+                    optimizationResult.appendChild(scaleBarsContainer);
                 } else {
-                    console.error("Table element not found. Scale bars cannot be positioned correctly.");
+                    console.error("Optimization result container not found. Cannot append scale bars.");
                 }
 
                 document.body.style.overflow = "auto"; // Ensure the page fits on the screen
