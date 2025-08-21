@@ -337,8 +337,6 @@
             <button type="button" class="calculate-btn" onclick="optimizeBlend()">Calculate</button>
         </form> 
         
-    </div>    
-    </div>
 
     <div id="coalPropertiesModal" class="modal">
         <div class="modal-content">
@@ -349,7 +347,6 @@
             <div id="coalPropertiesContent"></div>
         </div>
     </div> 
-    
     <div id="optimization-result"></div>
 
 
@@ -814,17 +811,22 @@
     }
 
     function displayScaleBars(data) {
-        const { bestAftBlend, cheapestBlend, balancedBlend, currentBlend } = data;
+        const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
+
+        if (!best_aft_blend || !cheapest_blend || !balanced_blend || !current_blend) {
+            console.error("Missing blend data in the response:", data);
+            return;
+        }
 
         document.getElementById("bestAftScaleBar").style.display = "block";
         document.getElementById("cheapestScaleBar").style.display = "block";
         document.getElementById("balancedScaleBar").style.display = "block";
         document.getElementById("currentScaleBar").style.display = "block";
 
-        createHorizontalScaleBar("bestAftScaleBar", bestAftBlend.totalScore, bestAftBlend.checkboxScore, bestAftBlend.overallTotal);
-        createHorizontalScaleBar("cheapestScaleBar", cheapestBlend.totalScore, cheapestBlend.checkboxScore, cheapestBlend.overallTotal);
-        createHorizontalScaleBar("balancedScaleBar", balancedBlend.totalScore, balancedBlend.checkboxScore, balancedBlend.overallTotal);
-        createHorizontalScaleBar("currentScaleBar", currentBlend.totalScore, currentBlend.checkboxScore, currentBlend.overallTotal);
+        createHorizontalScaleBar("bestAftScaleBar", best_aft_blend.totalScore || 0, best_aft_blend.checkboxScore || 0, best_aft_blend.overallTotal || 0);
+        createHorizontalScaleBar("cheapestScaleBar", cheapest_blend.totalScore || 0, cheapest_blend.checkboxScore || 0, cheapest_blend.overallTotal || 0);
+        createHorizontalScaleBar("balancedScaleBar", balanced_blend.totalScore || 0, balanced_blend.checkboxScore || 0, balanced_blend.overallTotal || 0);
+        createHorizontalScaleBar("currentScaleBar", current_blend.totalScore || 0, current_blend.checkboxScore || 0, current_blend.overallTotal || 0);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
