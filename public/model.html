@@ -666,77 +666,61 @@
 
     updatePlot(blendsWithAFT);
 
-    }
+    // Add horizontal graphs for all blends
+    const graphContainer = document.createElement("div");
+    graphContainer.style.marginTop = "20px";
 
-    function updatePlot(blendsWithAFT) {
-        const ternaryPlotElement = document.getElementById('ternary-plot');
-        if (!ternaryPlotElement) {
-            console.error("Ternary plot element #ternary-plot not found.");
-            return;
-        }
+    const blendsWithScores = [
+        { label: "Current Blend", score: currentBlend.score, color: getColor(currentBlend.score) },
+        { label: "Best AFT Blend", score: bestAftBlend.score, color: getColor(bestAftBlend.score) },
+        { label: "Cheapest Blend", score: cheapestBlend.score, color: getColor(cheapestBlend.score) },
+        { label: "Balanced Blend", score: balancedBlend.score, color: getColor(balancedBlend.score) }
+    ];
 
-        const a = [];  // Acidic
-        const b = [];  // Basic
-        const c = [];  // Other
-        const colors = [];  // AFTs
-        const labels = [];  // For hover
+    blendsWithScores.forEach(blend => {
+        const graph = createHorizontalGraph(blend.label, blend.score, blend.color);
+        graphContainer.appendChild(graph);
+    });
 
-        blendsWithAFT.forEach(blend => {
-            let acidic = 0, basic = 0, other = 0;
-            let totalPercentage = 0;
+    document.getElementById("optimization-result").appendChild(graphContainer);
+}
 
-            blend.blend.forEach((pct, i) => {
-                const coal = blend.coals[i];
-                const props = coal.properties;
-                const weight = pct;
+function createHorizontalGraph(label, score, color) {
+    const container = document.createElement("div");
+    container.style.marginBottom = "10px";
 
-                totalPercentage += weight;
+    const title = document.createElement("div");
+    title.textContent = `${label}: ${score.toFixed(2)}`;
+    title.style.fontWeight = "bold";
+    title.style.marginBottom = "5px";
 
-                if (props) {
-                    acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
-                    basic  += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
-                    other  += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0) + (props.P2O5 || 0) + (props.Mn3O4 || 0));
-                }
-            });
+    const graph = document.createElement("div");
+    graph.style.width = "100%";
+    graph.style.height = "30px";
+    graph.style.border = "1px solid #ccc";
+    graph.style.borderRadius = "5px";
+    graph.style.position = "relative";
+    graph.style.backgroundColor = "#f0f0f0";
 
-            // Normalize to percentages
-            a.push(acidic / totalPercentage);
-            b.push(basic / totalPercentage);
-            c.push(other / totalPercentage);
-            colors.push(blend.predicted_aft);
-            labels.push(`${blend.label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`);
-        });
+    const bar = document.createElement("div");
+    bar.style.width = `${Math.min(score, 100)}%`;
+    bar.style.height = "100%";
+    bar.style.backgroundColor = color;
+    bar.style.borderRadius = "5px";
 
-        const data = [{
-            type: 'scatterternary',
-            mode: 'markers',
-            a,
-            b,
-            c,
-            marker: {
-                size: 14,
-                color: colors,
-                colorscale: 'Jet',
-                colorbar: { title: "Fusion Temp (°C)" }
-            },
-            text: labels,
-            hoverinfo: 'text'
-        }];
+    graph.appendChild(bar);
+    container.appendChild(title);
+    container.appendChild(graph);
 
-        const layout = {
-            margin: { l: 40, r: 40, t: 60, b: 50 },
-            ternary: {
-                sum: 100,
-                aaxis: { title: { text: "Thermal Stability", font: { size: 14 } }, showticklabels: true },
-                baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } }, showticklabels: true },
-                caxis: { title: { text: "Hardening Index", font: { size: 14 } }, showticklabels: true }
-            }
-        };
+    return container;
+}
 
-        Plotly.newPlot(ternaryPlotElement, data, layout);
-    }
-
+function getColor(score) {
+    if (score < 3) return "#5de65d"; // Green
+    if (score < 6.5) return "#fddf05"; // Yellow
+    return "#e24242"; // Red
+}
 </script>
-    
+
 </body>
 </html>
