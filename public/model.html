@@ -900,9 +900,8 @@
 
                 document.body.style.overflow = "hidden"; // Prevent scrolling
                 document.body.style.height = "100vh"; // Fit content to screen height
-                document.body.style.display = "flex";
-                document.body.style.flexDirection = "column";
-                document.body.style.justifyContent = "center"; // Center content vertically
+                document.body.style.display = "grid";
+                document.body.style.gridTemplateRows = "auto 1fr auto"; // Stretch content to fit screen
             });
         </script>
 
