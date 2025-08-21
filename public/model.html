@@ -550,18 +550,7 @@
     .then(data => {
         console.log("Optimization Result:", data);
         displayOptimizationResult(data, blends);
-
-        // Create the bar graph container
-        const barGraphContainer = document.createElement("div");
-        barGraphContainer.id = "overallGraphWrapper";
-        barGraphContainer.style.marginTop = "20px"; // Add spacing between the table and the graph
-
-        // Append the bar graph container below the table
-        const optimizationResultDiv = document.getElementById("optimization-result");
-        optimizationResultDiv.appendChild(barGraphContainer);
-
-        // Create the bar graph
-        createOverallGraph(data.totalScore, data.checkboxScore, data.overallTotal);
+        displayScaleBars(data); // Call to display scale bars dynamically
     })
     .catch(err => console.error("Error optimizing blend:", err));
 }
@@ -824,11 +813,25 @@
         return `repeating-linear-gradient(45deg, transparent, transparent 5px, ${hatchColor} 5px, ${hatchColor} 10px)`;
     }
 
+    function displayScaleBars(data) {
+        const { bestAftBlend, cheapestBlend, balancedBlend, currentBlend } = data;
+
+        document.getElementById("bestAftScaleBar").style.display = "block";
+        document.getElementById("cheapestScaleBar").style.display = "block";
+        document.getElementById("balancedScaleBar").style.display = "block";
+        document.getElementById("currentScaleBar").style.display = "block";
+
+        createHorizontalScaleBar("bestAftScaleBar", bestAftBlend.totalScore, bestAftBlend.checkboxScore, bestAftBlend.overallTotal);
+        createHorizontalScaleBar("cheapestScaleBar", cheapestBlend.totalScore, cheapestBlend.checkboxScore, cheapestBlend.overallTotal);
+        createHorizontalScaleBar("balancedScaleBar", balancedBlend.totalScore, balancedBlend.checkboxScore, balancedBlend.overallTotal);
+        createHorizontalScaleBar("currentScaleBar", currentBlend.totalScore, currentBlend.checkboxScore, currentBlend.overallTotal);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        createHorizontalScaleBar("bestAftScaleBar", 4, 2, 6);
-        createHorizontalScaleBar("cheapestScaleBar", 3, 1, 4);
-        createHorizontalScaleBar("balancedScaleBar", 5, 2, 7);
-        createHorizontalScaleBar("currentScaleBar", 2, 1, 3);
+        document.getElementById("bestAftScaleBar").style.display = "none";
+        document.getElementById("cheapestScaleBar").style.display = "none";
+        document.getElementById("balancedScaleBar").style.display = "none";
+        document.getElementById("currentScaleBar").style.display = "none";
     });
 </script>
 
