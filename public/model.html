@@ -9,19 +9,22 @@
     <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             margin: 0;
             padding: 0;
             font-size: large;
             font-family: Arial, sans-serif;
-            width: fit-content;
-            margin: 0 auto;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         .navbar {
             display: flex;
             justify-content: space-between;
-            /* or space-evenly */
             width: 100%;
             background-color: #f7f8fa;
             align-items: center;
@@ -44,17 +47,13 @@
         .nav-buttons {
             display: flex;
             gap: 10px;
-            /* Use 'gap' for spacing between flex items */
             margin-right: 20px;
-
         }
 
         .navbar h1 {
             margin-left: 0px;
             font-size: 20px;
-            /* Adjust font size as needed */
             color: black;
-
         }
 
         .navbar button {
@@ -83,13 +82,10 @@
 
         .content {
             margin-top: 90px;
-            width: 100vw;
-            padding: 10px;
+            width: 100%;
+            padding: 20px;
             display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            margin-left: 50px;
-            margin-right: 50px;
+            flex-direction: column;
             height: auto;
         }
 
@@ -97,6 +93,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            width: 100%;
         }
 
         .blend {
@@ -105,13 +102,15 @@
             margin-bottom: 10px;
             gap: 10px;
             width: 100%;
+            flex-wrap: wrap;
         }
 
         .blend select,
         .blend-entry select,
         .blend input,
         .blend-entry input {
-            flex: 2;
+            flex: 1;
+            min-width: 120px;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -170,7 +169,6 @@
             background: #d4e6ff;
         }
 
-
         /* Light blue background for table headers */
         th[colspan="3"] {
             background-color: rgb(24, 0, 158);
@@ -193,7 +191,8 @@
             margin: 10% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 30%;
+            width: 80%;
+            max-width: 600px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
         }
@@ -217,6 +216,7 @@
             margin-top: 10px;
             white-space: nowrap;
             padding: 10px;
+            width: 100%;
         }
 
         .blendedcoalProperties p {
@@ -260,11 +260,10 @@
             padding: 8px 12px;
             cursor: pointer;
             border: none;
-            width: 20%;
-            margin-left: 40%;
+            width: 200px;
+            margin: 20px auto;
+            display: block;
             background-color: #02008a;
-            margin-bottom: 20px;
-            margin-top: 20px;
             color: white;
             border-radius: 5px;
         }
@@ -274,20 +273,20 @@
             cursor: pointer;
             border: none;
             background-color: #02008a;
-            width: 20%;
-            margin-left: 40%;
-            margin-top: 20px;
-
+            width: 200px;
+            margin: 20px auto;
+            display: block;
             color: white;
             border-radius: 5px;
         }
 
         #optimization-result {
             display: none;
+            width: 100%;
         }
 
         .individual-aft-table {
-            width: 50%;
+            width: 100%;
             border-collapse: collapse;
             font-family: Arial, sans-serif;
             font-size: 14px;
@@ -320,6 +319,44 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
+        
+        #totalRangeContainer {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+            
+            .navbar img {
+                height: 70px;
+                margin: 10px 0;
+            }
+            
+            .nav-buttons {
+                margin: 10px 0;
+            }
+            
+            .content {
+                margin-top: 150px;
+                padding: 10px;
+            }
+            
+            .blend {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .blend select, .blend input {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 
@@ -330,7 +367,6 @@
         <div class="nav-buttons">
             <button onclick="window.location.href='coal_table.html'">Coal Properties</button>
             <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
-
         </div>
     </div>
 
@@ -342,11 +378,10 @@
             </div>
             <button type="button" class="add-blend-btn" onclick="addBlend()">Add Coal</button>
             <div id="totalRangeContainer">
-                <label>Total Current Range:<span id="totalRange"></span>%</label>
+                <label>Total Current Range: <span id="totalRange">0</span>%</label>
             </div>
             <button type="button" class="calculate-btn" onclick="optimizeBlend()">Calculate</button>
         </form>
-
 
         <div id="coalPropertiesModal" class="modal">
             <div class="modal-content">
@@ -358,568 +393,369 @@
             </div>
         </div>
         <div id="optimization-result"></div>
+    </div>
 
+    <script>
+        function addBlend() {
+            const MAX_COALS = 5;
+            const currentCoals = document.querySelectorAll('.blend').length;
 
-        <script>
-            function addBlend() {
-                const MAX_COALS = 5;
-                const currentCoals = document.querySelectorAll('.blend').length;
-
-                if (currentCoals >= MAX_COALS) {
-                    alert("You can only add up to 5 coal types.");
-                    return;
-                }
-
-                const index = currentCoals;
-                const blendDiv = document.createElement("div");
-                blendDiv.className = "blend";
-                blendDiv.innerHTML = `
-            <label for="coal${index}">Coal:</label>
-            <select name="coal${index}" id="coal${index}">
-                <option value="">Select Coal Type</option>
-            </select>
-            <input type="number" id="currentrange${index}" placeholder="Current Range (%)">
-            <input type="number" id="minrange${index}" placeholder="Min Range (%)">
-            <input type="number" id="maxrange${index}" placeholder="Max Range (%)">
-            <input type="number" id="cost${index}" placeholder="Cost (Rs.)">
-            
-            <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
-            <button type="button" class="properties-btn" onclick="fetchCoalProperties(${index})">Properties</button>
-            <div id="properties${index}"></div>
-        `;
-
-                const currentRangeInput = blendDiv.querySelector(`#currentrange${index}`);
-                currentRangeInput.addEventListener("input", updateTotalRange);
-
-                const blendRow = document.querySelector(".blend-row");
-
-                // Append the new blendDiv to the blendRow
-                blendRow.appendChild(blendDiv); // This will add it to the end
-
-                populateDropdown(blendDiv.querySelector(`#coal${index}`));
-                updateTotalRange();
+            if (currentCoals >= MAX_COALS) {
+                alert("You can only add up to 5 coal types.");
+                return;
             }
 
-            function updateTotalRange() {
-                totalCurrentRange = 0;
-                const ranges = document.querySelectorAll('input[id^="currentrange"]');
-                ranges.forEach(range => {
-                    const rangeValue = parseFloat(range.value) || 0;
-                    totalCurrentRange += rangeValue;
-                });
-                document.getElementById("totalRange").textContent = totalCurrentRange;
+            const index = currentCoals;
+            const blendDiv = document.createElement("div");
+            blendDiv.className = "blend";
+            blendDiv.innerHTML = `
+                <label for="coal${index}">Coal:</label>
+                <select name="coal${index}" id="coal${index}">
+                    <option value="">Select Coal Type</option>
+                </select>
+                <input type="number" id="currentrange${index}" placeholder="Current Range (%)" min="0" max="100">
+                <input type="number" id="minrange${index}" placeholder="Min Range (%)" min="0" max="100">
+                <input type="number" id="maxrange${index}" placeholder="Max Range (%)" min="0" max="100">
+                <input type="number" id="cost${index}" placeholder="Cost (Rs.)" min="0">
+                
+                <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
+                <button type="button" class="properties-btn" onclick="fetchCoalProperties(${index})">Properties</button>
+                <div id="properties${index}"></div>
+            `;
 
-            }
+            const currentRangeInput = blendDiv.querySelector(`#currentrange${index}`);
+            currentRangeInput.addEventListener("input", updateTotalRange);
 
-            function removeBlend(button) {
-                button.parentElement.remove();
-            }
+            const blendRow = document.querySelector(".blend-row");
+            blendRow.appendChild(blendDiv);
 
-            document.addEventListener('DOMContentLoaded', () => {
+            populateDropdown(blendDiv.querySelector(`#coal${index}`));
+            updateTotalRange();
+        }
 
-                fetch(`/get_coal_types`)
-                    .then(response => response.json())
-                    .then(data => {
-                        window.coalData = data.coal_data;
-                        addBlend();
-                    })
-                    .catch(error => console.error('Error fetching coal types:', error));
+        function updateTotalRange() {
+            let totalCurrentRange = 0;
+            const ranges = document.querySelectorAll('input[id^="currentrange"]');
+            ranges.forEach(range => {
+                const rangeValue = parseFloat(range.value) || 0;
+                totalCurrentRange += rangeValue;
             });
+            document.getElementById("totalRange").textContent = totalCurrentRange;
+        }
 
+        function removeBlend(button) {
+            button.parentElement.remove();
+            updateTotalRange();
+        }
 
-            function populateDropdown(selectElement) {
-                selectElement.innerHTML = '<option value="">Select Coal Type</option>';
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(`/get_coal_types`)
+                .then(response => response.json())
+                .then(data => {
+                    window.coalData = data.coal_data;
+                    addBlend();
+                })
+                .catch(error => console.error('Error fetching coal types:', error));
+        });
+
+        function populateDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">Select Coal Type</option>';
+            if (window.coalData) {
                 window.coalData.forEach(coal => {
                     const opt = document.createElement('option');
-                    opt.value = coal.id;            // <-- hidden unique key
+                    opt.value = coal.id;
                     opt.textContent = coal.transportId
                         ? `${coal.coalType} – ${coal.transportId}`
                         : coal.coalType;
                     selectElement.appendChild(opt);
                 });
             }
+        }
 
+        function fetchCoalProperties(index) {
+            const selectedCoal = document.querySelector(`#coal${index}`).value;
 
-            function fetchCoalProperties(index) {
-                const selectedCoal = document.querySelector(`#coal${index}`).value;
+            if (!selectedCoal) {
+                alert("Please select a coal type first.");
+                return;
+            }
 
-                if (!selectedCoal) {
-                    alert("Please select a coal type first.");
-                    return;
-                }
+            const coalInfo = window.coalData.find(coal => coal.id === selectedCoal);
+            if (!coalInfo) {
+                alert("Properties not found.");
+                return;
+            }
 
-                const coalInfo = window.coalData.find(coal => coal.id === selectedCoal);
-                if (!coalInfo) {
-                    alert("Properties not found.");
-                    return;
-                }
-
-                // Generate table HTML
-                let propertiesHTML = `
-            <table border="1" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th style="padding: 8px; border: 1px solid lightgray;">Percentage Properties</th>
-                        <th style="padding: 8px; border: 1px solid lightgray;">Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-
-                for (const [key, value] of Object.entries(coalInfo.properties)) {
-                    propertiesHTML += `
-                <tr>
-                    <td style="padding: 8px; border: 1px solid lightgray;">${key}</td>
-                    <td style="padding: 8px; border: 1px solid lightgray;">${value}</td>
-                </tr>
+            let propertiesHTML = `
+                <table border="1" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 8px; border: 1px solid lightgray;">Percentage Properties</th>
+                            <th style="padding: 8px; border: 1px solid lightgray;">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
-                }
 
-                propertiesHTML += `</tbody></table>`;
-
-                document.getElementById("coalPropertiesContent").innerHTML = propertiesHTML;
-                document.getElementById("coalPropertiesModal").style.display = "block";
+            for (const [key, value] of Object.entries(coalInfo.properties)) {
+                propertiesHTML += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid lightgray;">${key}</td>
+                        <td style="padding: 8px; border: 1px solid lightgray;">${value}</td>
+                    </tr>
+                `;
             }
 
-            function closeModal() {
-                document.getElementById("coalPropertiesModal").style.display = "none";
+            propertiesHTML += `</tbody></table>`;
+
+            document.getElementById("coalPropertiesContent").innerHTML = propertiesHTML;
+            document.getElementById("coalPropertiesModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("coalPropertiesModal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("coalPropertiesModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        function optimizeBlend() {
+            const blends = [];
+
+            let totalCurrentRange = 0;
+            const ranges = document.querySelectorAll('input[id^="currentrange"]');
+
+            ranges.forEach(range => {
+                const rangeValue = parseFloat(range.value) || 0;
+                totalCurrentRange += rangeValue;
+            });
+
+            if (totalCurrentRange !== 100) {
+                alert("Total percentage must be exactly 100 to proceed!");
+                return;
             }
 
-            window.onclick = function (event) {
-                const modal = document.getElementById("coalPropertiesModal");
-                if (event.target === modal) {
-                    modal.style.display = "none";
+            document.querySelectorAll(".blend").forEach((blendDiv, index) => {
+                const selectedId = document.querySelector(`#coal${index}`).value;
+                const min = parseFloat(document.querySelector(`#minrange${index}`).value) || 0;
+                const max = parseFloat(document.querySelector(`#maxrange${index}`).value) || 0;
+                const cost = parseFloat(document.querySelector(`#cost${index}`).value) || 0;
+                const current = parseFloat(document.querySelector(`#currentrange${index}`).value) || 0;
+
+                const coalInfo = window.coalData.find(coal => coal.id === selectedId);
+                if (!coalInfo) return;
+
+                blends.push({
+                    id: selectedId,
+                    coal: coalInfo.coalType,
+                    current,
+                    min,
+                    max,
+                    cost,
+                    properties: {
+                        SiO2: coalInfo.properties["SiO₂"] || 0,
+                        Al2O3: coalInfo.properties["Al₂O₃"] || 0,
+                        Fe2O3: coalInfo.properties["Fe₂O₃"] || 0,
+                        CaO: coalInfo.properties["CaO"] || 0,
+                        MgO: coalInfo.properties["MgO"] || 0,
+                        Na2O: coalInfo.properties["Na₂O"] || 0,
+                        K2O: coalInfo.properties["K₂O"] || 0,
+                        SO3: coalInfo.properties["SO₃"] || 0,
+                        TiO2: coalInfo.properties["TiO₂"] || 0,
+                        Gcv: coalInfo.properties["GCV"] || 0
+                    }
+                });
+            });
+
+            console.log("Blends data:", blends);
+
+            document.getElementById("coalForm").style.display = "none";
+            document.getElementById("optimization-result").style.display = "block";
+
+            fetch(`/optimize`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ blends })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log("Optimization Result:", data);
+                displayOptimizationResult(data, blends);
+            })
+            .catch(err => console.error("Error optimizing blend:", err));
+        }
+
+        function displayOptimizationResult(data, blends) {
+            const bestAftBlend = data.best_aft_blend;
+            const cheapestBlend = data.cheapest_blend;
+            const balancedBlend = data.balanced_blend;
+            const currentBlend = data.current_blend;
+
+            const tableHtml = `
+                <table>
+                    <tr>
+                        <th>Coal type</th>
+                        <th>Current Blend</th>
+                        <th>Best Blend</th>
+                        <th>Best Price Blend</th>
+                        <th>Balanced Blend</th>
+                    </tr>
+                    ${blends.map((blend, i) => {
+                        const bestAftPct = bestAftBlend.blend[i] || 0;
+                        const cheapestPct = cheapestBlend.blend[i] || 0;
+                        const balancedPct = balancedBlend.blend[i] || 0;
+                        const currentPct = currentBlend.blend[i] || 0;
+
+                        return `
+                            <tr>
+                                <td>${blend.coal}</td>
+                                <td>${currentPct}%</td>
+                                <td>${bestAftPct}%</td>
+                                <td>${cheapestPct}%</td>
+                                <td>${balancedPct}%</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                    <tr>
+                        <td>AFT (°C)</td>
+                        <td>${currentBlend.predicted_aft.toFixed(2)}</td>
+                        <td>${bestAftBlend.predicted_aft.toFixed(2)}</td>
+                        <td>${cheapestBlend.predicted_aft.toFixed(2)}</td>
+                        <td>${balancedBlend.predicted_aft.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td>GCV</td>
+                        <td>${currentBlend.gcv.toFixed(2)}</td>
+                        <td>${bestAftBlend.gcv.toFixed(2)}</td>
+                        <td>${cheapestBlend.gcv.toFixed(2)}</td>
+                        <td>${balancedBlend.gcv.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td>Cost (Rs.)</td>
+                        <td>${currentBlend.cost.toFixed(2)}</td>
+                        <td>${bestAftBlend.cost.toFixed(2)}</td>
+                        <td>${cheapestBlend.cost.toFixed(2)}</td>
+                        <td>${balancedBlend.cost.toFixed(2)}</td>
+                    </tr>
+                </table>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button onclick="window.location.reload()">Back</button>
+                </div>
+            `;
+
+            const individualTable = `
+                <h3>Individual Coal AFTs</h3>
+                <table class="individual-aft-table">
+                    <tr>
+                        <th>Coal Type</th>
+                        <th>Predicted AFT (°C)</th>
+                    </tr>
+                    ${data.individual_coal_afts.map(coal => `
+                        <tr>
+                            <td>${coal.coal}</td>
+                            <td>${coal.predicted_aft.toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+
+            document.getElementById("optimization-result").innerHTML = `
+                <div style="width: 100%; margin-bottom: 30px;">
+                    ${tableHtml}
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
+                    <div style="flex: 1; min-width: 300px; padding: 20px;">
+                        <div id="ternary-plot" style="width: 100%; height: 400px;"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 300px;">
+                        ${individualTable}
+                    </div>
+                </div>
+            `;
+
+            const blendsWithAFT = [
+                { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
+                { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
+                { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
+            ];
+
+            updatePlot(blendsWithAFT);
+        }
+
+        function updatePlot(blendsWithAFT) {
+            const ternaryPlotElement = document.getElementById('ternary-plot');
+            if (!ternaryPlotElement) {
+                console.error("Ternary plot element #ternary-plot not found.");
+                return;
+            }
+
+            const a = [];  // Acidic
+            const b = [];  // Basic
+            const c = [];  // Other
+            const colors = [];  // AFTs
+            const labels = [];  // For hover
+
+            blendsWithAFT.forEach(blend => {
+                let acidic = 0, basic = 0, other = 0;
+                let totalPercentage = 0;
+
+                blend.blend.forEach((pct, i) => {
+                    const coal = blend.coals[i];
+                    const props = coal.properties;
+                    const weight = pct;
+
+                    totalPercentage += weight;
+
+                    if (props) {
+                        acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
+                        basic += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
+                        other += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0));
+                    }
+                });
+
+                // Normalize to percentages
+                a.push(acidic / totalPercentage);
+                b.push(basic / totalPercentage);
+                c.push(other / totalPercentage);
+                colors.push(blend.predicted_aft);
+                labels.push(`${blend.label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`);
+            });
+
+            const data = [{
+                type: 'scatterternary',
+                mode: 'markers',
+                a,
+                b,
+                c,
+                marker: {
+                    size: 14,
+                    color: colors,
+                    colorscale: 'Jet',
+                    colorbar: { title: "Fusion Temp (°C)" }
+                },
+                text: labels,
+                hoverinfo: 'text'
+            }];
+
+            const layout = {
+                margin: { l: 40, r: 40, t: 60, b: 50 },
+                ternary: {
+                    sum: 100,
+                    aaxis: { title: { text: "Thermal Stability", font: { size: 14 } }, showticklabels: true },
+                    baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } }, showticklabels: true },
+                    caxis: { title: { text: "Hardening Index", font: { size: 14 } }, showticklabels: true }
                 }
             };
 
-            function optimizeBlend() {
-                const blends = [];
-
-                let totalCurrentRange = 0;
-                const ranges = document.querySelectorAll('input[id^="currentrange"]');
-
-                ranges.forEach(range => {
-                    const rangeValue = parseFloat(range.value) || 0;
-                    totalCurrentRange += rangeValue;
-                });
-
-                if (totalCurrentRange !== 100) {
-                    alert("Total percentage must be exactly 100 to proceed!");
-                    return;
-                }
-
-                document.querySelectorAll(".blend").forEach((blendDiv, index) => {
-                    const selectedId = document.querySelector(`#coal${index}`).value;
-                    const min = parseFloat(document.querySelector(`#minrange${index}`).value) || 0;
-                    const max = parseFloat(document.querySelector(`#maxrange${index}`).value) || 0;
-                    const cost = parseFloat(document.querySelector(`#cost${index}`).value) || 0;
-                    const current = parseFloat(document.querySelector(`#currentrange${index}`).value) || 0;
-
-                    const coalInfo = window.coalData.find(coal => coal.id === selectedId);
-                    if (!coalInfo) return;
-
-                    blends.push({
-                        id: selectedId,
-                        coal: coalInfo.coalType,
-                        current,
-                        min,
-                        max,
-                        cost,
-                        properties: {
-                            SiO2: coalInfo.properties["SiO₂"] || 0,
-                            Al2O3: coalInfo.properties["Al₂O₃"] || 0,
-                            Fe2O3: coalInfo.properties["Fe₂O₃"] || 0,
-                            CaO: coalInfo.properties["CaO"] || 0,
-                            MgO: coalInfo.properties["MgO"] || 0,
-                            Na2O: coalInfo.properties["Na₂O"] || 0,
-                            K2O: coalInfo.properties["K₂O"] || 0,
-                            SO3: coalInfo.properties["SO₃"] || 0,
-                            TiO2: coalInfo.properties["TiO₂"] || 0,
-                            Gcv: coalInfo.properties["GCV"] || 0
-                        }
-                    });
-                });
-
-                console.log("Blends data:", blends);
-
-                document.getElementById("coalForm").style.display = "none";
-                document.getElementById("optimization-result").style.display = "block";
-
-                fetch(`/optimize`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ blends })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log("Optimization Result:", data);
-                        displayOptimizationResult(data, blends);
-                        displayScaleBars(data); // Call to display scale bars dynamically
-                    })
-                    .catch(err => console.error("Error optimizing blend:", err));
-            }
-            function displayOptimizationResult(data, blends) {
-                const bestAftBlend = data.best_aft_blend;
-                const cheapestBlend = data.cheapest_blend;
-                const balancedBlend = data.balanced_blend;
-                const currentBlend = data.current_blend;
-
-
-                const coalTypes = blends.map(b => b.coal);
-
-                const blendsWithAFT = [
-                    { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
-                    { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
-                    { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
-                ];
-
-                const tableHtml = `
-            <table>
-                <tr>
-                    <th>Coal type</th>
-                    <th>Current Blend</th>
-                    <th>Best Blend</th>
-                    <th>Best Price Blend</th>
-                    <th>Balanced Blend</th>
-                </tr>
-                ${blends.map((blend, i) => {
-                    const bestAftPct = bestAftBlend.blend[i];
-                    const cheapestPct = cheapestBlend.blend[i];
-                    const balancedPct = balancedBlend.blend[i];
-                    const currentPct = currentBlend.blend[i];
-
-                    return `
-                        <tr>
-                            <td>${blend.coal}</td>
-                            <td>${currentPct}</td>
-                            <td>${bestAftPct}%</td>
-                            <td>${cheapestPct}%</td>
-                            <td>${balancedPct}%</td>
-                        </tr>
-                    `;
-                }).join('')}
-                <tr>
-                    <td>AFT (°C)</td>
-                    <td>${currentBlend.predicted_aft.toFixed(2)}</td>
-                    <td>${bestAftBlend.predicted_aft.toFixed(2)}</td>
-                    <td>${cheapestBlend.predicted_aft.toFixed(2)}</td>
-                    <td>${balancedBlend.predicted_aft.toFixed(2)}</td>
-                </tr>
-                <tr>
-                    <td>GCV</td>
-                    <td>${currentBlend.gcv.toFixed(2)}</td>
-                    <td>${bestAftBlend.gcv.toFixed(2)}</td>
-                    <td>${cheapestBlend.gcv.toFixed(2)}</td>
-                    <td>${balancedBlend.gcv.toFixed(2)}</td>
-                </tr>
-                <tr>
-                    <td>Cost (Rs.)</td>
-                    <td>${currentBlend.cost.toFixed(2)}</td>
-                    <td>${bestAftBlend.cost.toFixed(2)}</td>
-                    <td>${cheapestBlend.cost.toFixed(2)}</td>
-                    <td>${balancedBlend.cost.toFixed(2)}</td>
-                </tr>
-            </table>
-            <div style="margin-top: 20px;">
-                <button onclick="window.location.reload()">Back</button>
-            </div>
-        `;
-
-
-                // Display individual coal AFTs
-                const individualTable = `
-            <h3>Individual Coal AFTs</h3>
-            <table>
-                <tr>
-                    <th>Coal Type</th>
-                    <th>Predicted AFT (°C)</th>
-                </tr>
-                ${data.individual_coal_afts.map(coal => `
-                    <tr>
-                        <td>${coal.coal}</td>
-                        <td>${coal.predicted_aft.toFixed(2)}</td>
-                    </tr>
-                `).join('')}
-            </table>
-        `;
-
-                document.getElementById("optimization-result").innerHTML = `
-        <div style="width: 100%; margin-bottom: 30px;">
-            ${tableHtml}
-         
-        </div>
-     
-        <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
-            <div style="flex: 1; min-width: 400px; padding: 20px;">
-                <div id="ternary-plot" style="width: 100%; height: 500px;"></div>
-            </div>
-            <div style="flex: 1;">
-                ${individualTable}
-            </div>
-        </div>
-    `;
-
-                updatePlot(blendsWithAFT);
-
-            }
-
-            function updatePlot(blendsWithAFT) {
-                const ternaryPlotElement = document.getElementById('ternary-plot');
-                if (!ternaryPlotElement) {
-                    console.error("Ternary plot element #ternary-plot not found.");
-                    return;
-                }
-
-                const a = [];  // Acidic
-                const b = [];  // Basic
-                const c = [];  // Other
-                const colors = [];  // AFTs
-                const labels = [];  // For hover
-
-                blendsWithAFT.forEach(blend => {
-                    let acidic = 0, basic = 0, other = 0;
-                    let totalPercentage = 0;
-
-                    blend.blend.forEach((pct, i) => {
-                        const coal = blend.coals[i];
-                        const props = coal.properties;
-                        const weight = pct;
-
-                        totalPercentage += weight;
-
-                        if (props) {
-                            acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
-                            basic += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
-                            other += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0) + (props.P2O5 || 0) + (props.Mn3O4 || 0));
-                        }
-                    });
-
-                    // Normalize to percentages
-                    a.push(acidic / totalPercentage);
-                    b.push(basic / totalPercentage);
-                    c.push(other / totalPercentage);
-                    colors.push(blend.predicted_aft);
-                    labels.push(`${blend.label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`);
-                });
-
-                const data = [{
-                    type: 'scatterternary',
-                    mode: 'markers',
-                    a,
-                    b,
-                    c,
-                    marker: {
-                        size: 14,
-                        color: colors,
-                        colorscale: 'Jet',
-                        colorbar: { title: "Fusion Temp (°C)" }
-                    },
-                    text: labels,
-                    hoverinfo: 'text'
-                }];
-
-                const layout = {
-                    margin: { l: 40, r: 40, t: 60, b: 50 },
-                    ternary: {
-                        sum: 100,
-                        aaxis: { title: { text: "Thermal Stability", font: { size: 14 } }, showticklabels: true },
-                        baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } }, showticklabels: true },
-                        caxis: { title: { text: "Hardening Index", font: { size: 14 } }, showticklabels: true }
-                    }
-                };
-
-                Plotly.newPlot(ternaryPlotElement, data, layout);
-            }
-
-            function createHorizontalScaleBar(containerId, totalScore, checkboxScore, overallTotal) {
-                const minValue = 0;
-                const maxValue = 10;
-
-                const container = document.getElementById(containerId);
-                container.innerHTML = ""; // Clear previous content
-
-                const barWrapper = document.createElement("div");
-                barWrapper.style.width = "100%";
-                barWrapper.style.height = "32px";
-                barWrapper.style.border = "1px solid black";
-                barWrapper.style.borderRadius = "12px";
-                barWrapper.style.position = "relative";
-                barWrapper.style.display = "flex";
-
-                let sfWidth = (totalScore / maxValue) * 100;
-                sfWidth = sfWidth > 100 ? 100 : sfWidth;
-
-                let cbWidth = ((totalScore + checkboxScore) > maxValue)
-                    ? Math.max(0, (maxValue - totalScore) / maxValue * 100)
-                    : (checkboxScore / maxValue) * 100;
-
-                const totalCombined = totalScore + checkboxScore;
-
-                const sfBar = document.createElement("div");
-                sfBar.style.height = "100%";
-                sfBar.style.width = `${sfWidth}%`;
-                sfBar.style.borderRadius = totalCombined >= maxValue ? "12px" : "12px 0 0 12px";
-                sfBar.style.backgroundColor = getColor(totalScore);
-
-                const cbBar = document.createElement("div");
-                cbBar.style.height = "100%";
-                cbBar.style.width = `${cbWidth}%`;
-                cbBar.style.borderRadius = totalCombined >= maxValue ? "0 12px 12px 0" : "0";
-                cbBar.style.backgroundColor = getCheckboxBaseColor(totalScore);
-                cbBar.style.backgroundImage = getHatchingLines(getHatchColor(totalCombined));
-
-                barWrapper.appendChild(sfBar);
-                barWrapper.appendChild(cbBar);
-
-                for (let i = minValue; i <= maxValue; i++) {
-                    const tick = document.createElement("div");
-                    tick.style.position = "absolute";
-                    tick.style.left = `${(i / maxValue) * 100}%`;
-                    tick.style.top = "50%";
-                    tick.style.transform = "translateY(-50%)";
-                    tick.style.height = "10px";
-                    tick.style.width = "1px";
-                    tick.style.backgroundColor = "black";
-
-                    const label = document.createElement("span");
-                    label.style.position = "absolute";
-                    label.style.marginTop = "5px";
-                    label.style.left = `${(i / maxValue) * 100}%`;
-                    label.style.top = "100%";
-                    label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "12px";
-                    label.textContent = i;
-
-                    barWrapper.appendChild(tick);
-                    barWrapper.appendChild(label);
-                }
-
-                container.appendChild(barWrapper);
-            }
-
-            function getColor(score) {
-                if (score < 3) return "#a6e3a6";
-                if (score < 6.5) return "yellow";
-                return "red";
-            }
-
-            function getCheckboxBaseColor(score) {
-                if (score < 3) return "#5de65d";
-                if (score < 6.5) return "#fddf05";
-                return "#e24242";
-            }
-
-            function getHatchColor(totalCombined) {
-                if (totalCombined > 6.5) return "red";
-                if (totalCombined > 3) return "yellow";
-                return "green";
-            }
-
-            function getHatchingLines(hatchColor) {
-                return `repeating-linear-gradient(45deg, transparent, transparent 5px, ${hatchColor} 5px, ${hatchColor} 10px)`;
-            }
-
-            function displayScaleBars(data) {
-                const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
-
-                const tableElement = document.querySelector("#optimization-result table");
-                if (!tableElement) {
-                    console.error("Table element not found. Cannot render scale bars.");
-                    return;
-                }
-
-                const scaleBarsContainer = document.createElement("div");
-                scaleBarsContainer.id = "scaleBarsContainer";
-                scaleBarsContainer.style.marginTop = "20px";
-                scaleBarsContainer.style.width = "100%";
-
-                tableElement.parentNode.insertBefore(scaleBarsContainer, tableElement.nextSibling);
-
-                scaleBarsContainer.innerHTML = ""; // Clear previous content
-
-                const blends = [
-                    { id: "bestAftScaleBar", label: "Best Blend", blend: best_aft_blend },
-                    { id: "cheapestScaleBar", label: "Best Price Blend", blend: cheapest_blend },
-                    { id: "balancedScaleBar", label: "Balanced Blend", blend: balanced_blend },
-                    { id: "currentScaleBar", label: "Current Blend", blend: current_blend }
-                ];
-
-                blends.forEach(({ id, label, blend }) => {
-                    const container = document.createElement("div");
-                    container.style.marginBottom = "10px";
-                    container.style.display = "flex";
-                    container.style.alignItems = "center";
-
-                    const title = document.createElement("div");
-                    title.textContent = label;
-                    title.style.width = "150px";
-                    title.style.fontWeight = "bold";
-                    title.style.marginRight = "10px";
-
-                    const barWrapper = document.createElement("div");
-                    barWrapper.id = id;
-                    barWrapper.style.width = "100%";
-                    barWrapper.style.height = "32px";
-                    barWrapper.style.border = "1px solid black";
-                    barWrapper.style.borderRadius = "12px";
-                    barWrapper.style.position = "relative";
-                    barWrapper.style.display = "flex";
-
-                    const valueDisplay = document.createElement("div");
-                    valueDisplay.style.position = "absolute";
-                    valueDisplay.style.top = "50%";
-                    valueDisplay.style.left = "50%";
-                    valueDisplay.style.transform = "translate(-50%, -50%)";
-                    valueDisplay.style.fontWeight = "bold";
-                    valueDisplay.style.fontSize = "14px";
-                    valueDisplay.textContent = `${blend.totalScore || 0}`;
-
-                    barWrapper.appendChild(valueDisplay);
-                    container.appendChild(title);
-                    container.appendChild(barWrapper);
-                    scaleBarsContainer.appendChild(container);
-
-                    createHorizontalScaleBar(id, blend.totalScore || 0, blend.checkboxScore || 0, blend.overallTotal || 0);
-                });
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                const tableElement = document.querySelector("#optimization-result table");
-                const scaleBarsContainer = document.createElement("div");
-                scaleBarsContainer.id = "scaleBarsContainer";
-                scaleBarsContainer.style.marginTop = "20px";
-                scaleBarsContainer.style.width = "100%";
-
-                if (tableElement) {
-                    tableElement.parentNode.insertBefore(scaleBarsContainer, tableElement.nextSibling);
-                } else {
-                    console.error("Table element not found. Cannot render scale bars.");
-                    return;
-                }
-
-                document.body.style.overflowX = "hidden"; // Prevent horizontal scrolling
-                document.body.style.width = "100vw"; // Ensure content stretches horizontally
-
-                const contentElement = document.querySelector(".content");
-                if (contentElement) {
-                    contentElement.style.width = "100vw"; // Utilize the full screen width
-                    contentElement.style.margin = "0 auto"; // Center content horizontally
-                    contentElement.style.padding = "0"; // Remove padding
-                }
-
-                const optimizationResult = document.getElementById("optimization-result");
-                if (optimizationResult) {
-                    optimizationResult.style.width = "100vw"; // Ensure optimization result stretches horizontally
-                }
-            });
-        </script>
-
-</div>
-
-
+            Plotly.newPlot(ternaryPlotElement, data, layout);
+        }
+    </script>
 </body>
 
 </html>
