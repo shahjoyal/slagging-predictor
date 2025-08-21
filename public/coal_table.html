@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coal Data Table</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: large;
+            font-family: Arial, sans-serif;
+        }
+
+         /* Navbar Styling */
+         .navbar {
+            display: flex;
+            justify-content: space-between; /* or space-evenly */
+            width: 100%;
+            background-color: #f7f8fa;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 65px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar img {
+            height: 95px;
+            margin-right: 10px;
+            margin-left: 0px;
+        }
+        .nav-buttons {
+        display: flex;
+            gap: 10px; /* Use 'gap' for spacing between flex items */
+            margin-right: 20px;
+            
+        }
+        .navbar button {
+            padding: 10px 15px;
+            background-color: #02008a;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        
+        .navbar button:hover {
+            background-color: #001cbb;
+        }
+
+        .navbar h1 {
+            margin-left: 0px;
+            font-size: 20px; /* Adjust font size as needed */
+            color: black;
+            
+        }
+
+        
+        .container {
+            margin: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-right: 15px;
+            margin: 10px;
+            
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            min-width: 100px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+            min-height: 20px;
+
+        }
+
+        th:first-child, td:first-child {
+            position: sticky;
+            left: 0;
+            border: 1px solid black;   
+            background-color: white; /* Ensure it doesn't become transparent */
+            z-index: 2;
+        }
+        .btn {
+            margin-left: 20%;
+            margin-top: 25px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-upload {
+            background-color: blue;
+        }
+
+        #delete-selected-btn {
+            background-color: #02008a;
+            color: white;
+            border: none;
+            margin-left: 50px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+          }
+          
+          #delete-selected-btn:hover {
+            background-color: #0300b5;
+          }
+
+        
+
+        
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <img src="/images/abhitech-logo.png" alt="Company Logo">
+    <h1>Combustion Analyzer</h1> 
+     <div class="nav-buttons">
+            <button onclick="window.location.href='model.html'">Model</button>
+            <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
+           
+    </div>
+</div>
+
+<h1>Slagging Data Table</h1>
+
+<div class="container">
+    <button class="btn" onclick="downloadExcel()">Download Template</button>
+    <input type="file" id="fileInput" accept=".xlsx, .xls" class="btn btn-upload">
+    <button id="delete-selected-btn" style="background-color: #02008a; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px;">Delete Selected</button>
+</div>
+
+<div class="table-container">
+    <table id="data-table">
+        <thead>
+            <tr id="table-header"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+</div>
+
+<script>
+    function downloadExcel() {
+        window.location.href = "/download-template";
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchData);
+
+    function fetchData() {
+        fetch("/fetch-data")
+            .then(response => response.json())
+            
+            .then(data => displayTable(data))
+            .catch(error => console.error("Error fetching data:", error));
+    }
+    
+    document.getElementById("fileInput").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+    
+        const formData = new FormData();
+        formData.append("file", file);
+    
+        fetch("/upload-excel", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("File uploaded successfully!");
+            window.location.reload();
+            displayTable(data);
+        })
+        .catch(error => console.error("Error uploading file:", error));
+    });
+    
+    function displayTable(data) {
+        const tableHeader = document.getElementById("table-header");
+        const tableBody = document.getElementById("table-body");
+        tableHeader.innerHTML = "";
+        tableBody.innerHTML = "";
+
+        if (data.length === 0) return;
+
+        const headers = Object.keys(data[0]).filter(header => header !== '_id');
+        headers.push("Select"); // Add Select header
+
+        // Create table headers
+        headers.forEach((header) => {
+            let th = document.createElement("th");
+            th.textContent = header;
+            if (header === headers[0]) th.style.position = "sticky"; // Fix first column
+            tableHeader.appendChild(th);
+        });
+
+        // Create table rows
+        data.forEach(row => {
+            let tr = document.createElement("tr");
+
+            headers.slice(0, -1).forEach((header) => {
+                let td = document.createElement("td");
+                td.textContent = row[header];
+                if (header === headers[0]) td.style.position = "sticky"; // Fix first column
+                tr.appendChild(td);
+            });
+
+            // Add Checkbox
+            let checkboxTd = document.createElement("td");
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.setAttribute("data-id", row._id); // Store _id
+            checkboxTd.appendChild(checkbox);
+            tr.appendChild(checkboxTd);
+
+            tableBody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("delete-selected-btn").addEventListener("click", function() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            alert("Please select at least one row to delete.");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete the selected data?")) return;
+
+        const ids = Array.from(checkboxes).map(checkbox => checkbox.getAttribute("data-id"));
+
+        fetch("/delete-data", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ids: ids })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchData(); // Refresh Table
+        })
+        .catch(error => console.error("Error deleting data:", error));
+    });
+
+    // Delete Data Function (for single delete, if needed)
+    function deleteData(id) {
+        if (!id) {
+            console.error("Invalid ID for deletion.");
+            return;
+        }
+        
+        if (!confirm("Are you sure you want to delete this data?")) return;
+
+        fetch(`/delete-data/${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchData(); // Refresh Table
+            })
+            .catch(error => console.error("Error deleting data:", error));
+    } 
+</script>
+</body>
+</html>
