@@ -905,7 +905,9 @@
 
                 const contentElement = document.querySelector(".content");
                 if (contentElement) {
-                    contentElement.style.width = "100%"; // Remove any width limits
+                    contentElement.style.width = "100vw"; // Utilize the full screen width
+                    contentElement.style.margin = "0"; // Remove margins
+                    contentElement.style.padding = "0"; // Remove padding
                 }
             });
         </script>
