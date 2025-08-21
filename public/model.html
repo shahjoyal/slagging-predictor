@@ -841,6 +841,74 @@
         function getHatchingLines(hatchColor) {
             return `repeating-linear-gradient(45deg, transparent, transparent 5px, ${hatchColor} 5px, ${hatchColor} 10px)`;
         }
+
+        function updatePlot(blendsWithAFT) {
+            const ternaryPlotElement = document.getElementById('ternary-plot');
+            if (!ternaryPlotElement) {
+                console.error("Ternary plot element #ternary-plot not found.");
+                return;
+            }
+
+            const a = [];  // Acidic
+            const b = [];  // Basic
+            const c = [];  // Other
+            const colors = [];  // AFTs
+            const labels = [];  // For hover
+
+            blendsWithAFT.forEach(blend => {
+                let acidic = 0, basic = 0, other = 0;
+                let totalPercentage = 0;
+
+                blend.blend.forEach((pct, i) => {
+                    const coal = blend.coals[i];
+                    const props = coal.properties;
+                    const weight = pct;
+
+                    totalPercentage += weight;
+
+                    if (props) {
+                        acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
+                        basic += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
+                        other += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0));
+                    }
+                });
+
+                // Normalize to percentages
+                a.push(acidic / totalPercentage);
+                b.push(basic / totalPercentage);
+                c.push(other / totalPercentage);
+                colors.push(blend.predicted_aft);
+                labels.push(`${blend.label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`);
+            });
+
+            const data = [{
+                type: 'scatterternary',
+                mode: 'markers',
+                a,
+                b,
+                c,
+                marker: {
+                    size: 14,
+                    color: colors,
+                    colorscale: 'Jet',
+                    colorbar: { title: "Fusion Temp (°C)" }
+                },
+                text: labels,
+                hoverinfo: 'text'
+            }];
+
+            const layout = {
+                margin: { l: 40, r: 40, t: 60, b: 50 },
+                ternary: {
+                    sum: 100,
+                    aaxis: { title: { text: "Thermal Stability", font: { size: 14 } }, showticklabels: true },
+                    baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } }, showticklabels: true },
+                    caxis: { title: { text: "Hardening Index", font: { size: 14 } }, showticklabels: true }
+                }
+            };
+
+            Plotly.newPlot(ternaryPlotElement, data, layout);
+        }
     </script>
 </body>
 
