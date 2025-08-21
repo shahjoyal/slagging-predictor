@@ -878,12 +878,17 @@
             }
 
             document.addEventListener('DOMContentLoaded', () => {
-                const optimizationResult = document.getElementById("optimization-result");
+                const tableElement = document.querySelector("#optimization-result table");
                 const scaleBarsContainer = document.createElement("div");
                 scaleBarsContainer.id = "scaleBarsContainer";
                 scaleBarsContainer.style.marginTop = "20px";
                 scaleBarsContainer.style.width = "100%";
-                optimizationResult.insertAdjacentElement("beforebegin", scaleBarsContainer);
+
+                if (tableElement) {
+                    tableElement.parentNode.insertBefore(scaleBarsContainer, tableElement.nextSibling);
+                } else {
+                    console.error("Table element not found. Scale bars cannot be positioned correctly.");
+                }
 
                 document.body.style.overflow = "auto"; // Ensure the page fits on the screen
             });
