@@ -823,15 +823,21 @@
             function displayScaleBars(data) {
                 const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
-                if (!best_aft_blend || !cheapest_blend || !balanced_blend || !current_blend) {
-                    console.error("Missing blend data in the response:", data);
-                    return;
-                }
-
-                const scaleBarsContainer = document.getElementById("scaleBarsContainer");
+                let scaleBarsContainer = document.getElementById("scaleBarsContainer");
                 if (!scaleBarsContainer) {
-                    console.error("Scale bars container not found. Cannot display scale bars.");
-                    return;
+                    console.warn("Scale bars container not found. Creating a new container dynamically.");
+                    scaleBarsContainer = document.createElement("div");
+                    scaleBarsContainer.id = "scaleBarsContainer";
+                    scaleBarsContainer.style.marginTop = "20px";
+                    scaleBarsContainer.style.width = "100%";
+
+                    const optimizationResult = document.getElementById("optimization-result");
+                    if (optimizationResult) {
+                        optimizationResult.appendChild(scaleBarsContainer);
+                    } else {
+                        console.error("Optimization result container not found. Cannot append scale bars.");
+                        return;
+                    }
                 }
 
                 scaleBarsContainer.innerHTML = ""; // Clear previous content
