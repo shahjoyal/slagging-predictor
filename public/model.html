@@ -818,15 +818,40 @@
             return;
         }
 
-        document.getElementById("bestAftScaleBar").style.display = "block";
-        document.getElementById("cheapestScaleBar").style.display = "block";
-        document.getElementById("balancedScaleBar").style.display = "block";
-        document.getElementById("currentScaleBar").style.display = "block";
+        const scaleBarsContainer = document.getElementById("scaleBarsContainer");
+        scaleBarsContainer.innerHTML = ""; // Clear previous content
 
-        createHorizontalScaleBar("bestAftScaleBar", best_aft_blend.totalScore || 0, best_aft_blend.checkboxScore || 0, best_aft_blend.overallTotal || 0);
-        createHorizontalScaleBar("cheapestScaleBar", cheapest_blend.totalScore || 0, cheapest_blend.checkboxScore || 0, cheapest_blend.overallTotal || 0);
-        createHorizontalScaleBar("balancedScaleBar", balanced_blend.totalScore || 0, balanced_blend.checkboxScore || 0, balanced_blend.overallTotal || 0);
-        createHorizontalScaleBar("currentScaleBar", current_blend.totalScore || 0, current_blend.checkboxScore || 0, current_blend.overallTotal || 0);
+        const blends = [
+            { id: "bestAftScaleBar", label: "Best AFT Blend", blend: best_aft_blend },
+            { id: "cheapestScaleBar", label: "Cheapest Blend", blend: cheapest_blend },
+            { id: "balancedScaleBar", label: "Balanced Blend", blend: balanced_blend },
+            { id: "currentScaleBar", label: "Current Blend", blend: current_blend }
+        ];
+
+        blends.forEach(({ id, label, blend }) => {
+            const container = document.createElement("div");
+            container.style.marginBottom = "20px";
+
+            const title = document.createElement("div");
+            title.textContent = label;
+            title.style.fontWeight = "bold";
+            title.style.marginBottom = "5px";
+
+            const bar = document.createElement("div");
+            bar.id = id;
+            bar.style.width = "100%";
+            bar.style.height = "32px";
+            bar.style.border = "1px solid black";
+            bar.style.borderRadius = "12px";
+            bar.style.position = "relative";
+            bar.style.display = "flex";
+
+            container.appendChild(title);
+            container.appendChild(bar);
+            scaleBarsContainer.appendChild(container);
+
+            createHorizontalScaleBar(id, blend.totalScore || 0, blend.checkboxScore || 0, blend.overallTotal || 0);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -834,6 +859,13 @@
         document.getElementById("cheapestScaleBar").style.display = "none";
         document.getElementById("balancedScaleBar").style.display = "none";
         document.getElementById("currentScaleBar").style.display = "none";
+
+        const optimizationResult = document.getElementById("optimization-result");
+        const scaleBarsContainer = document.createElement("div");
+        scaleBarsContainer.id = "scaleBarsContainer";
+        scaleBarsContainer.style.marginTop = "20px";
+        scaleBarsContainer.style.width = "100%";
+        optimizationResult.insertAdjacentElement("beforebegin", scaleBarsContainer);
     });
 </script>
 
