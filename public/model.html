@@ -823,22 +823,18 @@
             function displayScaleBars(data) {
                 const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
-                let scaleBarsContainer = document.getElementById("scaleBarsContainer");
-                if (!scaleBarsContainer) {
-                    console.warn("Scale bars container not found. Creating a new container dynamically.");
-                    scaleBarsContainer = document.createElement("div");
-                    scaleBarsContainer.id = "scaleBarsContainer";
-                    scaleBarsContainer.style.marginTop = "20px";
-                    scaleBarsContainer.style.width = "100%";
-
-                    const optimizationResult = document.getElementById("optimization-result");
-                    if (optimizationResult) {
-                        optimizationResult.appendChild(scaleBarsContainer);
-                    } else {
-                        console.error("Optimization result container not found. Cannot append scale bars.");
-                        return;
-                    }
+                const tableElement = document.querySelector("#optimization-result table");
+                if (!tableElement) {
+                    console.error("Table element not found. Cannot render scale bars.");
+                    return;
                 }
+
+                const scaleBarsContainer = document.createElement("div");
+                scaleBarsContainer.id = "scaleBarsContainer";
+                scaleBarsContainer.style.marginTop = "20px";
+                scaleBarsContainer.style.width = "100%";
+
+                tableElement.parentNode.insertBefore(scaleBarsContainer, tableElement.nextSibling);
 
                 scaleBarsContainer.innerHTML = ""; // Clear previous content
 
