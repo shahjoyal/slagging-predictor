@@ -900,16 +900,12 @@
                     return;
                 }
 
-                document.body.style.overflow = "hidden"; // Prevent scrolling
-                document.body.style.height = "100vh"; // Fit content to screen height
-                document.body.style.display = "flex";
-                document.body.style.flexDirection = "column";
-                document.body.style.alignItems = "stretch"; // Stretch content horizontally
-                document.body.style.justifyContent = "stretch"; // Stretch content vertically
+                document.body.style.overflowX = "hidden"; // Prevent horizontal scrolling
+                document.body.style.width = "100vw"; // Ensure content stretches horizontally
 
                 const contentElement = document.querySelector(".content");
                 if (contentElement) {
-                    contentElement.style.flex = "1"; // Ensure content takes up available space
+                    contentElement.style.width = "100%"; // Remove any width limits
                 }
             });
         </script>
