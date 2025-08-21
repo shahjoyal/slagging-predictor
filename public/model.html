@@ -906,8 +906,13 @@
                 const contentElement = document.querySelector(".content");
                 if (contentElement) {
                     contentElement.style.width = "100vw"; // Utilize the full screen width
-                    contentElement.style.margin = "0"; // Remove margins
+                    contentElement.style.margin = "0 auto"; // Center content horizontally
                     contentElement.style.padding = "0"; // Remove padding
+                }
+
+                const optimizationResult = document.getElementById("optimization-result");
+                if (optimizationResult) {
+                    optimizationResult.style.width = "100vw"; // Ensure optimization result stretches horizontally
                 }
             });
         </script>
