@@ -873,9 +873,9 @@
         scaleBarsContainer.id = "scaleBarsContainer";
         scaleBarsContainer.style.marginTop = "20px";
         scaleBarsContainer.style.width = "100%";
-        optimizationResult.insertAdjacentElement("afterend", scaleBarsContainer);
+        optimizationResult.insertAdjacentElement("beforebegin", scaleBarsContainer);
 
-        document.body.style.overflow = "hidden"; // Ensure the page fits on the screen
+        document.body.style.overflow = "auto"; // Ensure the page fits on the screen
     });
 </script>
 
