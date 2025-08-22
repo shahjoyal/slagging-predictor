@@ -832,15 +832,15 @@
                 return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
             }
 
-            const { properties } = blend;
+            const { blended_oxides } = blend;
 
-            // Ensure properties exist and have default values to avoid undefined errors
-            const SiO2 = properties.SiO2 || 0;
-            const Al2O3 = properties.Al2O3 || 0;
-            const CaO = properties.CaO || 0;
-            const MgO = properties.MgO || 0;
-            const Na2O = properties.Na2O || 0;
-            const K2O = properties.K2O || 0;
+            // Ensure blended_oxides exist and have default values to avoid undefined errors
+            const SiO2 = blended_oxides[0] || 0;
+            const Al2O3 = blended_oxides[1] || 0;
+            const CaO = blended_oxides[2] || 0;
+            const MgO = blended_oxides[3] || 0;
+            const Na2O = blended_oxides[4] || 0;
+            const K2O = blended_oxides[5] || 0;
 
             // Example calculations for slagging and fouling potential
             const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
