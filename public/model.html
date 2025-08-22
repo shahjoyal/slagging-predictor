@@ -824,6 +824,9 @@
 
             const row = tableElement.insertRow(-1);
 
+            // Add an empty cell for the first column
+            const emptyCell = row.insertCell(0);
+
             blends.forEach(({ blend }) => {
                 const cell = row.insertCell(-1);
 
