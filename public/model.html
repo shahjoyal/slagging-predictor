@@ -827,6 +827,11 @@
         }
 
         function calculateSlaggingAndFouling(blend) {
+            if (!blend || !blend.properties) {
+                console.error("Invalid blend data or missing properties.", blend);
+                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
+            }
+
             const { properties } = blend;
 
             // Ensure properties exist and have default values to avoid undefined errors
