@@ -826,22 +826,28 @@
             container.appendChild(barWrapper);
         }
 
-        function calculateSlaggingAndFouling(blend) {
-            if (!blend || !blend.blended_oxides || !Array.isArray(blend.blended_oxides)) {
+        function calculateSlaggingAndFouling(blend, otherBlends = []) {
+            if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
                 console.error("Invalid blend data or missing blended_oxides.", blend);
                 return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
             }
 
-            const blended_oxides = blend.blended_oxides;
+            let blended_oxides = blend.blended_oxides;
+
+            // If blended_oxides is missing, calculate average from other blends
+            if (!blended_oxides || blended_oxides.length === 0) {
+                blended_oxides = otherBlends.reduce((acc, otherBlend) => {
+                    if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
+                        otherBlend.blended_oxides.forEach((value, index) => {
+                            acc[index] = (acc[index] || 0) + value;
+                        });
+                    }
+                    return acc;
+                }, []).map(value => value / otherBlends.length);
+            }
 
             // Ensure blended_oxides have default values to avoid undefined errors
             const [SiO2 = 0, Al2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0] = blended_oxides;
-
-            // Check if blended_oxides array is empty
-            if (blended_oxides.length === 0) {
-                console.error("Blended oxides array is empty.", blended_oxides);
-                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
-            }
 
             // Example calculations for slagging and fouling potential
             const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
