@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/app.js": {
+    "app.js": {
       "memory": 512,
       "maxDuration": 10
     }
@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*)", 
-      "dest": "/api/app.js"
+      "dest": "app.js"
     }
   ],
   "env": {
