@@ -788,7 +788,7 @@
                 valueDisplay.style.transform = "translate(-50%, -50%)";
                 valueDisplay.style.fontWeight = "bold";
                 valueDisplay.style.fontSize = "14px";
-                valueDisplay.textContent = `${blend.totalScore || 0}`;
+                valueDisplay.textContent = `GCV: ${blend.gcv.toFixed(2)}`;
 
                 barWrapper.appendChild(valueDisplay);
                 container.appendChild(title);
