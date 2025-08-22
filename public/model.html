@@ -722,51 +722,25 @@
                         <td>${cheapestBlend.cost.toFixed(2)}</td>
                         <td>${balancedBlend.cost.toFixed(2)}</td>
                     </tr>
+                    <tr>
+                        <td>Score</td>
+                        <td id="currentBlendBar"></td>
+                        <td id="bestAftBlendBar"></td>
+                        <td id="cheapestBlendBar"></td>
+                        <td id="balancedBlendBar"></td>
+                    </tr>
                 </table>
                 <div style="margin-top: 20px; text-align: center;">
                     <button onclick="window.location.reload()">Back</button>
                 </div>
             `;
 
-            const individualTable = `
-                <h3>Individual Coal AFTs</h3>
-                <table class="individual-aft-table">
-                    <tr>
-                        <th>Coal Type</th>
-                        <th>Predicted AFT (°C)</th>
-                    </tr>
-                    ${data.individual_coal_afts.map(coal => `
-                        <tr>
-                            <td>${coal.coal}</td>
-                            <td>${coal.predicted_aft.toFixed(2)}</td>
-                        </tr>
-                    `).join('')}
-                </table>
-            `;
+            document.getElementById("optimization-result").innerHTML = tableHtml;
 
-            document.getElementById("optimization-result").innerHTML = `
-                <div style="width: 100%; margin-bottom: 30px;">
-                    ${tableHtml}
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
-                    <div style="flex: 1; min-width: 300px; padding: 20px;">
-                        <div id="ternary-plot" style="width: 100%; height: 400px;"></div>
-                    </div>
-                    <div style="flex: 1; min-width: 300px;">
-                        ${individualTable}
-                    </div>
-                </div>
-            `;
-
-            displayScaleBars(data);
-
-            const blendsWithAFT = [
-                { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
-                { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
-                { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
-            ];
-
-            updatePlot(blendsWithAFT);
+            createHorizontalScaleBar("currentBlendBar", currentBlend.gcv);
+            createHorizontalScaleBar("bestAftBlendBar", bestAftBlend.gcv);
+            createHorizontalScaleBar("cheapestBlendBar", cheapestBlend.gcv);
+            createHorizontalScaleBar("balancedBlendBar", balancedBlend.gcv);
         }
 
         function calculateSlaggingAndFouling(blend, otherBlends = []) {
@@ -943,10 +917,17 @@
         }
 
         function createHorizontalScaleBar(containerId, gcvValue) {
+            console.log(`Creating scale bar for container: ${containerId}, GCV Value: ${gcvValue}`);
+
             const minValue = 1;
             const maxValue = 10;
 
             const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container with ID ${containerId} not found.`);
+                return;
+            }
+
             container.innerHTML = ""; // Clear previous content
 
             const barWrapper = document.createElement("div");
