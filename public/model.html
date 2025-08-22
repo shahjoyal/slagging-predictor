@@ -823,19 +823,19 @@
             ];
 
             const row = tableElement.insertRow(-1);
-            const cell = row.insertCell(0);
-            cell.colSpan = 5;
-
-            const barWrapper = document.createElement("div");
-            barWrapper.style.width = "100%";
-            barWrapper.style.height = "32px";
-            barWrapper.style.border = "1px solid black";
-            barWrapper.style.borderRadius = "12px";
-            barWrapper.style.position = "relative";
-            barWrapper.style.display = "flex";
 
             blends.forEach(({ blend }) => {
+                const cell = row.insertCell(-1);
+
                 const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+
+                const barWrapper = document.createElement("div");
+                barWrapper.style.width = "100%";
+                barWrapper.style.height = "32px";
+                barWrapper.style.border = "1px solid black";
+                barWrapper.style.borderRadius = "12px";
+                barWrapper.style.position = "relative";
+                barWrapper.style.display = "flex";
 
                 const slaggingBar = document.createElement("div");
                 slaggingBar.style.height = "100%";
@@ -851,9 +851,8 @@
 
                 barWrapper.appendChild(slaggingBar);
                 barWrapper.appendChild(foulingBar);
+                cell.appendChild(barWrapper);
             });
-
-            cell.appendChild(barWrapper);
         }
 
         function updatePlot(blendsWithAFT) {
