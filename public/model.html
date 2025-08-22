@@ -722,6 +722,27 @@
                         <td>${cheapestBlend.cost.toFixed(2)}</td>
                         <td>${balancedBlend.cost.toFixed(2)}</td>
                     </tr>
+                    <tr>
+                        <td>Slagging Potential</td>
+                        <td id="currentBlendSlagging"></td>
+                        <td id="bestAftBlendSlagging"></td>
+                        <td id="cheapestBlendSlagging"></td>
+                        <td id="balancedBlendSlagging"></td>
+                    </tr>
+                    <tr>
+                        <td>Fouling Potential</td>
+                        <td id="currentBlendFouling"></td>
+                        <td id="bestAftBlendFouling"></td>
+                        <td id="cheapestBlendFouling"></td>
+                        <td id="balancedBlendFouling"></td>
+                    </tr>
+                    <tr>
+                        <td>Score</td>
+                        <td id="currentBlendBar"></td>
+                        <td id="bestAftBlendBar"></td>
+                        <td id="cheapestBlendBar"></td>
+                        <td id="balancedBlendBar"></td>
+                    </tr>
                 </table>
                 <div style="margin-top: 20px; text-align: center;">
                     <button onclick="window.location.reload()">Back</button>
@@ -758,15 +779,27 @@
                 </div>
             `;
 
-            displayScaleBars(data);
+            const currentBlendMetrics = calculateSlaggingAndFouling(currentBlend, [bestAftBlend, cheapestBlend, balancedBlend]);
+            const bestAftBlendMetrics = calculateSlaggingAndFouling(bestAftBlend);
+            const cheapestBlendMetrics = calculateSlaggingAndFouling(cheapestBlend);
+            const balancedBlendMetrics = calculateSlaggingAndFouling(balancedBlend);
 
-            const blendsWithAFT = [
-                { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
-                { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
-                { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
-            ];
+            document.getElementById("currentBlendSlagging").textContent = currentBlendMetrics.slaggingPotential.toFixed(2);
+            document.getElementById("bestAftBlendSlagging").textContent = bestAftBlendMetrics.slaggingPotential.toFixed(2);
+            document.getElementById("cheapestBlendSlagging").textContent = cheapestBlendMetrics.slaggingPotential.toFixed(2);
+            document.getElementById("balancedBlendSlagging").textContent = balancedBlendMetrics.slaggingPotential.toFixed(2);
 
-            updatePlot(blendsWithAFT);
+            document.getElementById("currentBlendFouling").textContent = currentBlendMetrics.foulingPotential.toFixed(2);
+            document.getElementById("bestAftBlendFouling").textContent = bestAftBlendMetrics.foulingPotential.toFixed(2);
+            document.getElementById("cheapestBlendFouling").textContent = cheapestBlendMetrics.foulingPotential.toFixed(2);
+            document.getElementById("balancedBlendFouling").textContent = balancedBlendMetrics.foulingPotential.toFixed(2);
+
+            createHorizontalScaleBar("currentBlendBar", currentBlend.gcv);
+            createHorizontalScaleBar("bestAftBlendBar", bestAftBlend.gcv);
+            createHorizontalScaleBar("cheapestBlendBar", cheapestBlend.gcv);
+            createHorizontalScaleBar("balancedBlendBar", balancedBlend.gcv);
+
+            updatePlot([currentBlend, bestAftBlend, cheapestBlend, balancedBlend]);
         }
 
         function calculateSlaggingAndFouling(blend, otherBlends = []) {
