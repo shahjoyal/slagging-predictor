@@ -357,6 +357,35 @@
                 margin-bottom: 5px;
             }
         }
+
+        .scale-bar-wrapper {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .scale-bar-label {
+            width: 150px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .scale-bar {
+            height: 20px;
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .scale-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -393,6 +422,7 @@
             </div>
         </div>
         <div id="optimization-result"></div>
+        <div id="scale-bars-container" style="margin-top: 20px;"></div>
     </div>
 
     <script>
