@@ -837,6 +837,12 @@
             // Ensure blended_oxides have default values to avoid undefined errors
             const [SiO2 = 0, Al2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0] = blended_oxides;
 
+            // Check if all values are numbers
+            if ([SiO2, Al2O3, CaO, MgO, Na2O, K2O].some(isNaN)) {
+                console.error("Blended oxides contain invalid values.", blended_oxides);
+                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
+            }
+
             // Example calculations for slagging and fouling potential
             const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
             const foulingPotential = (Na2O + K2O) / (SiO2 + 1);
