@@ -816,33 +816,26 @@
             }
 
             const blends = [
-                { label: "Best Blend", blend: best_aft_blend },
-                { label: "Best Price Blend", blend: cheapest_blend },
-                { label: "Balanced Blend", blend: balanced_blend },
-                { label: "Current Blend", blend: current_blend }
+                { blend: best_aft_blend },
+                { blend: cheapest_blend },
+                { blend: balanced_blend },
+                { blend: current_blend }
             ];
 
-            blends.forEach(({ label, blend }, index) => {
-                const { slaggingPotential, foulingPotential, finalScore } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+            const row = tableElement.insertRow(-1);
+            const cell = row.insertCell(0);
+            cell.colSpan = 5;
 
-                const row = tableElement.insertRow(-1);
+            const barWrapper = document.createElement("div");
+            barWrapper.style.width = "100%";
+            barWrapper.style.height = "32px";
+            barWrapper.style.border = "1px solid black";
+            barWrapper.style.borderRadius = "12px";
+            barWrapper.style.position = "relative";
+            barWrapper.style.display = "flex";
 
-                const labelCell = row.insertCell(0);
-                labelCell.colSpan = 5;
-                labelCell.style.textAlign = "center";
-                labelCell.style.fontWeight = "bold";
-                labelCell.textContent = `${label} (Score: ${finalScore.toFixed(2)})`;
-
-                const scaleBarCell = row.insertCell(1);
-                scaleBarCell.colSpan = 4;
-
-                const barWrapper = document.createElement("div");
-                barWrapper.style.width = "100%";
-                barWrapper.style.height = "32px";
-                barWrapper.style.border = "1px solid black";
-                barWrapper.style.borderRadius = "12px";
-                barWrapper.style.position = "relative";
-                barWrapper.style.display = "flex";
+            blends.forEach(({ blend }) => {
+                const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
 
                 const slaggingBar = document.createElement("div");
                 slaggingBar.style.height = "100%";
@@ -858,8 +851,9 @@
 
                 barWrapper.appendChild(slaggingBar);
                 barWrapper.appendChild(foulingBar);
-                scaleBarCell.appendChild(barWrapper);
             });
+
+            cell.appendChild(barWrapper);
         }
 
         function updatePlot(blendsWithAFT) {
