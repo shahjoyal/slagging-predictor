@@ -889,7 +889,7 @@
             ];
 
             blends.forEach(({ id, label, blend }) => {
-                const { slaggingPotential, foulingPotential, finalScore } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+                const { slaggingPotential, foulingPotential, finalScore } = calculateSlaggingAndFouling(blend);
 
                 const container = document.createElement("div");
                 container.style.marginBottom = "10px";
