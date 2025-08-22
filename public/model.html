@@ -398,7 +398,7 @@
         }
 
         .scale-bar {
-            height: 20px;
+            height: 20;
             border-radius: 10px;
             position: relative;
             display: flex;
@@ -471,15 +471,22 @@
             const coalInfo = window.coalData.find(coal => coal.id === coalId);
             if (!coalInfo) return;
 
-            document.querySelector(`#currentrange${index}`).value = coalInfo.defaultCurrentRange || 0;
-            document.querySelector(`#minrange${index}`).value = coalInfo.defaultMinRange || 0;
-            document.querySelector(`#maxrange${index}`).value = coalInfo.defaultMaxRange || 0;
-            document.querySelector(`#cost${index}`).value = coalInfo.defaultCost || 0;
+            const currentRangeInput = document.querySelector(`#currentrange${index}`);
+            const minRangeInput = document.querySelector(`#minrange${index}`);
+            const maxRangeInput = document.querySelector(`#maxrange${index}`);
+            const costInput = document.querySelector(`#cost${index}`);
 
-            // Normalize GCV to fit between 1 and 10
-            const gcv = coalInfo.properties.GCV || 0;
-            const normalizedGCV = Math.min(Math.max((gcv - 1) / (10 - 1), 0), 1) * 9 + 1; // Scale to 1-10
-            coalInfo.properties.GCV = normalizedGCV.toFixed(2);
+            // Set placeholders to guide the user
+            currentRangeInput.placeholder = "Current Range (%)";
+            minRangeInput.placeholder = "Min Range (%)";
+            maxRangeInput.placeholder = "Max Range (%)";
+            costInput.placeholder = "Cost (Rs.)";
+
+            // Prefill values if available, otherwise leave blank
+            currentRangeInput.value = coalInfo.defaultCurrentRange || "";
+            minRangeInput.value = coalInfo.defaultMinRange || "";
+            maxRangeInput.value = coalInfo.defaultMaxRange || "";
+            costInput.value = coalInfo.defaultCost || "";
         }
 
         function addBlend() {
