@@ -721,66 +721,47 @@
         }
 
         function displayScaleBars(data) {
-            const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
-
-            const tableElement = document.querySelector("#optimization-result table");
-            if (!tableElement) {
-                console.error("Table element not found. Cannot render scale bars.");
+            const scaleBarsContainer = document.getElementById('scale-bars-container');
+            if (!scaleBarsContainer) {
+                console.error("Scale bars container #scale-bars-container not found.");
                 return;
             }
 
-            const scaleBarsContainer = document.createElement("div");
-            scaleBarsContainer.id = "scaleBarsContainer";
-            scaleBarsContainer.style.marginTop = "20px";
-            scaleBarsContainer.style.width = "100%";
-
-            tableElement.parentNode.insertBefore(scaleBarsContainer, tableElement.nextSibling);
-
-            scaleBarsContainer.innerHTML = ""; // Clear previous content
+            // Clear existing scale bars
+            scaleBarsContainer.innerHTML = '';
 
             const blends = [
-                { id: "bestAftScaleBar", label: "Best Blend", blend: best_aft_blend },
-                { id: "cheapestScaleBar", label: "Best Price Blend", blend: cheapest_blend },
-                { id: "balancedScaleBar", label: "Balanced Blend", blend: balanced_blend },
-                { id: "currentScaleBar", label: "Current Blend", blend: current_blend }
+                { label: "Balanced Blend", blend: data.balanced_blend },
+                { label: "Best AFT Blend", blend: data.best_aft_blend },
+                { label: "Cheapest Blend", blend: data.cheapest_blend },
+                { label: "Current Blend", blend: data.current_blend }
             ];
 
-            blends.forEach(({ id, label, blend }) => {
-                const container = document.createElement("div");
-                container.style.marginBottom = "10px";
-                container.style.display = "flex";
-                container.style.alignItems = "center";
+            blends.forEach(({ label, blend }) => {
+                const scaleBarWrapper = document.createElement('div');
+                scaleBarWrapper.className = 'scale-bar-wrapper';
 
-                const title = document.createElement("div");
-                title.textContent = label;
-                title.style.width = "150px";
-                title.style.fontWeight = "bold";
-                title.style.marginRight = "10px";
+                const scaleBarLabel = document.createElement('div');
+                scaleBarLabel.className = 'scale-bar-label';
+                scaleBarLabel.textContent = `${label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`;
 
-                const barWrapper = document.createElement("div");
-                barWrapper.id = id;
-                barWrapper.style.width = "100%";
-                barWrapper.style.height = "32px";
-                barWrapper.style.border = "1px solid black";
-                barWrapper.style.borderRadius = "12px";
-                barWrapper.style.position = "relative";
-                barWrapper.style.display = "flex";
+                const scaleBar = document.createElement('div');
+                scaleBar.className = 'scale-bar';
+                scaleBar.style.width = `${blend.blend.reduce((acc, val) => acc + val, 0)}%`;
+                scaleBar.style.backgroundColor = 'blue';
 
-                const valueDisplay = document.createElement("div");
-                valueDisplay.style.position = "absolute";
-                valueDisplay.style.top = "50%";
-                valueDisplay.style.left = "50%";
-                valueDisplay.style.transform = "translate(-50%, -50%)";
-                valueDisplay.style.fontWeight = "bold";
-                valueDisplay.style.fontSize = "14px";
-                valueDisplay.textContent = `${blend.totalScore || 0}`;
+                const scaleBarText = document.createElement('span');
+                scaleBarText.style.position = 'absolute';
+                scaleBarText.style.left = '50%';
+                scaleBarText.style.transform = 'translateX(-50%)';
+                scaleBarText.style.color = 'white';
+                scaleBarText.style.fontWeight = 'bold';
+                scaleBarText.textContent = `Cost: Rs. ${blend.cost}, GCV: ${blend.gcv}`;
 
-                barWrapper.appendChild(valueDisplay);
-                container.appendChild(title);
-                container.appendChild(barWrapper);
-                scaleBarsContainer.appendChild(container);
-
-                createHorizontalScaleBar(id, blend.totalScore || 0, blend.checkboxScore || 0, blend.overallTotal || 0);
+                scaleBar.appendChild(scaleBarText);
+                scaleBarWrapper.appendChild(scaleBarLabel);
+                scaleBarWrapper.appendChild(scaleBar);
+                scaleBarsContainer.appendChild(scaleBarWrapper);
             });
         }
 
