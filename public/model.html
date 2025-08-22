@@ -829,9 +829,17 @@
         function calculateSlaggingAndFouling(blend) {
             const { properties } = blend;
 
+            // Ensure properties exist and have default values to avoid undefined errors
+            const SiO2 = properties.SiO2 || 0;
+            const Al2O3 = properties.Al2O3 || 0;
+            const CaO = properties.CaO || 0;
+            const MgO = properties.MgO || 0;
+            const Na2O = properties.Na2O || 0;
+            const K2O = properties.K2O || 0;
+
             // Example calculations for slagging and fouling potential
-            const slaggingPotential = (properties.SiO2 + properties.Al2O3) / (properties.CaO + properties.MgO + 1);
-            const foulingPotential = (properties.Na2O + properties.K2O) / (properties.SiO2 + 1);
+            const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
+            const foulingPotential = (Na2O + K2O) / (SiO2 + 1);
 
             // Normalize scores to a scale (e.g., 0-10)
             const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
