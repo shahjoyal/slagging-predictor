@@ -16,6 +16,12 @@
     "MONGODB_URI": "mongodb+srv://shalvimarudkar27:Jx3ip2scH5BZzTyj@coal-data.tfi4g.mongodb.net/",
     "MONGODB_RETRY_WRITES": "true",
     "MONGODB_SSL": "true"
+  },
+  "functions": {
+    "app.js": {
+      "memory": 512,
+      "maxDuration": 10
+    }
   }
 }
 
