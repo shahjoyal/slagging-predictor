@@ -426,6 +426,30 @@
     </div>
 
     <script>
+        function populateDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">Select Coal Type</option>';
+            if (window.coalData) {
+                window.coalData.forEach(coal => {
+                    const opt = document.createElement('option');
+                    opt.value = coal.id;
+                    opt.textContent = coal.transportId
+                        ? `${coal.coalType} – ${coal.transportId}`
+                        : coal.coalType;
+                    selectElement.appendChild(opt);
+                });
+            }
+        }
+
+        function prefillValues(index, coalId) {
+            const coalInfo = window.coalData.find(coal => coal.id === coalId);
+            if (!coalInfo) return;
+
+            document.querySelector(`#currentrange${index}`).value = coalInfo.defaultCurrentRange || 0;
+            document.querySelector(`#minrange${index}`).value = coalInfo.defaultMinRange || 0;
+            document.querySelector(`#maxrange${index}`).value = coalInfo.defaultMaxRange || 0;
+            document.querySelector(`#cost${index}`).value = coalInfo.defaultCost || 0;
+        }
+
         function addBlend() {
             const MAX_COALS = 5;
             const currentCoals = document.querySelectorAll('.blend').length;
@@ -440,7 +464,7 @@
             blendDiv.className = "blend";
             blendDiv.innerHTML = `
                 <label for="coal${index}">Coal:</label>
-                <select name="coal${index}" id="coal${index}">
+                <select name="coal${index}" id="coal${index}" onchange="prefillValues(${index}, this.value)">
                     <option value="">Select Coal Type</option>
                 </select>
                 <input type="number" id="currentrange${index}" placeholder="Current Range (%)" min="0" max="100">
@@ -487,20 +511,6 @@
                 })
                 .catch(error => console.error('Error fetching coal types:', error));
         });
-
-        function populateDropdown(selectElement) {
-            selectElement.innerHTML = '<option value="">Select Coal Type</option>';
-            if (window.coalData) {
-                window.coalData.forEach(coal => {
-                    const opt = document.createElement('option');
-                    opt.value = coal.id;
-                    opt.textContent = coal.transportId
-                        ? `${coal.coalType} – ${coal.transportId}`
-                        : coal.coalType;
-                    selectElement.appendChild(opt);
-                });
-            }
-        }
 
         function fetchCoalProperties(index) {
             const selectedCoal = document.querySelector(`#coal${index}`).value;
