@@ -827,14 +827,14 @@
         }
 
         function calculateSlaggingAndFouling(blend) {
-            if (!blend || !blend.properties) {
-                console.error("Invalid blend data or missing properties.", blend);
+            if (!blend || !blend.blended_oxides || !Array.isArray(blend.blended_oxides)) {
+                console.error("Invalid blend data or missing blended_oxides.", blend);
                 return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
             }
 
-            const { blended_oxides } = blend;
+            const blended_oxides = blend.blended_oxides;
 
-            // Ensure blended_oxides exist and have default values to avoid undefined errors
+            // Ensure blended_oxides have default values to avoid undefined errors
             const SiO2 = blended_oxides[0] || 0;
             const Al2O3 = blended_oxides[1] || 0;
             const CaO = blended_oxides[2] || 0;
