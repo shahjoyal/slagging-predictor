@@ -826,6 +826,23 @@
             container.appendChild(barWrapper);
         }
 
+        function calculateSlaggingAndFouling(blend) {
+            const { properties } = blend;
+
+            // Example calculations for slagging and fouling potential
+            const slaggingPotential = (properties.SiO2 + properties.Al2O3) / (properties.CaO + properties.MgO + 1);
+            const foulingPotential = (properties.Na2O + properties.K2O) / (properties.SiO2 + 1);
+
+            // Normalize scores to a scale (e.g., 0-10)
+            const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
+            const normalizedFouling = Math.min(foulingPotential * 10, 10);
+
+            // Aggregate final score
+            const finalScore = normalizedSlagging + normalizedFouling;
+
+            return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
+        }
+
         function displayScaleBars(data) {
             const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
@@ -852,13 +869,15 @@
             ];
 
             blends.forEach(({ id, label, blend }) => {
+                const { slaggingPotential, foulingPotential, finalScore } = calculateSlaggingAndFouling(blend);
+
                 const container = document.createElement("div");
                 container.style.marginBottom = "10px";
                 container.style.display = "flex";
                 container.style.alignItems = "center";
 
                 const title = document.createElement("div");
-                title.textContent = label;
+                title.textContent = `${label} (Score: ${finalScore.toFixed(2)})`;
                 title.style.width = "150px";
                 title.style.fontWeight = "bold";
                 title.style.marginRight = "10px";
@@ -872,11 +891,23 @@
                 barWrapper.style.position = "relative";
                 barWrapper.style.display = "flex";
 
+                const slaggingBar = document.createElement("div");
+                slaggingBar.style.height = "100%";
+                slaggingBar.style.width = `${(slaggingPotential / 10) * 100}%`;
+                slaggingBar.style.backgroundColor = "orange";
+                slaggingBar.style.borderRadius = "12px 0 0 12px";
+
+                const foulingBar = document.createElement("div");
+                foulingBar.style.height = "100%";
+                foulingBar.style.width = `${(foulingPotential / 10) * 100}%`;
+                foulingBar.style.backgroundColor = "blue";
+                foulingBar.style.borderRadius = "0 12px 12px 0";
+
+                barWrapper.appendChild(slaggingBar);
+                barWrapper.appendChild(foulingBar);
                 container.appendChild(title);
                 container.appendChild(barWrapper);
                 scaleBarsContainer.appendChild(container);
-
-                createHorizontalScaleBar(id, blend.gcv);
             });
         }
 
