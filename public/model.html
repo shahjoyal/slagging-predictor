@@ -749,7 +749,347 @@
                 </div>
             `;
 
-            document.getElementById("optimization-result").innerHTML = tableHtml;
+            const individualTable = `
+                <h3>Individual Coal AFTs</h3>
+                <table class="individual-aft-table">
+                    <tr>
+                        <th>Coal Type</th>
+                        <th>Predicted AFT (°C)</th>
+                    </tr>
+                    ${data.individual_coal_afts.map(coal => `
+                        <tr>
+                            <td>${coal.coal}</td>
+                            <td>${coal.predicted_aft.toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+
+            document.getElementById("optimization-result").innerHTML = `
+                <div style="width: 100%; margin-bottom: 30px;">
+                    ${tableHtml}
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
+                    <div style="flex: 1; min-width: 300px; padding: 20px;">
+                        <div id="ternary-plot" style="width: 100%; height: 400px;"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 300px;">
+                        ${individualTable}
+                    </div>
+                </div>
+            `;
+
+            displayScaleBars(data);
+
+            const blendsWithAFT = [
+                { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
+                { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
+                { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
+            ];
+
+            updatePlot(blendsWithAFT);
+        }
+
+        function calculateSlaggingAndFouling(blend, otherBlends = []) {
+            if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
+                console.error("Invalid blend data or missing blended_oxides.", blend);
+                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
+            }
+
+            let blended_oxides = blend.blended_oxides;
+
+            if (!blended_oxides || blended_oxides.length === 0) {
+                blended_oxides = otherBlends.reduce((acc, otherBlend) => {
+                    if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
+                        otherBlend.blended_oxides.forEach((value, index) => {
+                            acc[index] = (acc[index] || 0) + value;
+                        });
+                    }
+                    return acc;
+                }, []).map(value => value / otherBlends.length);
+            }
+
+            const [SiO2 = 0, Al2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0] = blended_oxides;
+
+            const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
+            const foulingPotential = (Na2O + K2O) / (SiO2 + 1);
+
+            const normalizedSlagging = slaggingPotential * 10;
+            const normalizedFouling = foulingPotential * 10;
+
+            const finalScore = normalizedSlagging + normalizedFouling;
+
+            return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
+        }
+
+        function displayScaleBars(data) {
+            const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
+
+            const tableElement = document.querySelector("#optimization-result table");
+            if (!tableElement) {
+                console.error("Table element not found. Cannot render scale bars.");
+                return;
+            }
+
+            const blends = [
+                { blend: best_aft_blend },
+                { blend: cheapest_blend },
+                { blend: balanced_blend },
+                { blend: current_blend }
+            ];
+
+            const row = tableElement.insertRow(-1);
+
+            const labelCell = row.insertCell(0);
+            labelCell.textContent = "Slagging Propensity";
+            labelCell.style.fontWeight = "bold";
+            labelCell.style.textAlign = "center";
+
+            blends.forEach(({ blend }) => {
+                const cell = row.insertCell(-1);
+
+                const { slaggingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+
+                const wrapper = document.createElement("div");
+                wrapper.style.display = "flex";
+                wrapper.style.flexDirection = "column";
+                wrapper.style.alignItems = "center";
+
+                const valueDisplay = document.createElement("div");
+                valueDisplay.textContent = slaggingPotential.toFixed(2);
+                valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.marginBottom = "5px";
+
+                const barWrapper = document.createElement("div");
+                barWrapper.style.width = "100%";
+                barWrapper.style.height = "32px";
+                barWrapper.style.border = "1px solid black";
+                barWrapper.style.borderRadius = "12px";
+                barWrapper.style.position = "relative";
+                barWrapper.style.display = "flex";
+
+                const valuePercentage = (slaggingPotential / 20) * 100;
+
+                const valueBar = document.createElement("div");
+                valueBar.style.height = "100%";
+                valueBar.style.width = `${valuePercentage}%`;
+                valueBar.style.borderRadius = valuePercentage >= 100 ? "12px" : "12px 0 0 12px";
+                valueBar.style.backgroundColor = getScaleColor(slaggingPotential);
+
+                barWrapper.appendChild(valueBar);
+
+                for (let i = 0; i <= 20; i++) {
+                    const tick = document.createElement("div");
+                    tick.style.position = "absolute";
+                    tick.style.left = `${(i / 20) * 100}%`;
+                    tick.style.top = "50%";
+                    tick.style.transform = "translateY(-50%)";
+                    tick.style.height = "10px";
+                    tick.style.width = "1px";
+                    tick.style.backgroundColor = "black";
+
+                    const label = document.createElement("span");
+                    label.style.position = "absolute";
+                    label.style.marginTop = "5px";
+                    label.style.left = `${(i / 20) * 100}%`;
+                    label.style.top = "100%";
+                    label.style.transform = "translateX(-50%)";
+                    label.style.fontSize = "12px";
+                    label.textContent = i;
+
+                    barWrapper.appendChild(tick);
+                    barWrapper.appendChild(label);
+                }
+
+                wrapper.appendChild(valueDisplay);
+                wrapper.appendChild(barWrapper);
+                cell.appendChild(wrapper);
+            });
+        }
+
+        function getScaleColor(value) {
+            if (value < 8) {
+                return "#5de65d";
+            }
+            if (value < 14) {
+                return "#ffff76";
+            }
+            return "#e24242";
+        }
+
+        function updatePlot(blendsWithAFT) {
+            const ternaryPlotElement = document.getElementById('ternary-plot');
+            if (!ternaryPlotElement) {
+                console.error("Ternary plot element #ternary-plot not found.");
+                return;
+            }
+
+            const a = [];
+            const b = [];
+            const c = [];
+            const colors = [];
+            const labels = [];
+
+            blendsWithAFT.forEach(blend => {
+                let acidic = 0, basic = 0, other = 0;
+                let totalPercentage = 0;
+
+                blend.blend.forEach((pct, i) => {
+                    const coal = blend.coals[i];
+                    const props = coal.properties;
+                    const weight = pct;
+
+                    totalPercentage += weight;
+
+                    if (props) {
+                        acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
+                        basic += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
+                        other += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0));
+                    }
+                });
+
+                a.push(acidic / totalPercentage);
+                b.push(basic / totalPercentage);
+                c.push(other / totalPercentage);
+                colors.push(blend.predicted_aft);
+                labels.push(`${blend.label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`);
+            });
+
+            const data = [{
+                type: 'scatterternary',
+                mode: 'markers',
+                a,
+                b,
+                c,
+                marker: {
+                    size: 14,
+                    color: colors,
+                    colorscale: 'Jet',
+                    colorbar: { title: "Fusion Temp (°C)" }
+                },
+                text: labels,
+                hoverinfo: 'text'
+            }];
+
+            const layout = {
+                margin: { l: 40, r: 40, t: 60, b: 50 },
+                ternary: {
+                    sum: 100,
+                    aaxis: { title: { text: "Thermal Stability", font: { size: 14 } }, showticklabels: true },
+                    baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } }, showticklabels: true },
+                    caxis: { title: { text: "Hardening Index", font: { size: 14 } }, showticklabels: true }
+                }
+            };
+
+            Plotly.newPlot(ternaryPlotElement, data, layout);
+        }
+
+        function createHorizontalScaleBar(containerId, gcvValue) {
+            const minValue = 1;
+            const maxValue = 10;
+
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+
+            const barWrapper = document.createElement("div");
+            barWrapper.style.width = "100%";
+            barWrapper.style.height = "32px";
+            barWrapper.style.border = "1px solid black";
+            barWrapper.style.borderRadius = "12px";
+            barWrapper.style.position = "relative";
+            barWrapper.style.display = "flex";
+
+            const gcvPercentage = ((gcvValue - minValue) / (maxValue - minValue)) * 100;
+
+            const gcvBar = document.createElement("div");
+            gcvBar.style.height = "100%";
+            gcvBar.style.width = `${gcvPercentage}%`;
+            gcvBar.style.borderRadius = gcvPercentage >= 100 ? "12px" : "12px 0 0 12px";
+            gcvBar.style.backgroundColor = getGcvColor(gcvValue);
+
+            barWrapper.appendChild(gcvBar);
+
+            for (let i = minValue; i <= maxValue; i++) {
+                const tick = document.createElement("div");
+                tick.style.position = "absolute";
+                tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                tick.style.top = "50%";
+                tick.style.transform = "translateY(-50%)";
+                tick.style.height = "10px";
+                tick.style.width = "1px";
+                tick.style.backgroundColor = "black";
+
+                const label = document.createElement("span");
+                label.style.position = "absolute";
+                label.style.marginTop = "5px";
+                label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                label.style.top = "100%";
+                label.style.transform = "translateX(-50%)";
+                label.style.fontSize = "12px";
+                label.textContent = i;
+
+                barWrapper.appendChild(tick);
+                barWrapper.appendChild(label);
+            }
+
+            container.appendChild(barWrapper);
+        }
+
+        function getGcvColor(gcvValue) {
+            if (gcvValue < 4) return "#a6e3a6";
+            if (gcvValue < 7) return "yellow";
+            return "red";
+        }
+
+        function createBarGraph(containerId, value, minValue, maxValue, colorRanges) {
+            const container = document.getElementById(containerId);
+            container.style.width = "550px";
+            container.style.height = "32px";
+            container.style.border = "1px solid black";
+            container.style.borderRadius = "12px";
+            container.style.position = "relative";
+            container.style.marginBottom = "20px";
+            container.style.display = "flex";
+
+            const valueWidth = ((value - minValue) / (maxValue - minValue)) * 100;
+
+            const bar = document.createElement("div");
+            bar.style.height = "100%";
+            bar.style.width = `${valueWidth}%`;
+            bar.style.borderRadius = valueWidth >= 100 ? "12px" : "12px 0 0 12px";
+            bar.style.backgroundColor = getColor(value, colorRanges);
+
+            container.appendChild(bar);
+
+            for (let i = minValue; i <= maxValue; i++) {
+                const tick = document.createElement("div");
+                tick.style.position = "absolute";
+                tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                tick.style.top = "50%";
+                tick.style.transform = "translateY(-50%)";
+                tick.style.height = "10px";
+                tick.style.width = "1px";
+                tick.style.backgroundColor = "black";
+
+                const label = document.createElement("span");
+                label.style.position = "absolute";
+                label.style.marginTop = "5px";
+                label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                label.style.top = "100%";
+                label.style.transform = "translateX(-50%)";
+                label.style.fontSize = "12px";
+                label.textContent = i;
+
+                container.appendChild(tick);
+                container.appendChild(label);
+            }
+        }
+
+        function getColor(value, colorRanges) {
+            if (value >= colorRanges.red[0] && value <= colorRanges.red[1]) return "#e24242";
+            if (value >= colorRanges.yellow[0] && value <= colorRanges.yellow[1]) return "#ffff76";
+            if (value >= colorRanges.green[0] && value <= colorRanges.green[1]) return "#5de65d";
+            return "#ccc";
         }
     </script>
 </body>
