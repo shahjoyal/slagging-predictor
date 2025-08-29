@@ -686,63 +686,67 @@
         }
 
         function displayOptimizationResult(data, blends) {
-            const bestAftBlend = data.best_aft_blend;
-            const cheapestBlend = data.cheapest_blend;
-            const balancedBlend = data.balanced_blend;
-            const currentBlend = data.current_blend;
+            const bestAftBlend = data.best_aft_blend || {};
+            const cheapestBlend = data.cheapest_blend || {};
+            const balancedBlend = data.balanced_blend || {};
+            const currentBlend = data.current_blend || {};
 
             const tableHtml = `
                 <table>
-                    <tr>
-                        <th>Coal type</th>
-                        <th>Current Blend</th>
-                        <th>Best Blend</th>
-                        <th>Best Price Blend</th>
-                        <th>Balanced Blend</th>
-                        <th>Currency</th>
-                    </tr>
-                    ${blends.map((blend, i) => {
-                        const bestAftPct = bestAftBlend.blend[i] || 0;
-                        const cheapestPct = cheapestBlend.blend[i] || 0;
-                        const balancedPct = balancedBlend.blend[i] || 0;
-                        const currentPct = currentBlend.blend[i] || 0;
-                        const currency = document.querySelector(`#currency${i}`).value || "INR";
+                    <thead>
+                        <tr>
+                            <th>Coal type</th>
+                            <th>Current Blend</th>
+                            <th>Best Blend</th>
+                            <th>Best Price Blend</th>
+                            <th>Balanced Blend</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${blends.map((blend, i) => {
+                            const bestAftPct = bestAftBlend.blend?.[i] || "-";
+                            const cheapestPct = cheapestBlend.blend?.[i] || "-";
+                            const balancedPct = balancedBlend.blend?.[i] || "-";
+                            const currentPct = currentBlend.blend?.[i] || "-";
+                            const currency = document.querySelector(`#currency${i}`)?.value || "INR";
 
-                        return `
-                            <tr>
-                                <td>${blend.coal}</td>
-                                <td>${currentPct}%</td>
-                                <td>${bestAftPct}%</td>
-                                <td>${cheapestPct}%</td>
-                                <td>${balancedPct}%</td>
-                                <td>${currency}</td>
-                            </tr>
-                        `;
-                    }).join('')}
-                    <tr>
-                        <td>AFT (°C)</td>
-                        <td>${currentBlend.predicted_aft.toFixed(2)}</td>
-                        <td>${bestAftBlend.predicted_aft.toFixed(2)}</td>
-                        <td>${cheapestBlend.predicted_aft.toFixed(2)}</td>
-                        <td>${balancedBlend.predicted_aft.toFixed(2)}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>GCV</td>
-                        <td>${currentBlend.gcv.toFixed(2)}</td>
-                        <td>${bestAftBlend.gcv.toFixed(2)}</td>
-                        <td>${cheapestBlend.gcv.toFixed(2)}</td>
-                        <td>${balancedBlend.gcv.toFixed(2)}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Cost</td>
-                        <td>${currentBlend.cost.toFixed(2)}</td>
-                        <td>${bestAftBlend.cost.toFixed(2)}</td>
-                        <td>${cheapestBlend.cost.toFixed(2)}</td>
-                        <td>${balancedBlend.cost.toFixed(2)}</td>
-                        <td></td>
-                    </tr>
+                            return `
+                                <tr>
+                                    <td>${blend.coal || "Unknown"}</td>
+                                    <td>${currentPct}%</td>
+                                    <td>${bestAftPct}%</td>
+                                    <td>${cheapestPct}%</td>
+                                    <td>${balancedPct}%</td>
+                                    <td>${currency}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                        <tr>
+                            <td>AFT (°C)</td>
+                            <td>${currentBlend.predicted_aft?.toFixed(2) || "-"}</td>
+                            <td>${bestAftBlend.predicted_aft?.toFixed(2) || "-"}</td>
+                            <td>${cheapestBlend.predicted_aft?.toFixed(2) || "-"}</td>
+                            <td>${balancedBlend.predicted_aft?.toFixed(2) || "-"}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>GCV</td>
+                            <td>${currentBlend.gcv?.toFixed(2) || "-"}</td>
+                            <td>${bestAftBlend.gcv?.toFixed(2) || "-"}</td>
+                            <td>${cheapestBlend.gcv?.toFixed(2) || "-"}</td>
+                            <td>${balancedBlend.gcv?.toFixed(2) || "-"}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Cost</td>
+                            <td>${currentBlend.cost?.toFixed(2) || "-"}</td>
+                            <td>${bestAftBlend.cost?.toFixed(2) || "-"}</td>
+                            <td>${cheapestBlend.cost?.toFixed(2) || "-"}</td>
+                            <td>${balancedBlend.cost?.toFixed(2) || "-"}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div style="margin-top: 20px; text-align: center;">
                     <button onclick="window.location.reload()">Back</button>
