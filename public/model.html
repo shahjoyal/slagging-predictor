@@ -133,7 +133,8 @@
         }
 
         table {
-            width: 100%;
+            table-layout: fixed; /* Ensures all columns, including the last one, are sized equally */
+            width: 100%; /* Ensures the table spans the full width */
             border-collapse: collapse;
             background: white;
             border-radius: 8px;
@@ -160,7 +161,8 @@
             font-size: 14px;
             border: 1px solid #ddd;
             color: #333;
-            width: 25%; /* Ensures all output columns are sized equally */
+            width: 25%; /* Ensures all columns, including the last one, are the same size */
+            word-wrap: break-word; /* Prevents content overflow */
         }
 
         /* Ensure the last column is the same size as the rest */
