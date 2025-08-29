@@ -996,6 +996,41 @@
             if (gcvValue < 7) return "yellow"; // Yellow for medium GCV
             return "red"; // Red for high GCV
         }
+
+        function createBarGraph(containerId, value, minValue, maxValue, colorRanges) {
+            const data = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Value', value]
+            ]);
+
+            const options = {
+                width: 200, height: 200,
+                min: minValue,
+                max: maxValue,
+                redFrom: colorRanges.red[0], redTo: colorRanges.red[1],
+                yellowFrom: colorRanges.yellow[0], yellowTo: colorRanges.yellow[1],
+                greenFrom: colorRanges.green[0], greenTo: colorRanges.green[1],
+                greenColor: '#5de65d', // Light Green
+                yellowColor: '#ffff76', // Light Yellow
+                redColor: '#e24242', // Light Red
+                majorTicks: ['0', '1', '2', '3', '4', '5', '6'], // 6 bold tick marks
+                minorTicks: 2
+            };
+
+            const chart = new google.visualization.Gauge(document.getElementById(containerId));
+            chart.draw(data, options);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            google.charts.load('current', { 'packages': ['gauge'] });
+            google.charts.setOnLoadCallback(() => {
+                createBarGraph('barGraphContainer', 3.5, 0, 6, {
+                    red: [4.5, 6],
+                    yellow: [3, 4.5],
+                    green: [0, 3]
+                });
+            });
+        });
     </script>
 </body>
 
