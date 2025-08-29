@@ -998,27 +998,54 @@
         }
 
         function createBarGraph(containerId, value, minValue, maxValue, colorRanges) {
-            const data = google.visualization.arrayToDataTable([
-                ['Label', 'Value'],
-                ['Value', value]
-            ]);
+            const container = document.getElementById(containerId);
+            container.style.width = "550px";
+            container.style.height = "32px";
+            container.style.border = "1px solid black";
+            container.style.borderRadius = "12px";
+            container.style.position = "relative";
+            container.style.marginBottom = "20px";
+            container.style.display = "flex";
 
-            const options = {
-                width: 200, height: 200,
-                min: minValue,
-                max: maxValue,
-                redFrom: colorRanges.red[0], redTo: colorRanges.red[1],
-                yellowFrom: colorRanges.yellow[0], yellowTo: colorRanges.yellow[1],
-                greenFrom: colorRanges.green[0], greenTo: colorRanges.green[1],
-                greenColor: '#5de65d', // Light Green
-                yellowColor: '#ffff76', // Light Yellow
-                redColor: '#e24242', // Light Red
-                majorTicks: ['0', '1', '2', '3', '4', '5', '6'], // 6 bold tick marks
-                minorTicks: 2
-            };
+            const valueWidth = ((value - minValue) / (maxValue - minValue)) * 100;
 
-            const chart = new google.visualization.Gauge(document.getElementById(containerId));
-            chart.draw(data, options);
+            const bar = document.createElement("div");
+            bar.style.height = "100%";
+            bar.style.width = `${valueWidth}%`;
+            bar.style.borderRadius = valueWidth >= 100 ? "12px" : "12px 0 0 12px";
+            bar.style.backgroundColor = getColor(value, colorRanges);
+
+            container.appendChild(bar);
+
+            for (let i = minValue; i <= maxValue; i++) {
+                const tick = document.createElement("div");
+                tick.style.position = "absolute";
+                tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                tick.style.top = "50%";
+                tick.style.transform = "translateY(-50%)";
+                tick.style.height = "10px";
+                tick.style.width = "1px";
+                tick.style.backgroundColor = "black";
+
+                const label = document.createElement("span");
+                label.style.position = "absolute";
+                label.style.marginTop = "5px";
+                label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                label.style.top = "100%";
+                label.style.transform = "translateX(-50%)";
+                label.style.fontSize = "12px";
+                label.textContent = i;
+
+                container.appendChild(tick);
+                container.appendChild(label);
+            }
+        }
+
+        function getColor(value, colorRanges) {
+            if (value >= colorRanges.red[0] && value <= colorRanges.red[1]) return "#e24242"; // Red
+            if (value >= colorRanges.yellow[0] && value <= colorRanges.yellow[1]) return "#ffff76"; // Yellow
+            if (value >= colorRanges.green[0] && value <= colorRanges.green[1]) return "#5de65d"; // Green
+            return "#ccc"; // Default color
         }
 
         document.addEventListener('DOMContentLoaded', () => {
