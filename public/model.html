@@ -846,6 +846,16 @@
 
                 const { slaggingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
 
+                const wrapper = document.createElement("div");
+                wrapper.style.display = "flex";
+                wrapper.style.flexDirection = "column";
+                wrapper.style.alignItems = "center";
+
+                const valueDisplay = document.createElement("div");
+                valueDisplay.textContent = slaggingPotential.toFixed(2);
+                valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.marginBottom = "5px";
+
                 const barWrapper = document.createElement("div");
                 barWrapper.style.width = "100%";
                 barWrapper.style.height = "32px";
@@ -854,7 +864,7 @@
                 barWrapper.style.position = "relative";
                 barWrapper.style.display = "flex";
 
-                const valuePercentage = (slaggingPotential / 10) * 100;
+                const valuePercentage = (slaggingPotential / 20) * 100;
 
                 const valueBar = document.createElement("div");
                 valueBar.style.height = "100%";
@@ -864,10 +874,10 @@
 
                 barWrapper.appendChild(valueBar);
 
-                for (let i = 0; i <= 10; i++) {
+                for (let i = 0; i <= 20; i++) {
                     const tick = document.createElement("div");
                     tick.style.position = "absolute";
-                    tick.style.left = `${(i / 10) * 100}%`;
+                    tick.style.left = `${(i / 20) * 100}%`;
                     tick.style.top = "50%";
                     tick.style.transform = "translateY(-50%)";
                     tick.style.height = "10px";
@@ -877,7 +887,7 @@
                     const label = document.createElement("span");
                     label.style.position = "absolute";
                     label.style.marginTop = "5px";
-                    label.style.left = `${(i / 10) * 100}%`;
+                    label.style.left = `${(i / 20) * 100}%`;
                     label.style.top = "100%";
                     label.style.transform = "translateX(-50%)";
                     label.style.fontSize = "12px";
@@ -887,15 +897,17 @@
                     barWrapper.appendChild(label);
                 }
 
-                cell.appendChild(barWrapper);
+                wrapper.appendChild(valueDisplay);
+                wrapper.appendChild(barWrapper);
+                cell.appendChild(wrapper);
             });
         }
 
         function getScaleColor(value) {
-            if (value < 4) {
+            if (value < 8) {
                 return "#5de65d"; // Green
             }
-            if (value < 7) {
+            if (value < 14) {
                 return "#ffff76"; // Yellow
             }
             return "#e24242"; // Red
