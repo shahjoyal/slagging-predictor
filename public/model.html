@@ -844,7 +844,7 @@
             blends.forEach(({ blend }) => {
                 const cell = row.insertCell(-1);
 
-                const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+                const { slaggingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
 
                 const barWrapper = document.createElement("div");
                 barWrapper.style.width = "100%";
@@ -854,22 +854,51 @@
                 barWrapper.style.position = "relative";
                 barWrapper.style.display = "flex";
 
-                const slaggingBar = document.createElement("div");
-                slaggingBar.style.height = "100%";
-                slaggingBar.style.width = `${(slaggingPotential / 10) * 100}%`;
-                slaggingBar.style.backgroundColor = "orange";
-                slaggingBar.style.borderRadius = "12px 0 0 12px";
+                const valuePercentage = (slaggingPotential / 10) * 100;
 
-                const foulingBar = document.createElement("div");
-                foulingBar.style.height = "100%";
-                foulingBar.style.width = `${(foulingPotential / 10) * 100}%`;
-                foulingBar.style.backgroundColor = "blue";
-                foulingBar.style.borderRadius = "0 12px 12px 0";
+                const valueBar = document.createElement("div");
+                valueBar.style.height = "100%";
+                valueBar.style.width = `${valuePercentage}%`;
+                valueBar.style.borderRadius = valuePercentage >= 100 ? "12px" : "12px 0 0 12px";
+                valueBar.style.backgroundColor = getScaleColor(slaggingPotential);
 
-                barWrapper.appendChild(slaggingBar);
-                barWrapper.appendChild(foulingBar);
+                barWrapper.appendChild(valueBar);
+
+                for (let i = 0; i <= 10; i++) {
+                    const tick = document.createElement("div");
+                    tick.style.position = "absolute";
+                    tick.style.left = `${(i / 10) * 100}%`;
+                    tick.style.top = "50%";
+                    tick.style.transform = "translateY(-50%)";
+                    tick.style.height = "10px";
+                    tick.style.width = "1px";
+                    tick.style.backgroundColor = "black";
+
+                    const label = document.createElement("span");
+                    label.style.position = "absolute";
+                    label.style.marginTop = "5px";
+                    label.style.left = `${(i / 10) * 100}%`;
+                    label.style.top = "100%";
+                    label.style.transform = "translateX(-50%)";
+                    label.style.fontSize = "12px";
+                    label.textContent = i;
+
+                    barWrapper.appendChild(tick);
+                    barWrapper.appendChild(label);
+                }
+
                 cell.appendChild(barWrapper);
             });
+        }
+
+        function getScaleColor(value) {
+            if (value < 4) {
+                return "#5de65d"; // Green
+            }
+            if (value < 7) {
+                return "#ffff76"; // Yellow
+            }
+            return "#e24242"; // Red
         }
 
         function updatePlot(blendsWithAFT) {
@@ -940,7 +969,10 @@
             Plotly.newPlot(ternaryPlotElement, data, layout);
         }
 
-        function createHorizontalScaleBar(containerId, value, minValue, maxValue) {
+        function createHorizontalScaleBar(containerId, gcvValue) {
+            const minValue = 1;
+            const maxValue = 10;
+
             const container = document.getElementById(containerId);
             container.innerHTML = ""; // Clear previous content
 
@@ -952,15 +984,15 @@
             barWrapper.style.position = "relative";
             barWrapper.style.display = "flex";
 
-            const valuePercentage = ((value - minValue) / (maxValue - minValue)) * 100;
+            const gcvPercentage = ((gcvValue - minValue) / (maxValue - minValue)) * 100;
 
-            const valueBar = document.createElement("div");
-            valueBar.style.height = "100%";
-            valueBar.style.width = `${valuePercentage}%`;
-            valueBar.style.borderRadius = valuePercentage >= 100 ? "12px" : "12px 0 0 12px";
-            valueBar.style.backgroundColor = getScaleColor(value);
+            const gcvBar = document.createElement("div");
+            gcvBar.style.height = "100%";
+            gcvBar.style.width = `${gcvPercentage}%`;
+            gcvBar.style.borderRadius = gcvPercentage >= 100 ? "12px" : "12px 0 0 12px";
+            gcvBar.style.backgroundColor = getGcvColor(gcvValue);
 
-            barWrapper.appendChild(valueBar);
+            barWrapper.appendChild(gcvBar);
 
             for (let i = minValue; i <= maxValue; i++) {
                 const tick = document.createElement("div");
@@ -988,22 +1020,72 @@
             container.appendChild(barWrapper);
         }
 
-        function getScaleColor(value) {
-            if (value < 4) {
-                return "#5de65d"; // Green
+        function getGcvColor(gcvValue) {
+            if (gcvValue < 4) return "#a6e3a6"; // Green for low GCV
+            if (gcvValue < 7) return "yellow"; // Yellow for medium GCV
+            return "red"; // Red for high GCV
+        }
+
+        function createBarGraph(containerId, value, minValue, maxValue, colorRanges) {
+            const container = document.getElementById(containerId);
+            container.style.width = "550px";
+            container.style.height = "32px";
+            container.style.border = "1px solid black";
+            container.style.borderRadius = "12px";
+            container.style.position = "relative";
+            container.style.marginBottom = "20px";
+            container.style.display = "flex";
+
+            const valueWidth = ((value - minValue) / (maxValue - minValue)) * 100;
+
+            const bar = document.createElement("div");
+            bar.style.height = "100%";
+            bar.style.width = `${valueWidth}%`;
+            bar.style.borderRadius = valueWidth >= 100 ? "12px" : "12px 0 0 12px";
+            bar.style.backgroundColor = getColor(value, colorRanges);
+
+            container.appendChild(bar);
+
+            for (let i = minValue; i <= maxValue; i++) {
+                const tick = document.createElement("div");
+                tick.style.position = "absolute";
+                tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                tick.style.top = "50%";
+                tick.style.transform = "translateY(-50%)";
+                tick.style.height = "10px";
+                tick.style.width = "1px";
+                tick.style.backgroundColor = "black";
+
+                const label = document.createElement("span");
+                label.style.position = "absolute";
+                label.style.marginTop = "5px";
+                label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                label.style.top = "100%";
+                label.style.transform = "translateX(-50%)";
+                label.style.fontSize = "12px";
+                label.textContent = i;
+
+                container.appendChild(tick);
+                container.appendChild(label);
             }
-            if (value < 7) {
-                return "#ffff76"; // Yellow
-            }
-            return "#e24242"; // Red
+        }
+
+        function getColor(value, colorRanges) {
+            if (value >= colorRanges.red[0] && value <= colorRanges.red[1]) return "#e24242"; // Red
+            if (value >= colorRanges.yellow[0] && value <= colorRanges.yellow[1]) return "#ffff76"; // Yellow
+            if (value >= colorRanges.green[0] && value <= colorRanges.green[1]) return "#5de65d"; // Green
+            return "#ccc"; // Default color
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const scaleBarContainer = document.createElement("div");
-            scaleBarContainer.id = "scaleBarContainer";
-            document.body.appendChild(scaleBarContainer);
-
-            createHorizontalScaleBar("scaleBarContainer", 5, 0, 10);
+            google.charts.load('current', { 'packages': ['gauge'] });
+            google.charts.setOnLoadCallback(() => {
+                createBarGraph('barGraphContainer', 3.5, 0, 6, {
+                    red: [4.5, 6],
+                    yellow: [3, 4.5],
+                    green: [0, 3]
+                });
+            });
         });
     </script>
 </body>
