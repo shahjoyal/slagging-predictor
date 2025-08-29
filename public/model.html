@@ -807,9 +807,9 @@
             const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
             const foulingPotential = (Na2O + K2O) / (SiO2 + 1);
 
-            // Normalize scores to a scale (e.g., 0-10)
-            const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
-            const normalizedFouling = Math.min(foulingPotential * 10, 10);
+            // Removed the limit of 10 for normalization
+            const normalizedSlagging = slaggingPotential * 10;
+            const normalizedFouling = foulingPotential * 10;
 
             // Aggregate final score
             const finalScore = normalizedSlagging + normalizedFouling;
