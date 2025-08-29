@@ -827,8 +827,11 @@
 
             const row = tableElement.insertRow(-1);
 
-            // Add an empty cell for the first column
-            const emptyCell = row.insertCell(0);
+            // Add a cell for the row name "Slagging Propensity"
+            const labelCell = row.insertCell(0);
+            labelCell.textContent = "Slagging Propensity";
+            labelCell.style.fontWeight = "bold";
+            labelCell.style.textAlign = "center";
 
             blends.forEach(({ blend }) => {
                 const cell = row.insertCell(-1);
