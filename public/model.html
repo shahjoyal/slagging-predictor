@@ -715,7 +715,7 @@
                                 <td>${bestAftPct}%</td>
                                 <td>${cheapestPct}%</td>
                                 <td>${balancedPct}%</td>
-                                <td>${uom}</td>
+                                <td>${document.querySelector(`#currency${i}`)?.value || "INR"}</td>
                             </tr>
                         `;
                     }).join('')}
@@ -741,7 +741,7 @@
                         <td>${bestAftBlend.cost.toFixed(2)}</td>
                         <td>${cheapestBlend.cost.toFixed(2)}</td>
                         <td>${balancedBlend.cost.toFixed(2)}</td>
-                        <td></td>
+                        <td>${document.querySelector(`#currency${i}`)?.value || "INR"}</td>
                     </tr>
                 </table>
                 <div style="margin-top: 20px; text-align: center;">
