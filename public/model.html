@@ -706,7 +706,7 @@
                         const cheapestPct = cheapestBlend.blend[i] || 0;
                         const balancedPct = balancedBlend.blend[i] || 0;
                         const currentPct = currentBlend.blend[i] || 0;
-                        const currency = document.querySelector(`#currency${i}`)?.value || "INR";
+                        const uom = "%"; // Set UoM to "%" for type of coals
 
                         return `
                             <tr>
@@ -715,7 +715,7 @@
                                 <td>${bestAftPct}%</td>
                                 <td>${cheapestPct}%</td>
                                 <td>${balancedPct}%</td>
-                                <td>${currency}</td>
+                                <td>${uom}</td>
                             </tr>
                         `;
                     }).join('')}
