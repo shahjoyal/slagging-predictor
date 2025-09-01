@@ -1081,7 +1081,6 @@
                 label.textContent = i;
 
                 container.appendChild(tick);
-                container.appendChild(label);
             }
         }
 
@@ -1091,6 +1090,113 @@
             if (value >= colorRanges.green[0] && value <= colorRanges.green[1]) return "#5de65d";
             return "#ccc";
         }
+
+        // Updated the horizontal scale graphs to reflect the calculated slagging and fouling values based on the provided formulas.
+function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
+    const minValue = 0;
+    const maxValue = 10;
+
+    // Graph container
+    const overallGraphContainer = document.createElement("div");
+    overallGraphContainer.style.width = "550px";
+    overallGraphContainer.style.height = "32px";
+    overallGraphContainer.style.border = "1px solid black";
+    overallGraphContainer.style.borderRadius = "12px";
+    overallGraphContainer.style.position = "relative";
+    overallGraphContainer.style.marginBottom = "20px";
+    overallGraphContainer.style.marginLeft = "50px";
+    overallGraphContainer.style.display = "flex";
+
+    let sfWidth = (totalScore / maxValue) * 100;
+    sfWidth = sfWidth > 100 ? 100 : sfWidth;
+
+    let cbWidth = ((totalScore + checkboxScore) > maxValue) 
+        ? Math.max(0, (maxValue - totalScore) / maxValue * 100) 
+        : (checkboxScore / maxValue) * 100;
+
+    const totalCombined = totalScore + checkboxScore;
+
+    // Slagging + Fouling Score Bar
+    const sfBar = document.createElement("div");
+    sfBar.style.height = "100%";
+    sfBar.style.width = `${sfWidth}%`;
+    sfBar.style.borderRadius = totalCombined >= maxValue ? "12px" : "12px 0 0 12px";
+    sfBar.style.backgroundColor = getColor(totalScore);
+
+    // Checkbox Score Bar (overlay)
+    const cbBar = document.createElement("div");
+    cbBar.style.height = "100%";
+    cbBar.style.width = `${cbWidth}%`;
+    cbBar.style.borderRadius = totalCombined >= maxValue ? "0 12px 12px 0" : "0";
+    cbBar.style.backgroundColor = getCheckboxBaseColor(totalScore); // base color
+    cbBar.style.backgroundImage = getHatchingLines(getHatchColor(totalCombined)); // hatch color depends on total
+
+    // Append bars
+    overallGraphContainer.appendChild(sfBar);
+    overallGraphContainer.appendChild(cbBar);
+
+    // Tick marks
+    for (let i = minValue; i <= maxValue; i++) {
+        const tick = document.createElement("div");
+        tick.style.position = "absolute";
+        tick.style.left = `${(i / maxValue) * 100}%`;
+        tick.style.top = "50%";
+        tick.style.transform = "translateY(-50%)";
+        tick.style.height = "10px";
+        tick.style.width = "1px";
+        tick.style.backgroundColor = "black";
+
+        const label = document.createElement("span");
+        label.style.position = "absolute";
+        label.style.marginTop = "5px";
+        label.style.left = `${(i / maxValue) * 100}%`;
+        label.style.top = "100%";
+        label.style.transform = "translateX(-50%)";
+        label.style.fontSize = "12px";
+        label.textContent = i;
+
+        overallGraphContainer.appendChild(tick);
+        overallGraphContainer.appendChild(label);
+    }
+
+    // Display score
+    const totalDisplay = document.createElement("div");
+    totalDisplay.style.marginBottom = "10px";
+    totalDisplay.style.marginTop = "10px";
+    totalDisplay.style.marginLeft = "80px";
+    totalDisplay.style.fontSize = "18px";
+    totalDisplay.style.fontWeight = "bold";
+    totalDisplay.textContent = `Overall Score: ${overallTotal.toFixed(1)} (Slagging + Fouling: ${totalScore.toFixed(1)}, O&M Score: ${checkboxScore.toFixed(1)})`;
+
+    const rightContainerDiv = document.getElementById("resultsContainer");
+    rightContainerDiv.appendChild(totalDisplay);
+    rightContainerDiv.appendChild(overallGraphContainer);
+}
+
+// Main score color
+function getColor(score) {
+    if (score < 3) return "#a6e3a6";
+    if (score < 6.5) return "yellow";
+    return "red";
+}
+
+// Base color of checkbox segment depends only on totalScore
+function getCheckboxBaseColor(score) {
+    if (score < 3) return "#5de65d";
+    if (score < 6.5) return "#fddf05";
+    return "#e24242";
+}
+
+// Hatch overlay color depends on totalCombined
+function getHatchColor(totalCombined) {
+    if (totalCombined > 6.5) return "red";
+    if (totalCombined > 3) return "yellow";
+    return "green";
+}
+
+function getHatchingLines(hatchColor) {
+    return `repeating-linear-gradient(45deg, transparent, transparent 5px, ${hatchColor} 5px, ${hatchColor} 10px)`;
+}
     </script>
 </body>
 
