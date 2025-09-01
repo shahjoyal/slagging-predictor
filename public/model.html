@@ -790,124 +790,132 @@
             updatePlot(blendsWithAFT);
         }
 
-        // Refined the slagging and fouling calculations to align with the provided formulas.
-function calculateSlaggingAndFouling(blend, otherBlends = []) {
-    if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
-        console.error("Invalid blend data or missing blended_oxides.", blend);
-        return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
-    }
-
-    let blended_oxides = blend.blended_oxides;
-
-    if (!blended_oxides || blended_oxides.length === 0) {
-        blended_oxides = otherBlends.reduce((acc, otherBlend) => {
-            if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
-                otherBlend.blended_oxides.forEach((value, index) => {
-                    acc[index] = (acc[index] || 0) + value;
-                });
+        function calculateSlaggingAndFouling(blend, otherBlends = []) {
+            if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
+                console.error("Invalid blend data or missing blended_oxides.", blend);
+                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
             }
-            return acc;
-        }, []).map(value => value / otherBlends.length);
-    }
 
-    const [SiO2 = 0, Al2O3 = 0, Fe2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0, TiO2 = 0, SO3 = 0] = blended_oxides;
+            let blended_oxides = blend.blended_oxides;
 
-    // Slagging Potential Calculation
-    const acidicOxides = SiO2 + Al2O3 + TiO2;
-    const basicOxides = CaO + MgO + Na2O + K2O;
-    const slaggingPotential = basicOxides / acidicOxides;
+            if (!blended_oxides || blended_oxides.length === 0) {
+                blended_oxides = otherBlends.reduce((acc, otherBlend) => {
+                    if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
+                        otherBlend.blended_oxides.forEach((value, index) => {
+                            acc[index] = (acc[index] || 0) + value;
+                        });
+                    }
+                    return acc;
+                }, []).map(value => value / otherBlends.length);
+            }
 
-    // Fouling Potential Calculation
-    const foulingPotential = (Na2O + K2O + SO3) / (SiO2 + 1);
+            const [SiO2 = 0, Al2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0] = blended_oxides;
 
-    // Normalize values for scale (0-10)
-    const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
-    const normalizedFouling = Math.min(foulingPotential * 10, 10);
+            const slaggingPotential = (SiO2 + Al2O3) / (CaO + MgO + 1);
+            const foulingPotential = (Na2O + K2O) / (SiO2 + 1);
 
-    const finalScore = normalizedSlagging + normalizedFouling;
+            const normalizedSlagging = slaggingPotential * 10;
+            const normalizedFouling = foulingPotential * 10;
 
-    return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
-}
+            const finalScore = normalizedSlagging + normalizedFouling;
 
-function displayScaleBars(data) {
-    const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
+            return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
+        }
 
-    const tableElement = document.querySelector("#optimization-result table");
-    if (!tableElement) {
-        console.error("Table element not found. Cannot render scale bars.");
-        return;
-    }
+        function displayScaleBars(data) {
+            const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
-    const blends = [
-        { blend: best_aft_blend },
-        { blend: cheapest_blend },
-        { blend: balanced_blend },
-        { blend: current_blend }
-    ];
+            const tableElement = document.querySelector("#optimization-result table");
+            if (!tableElement) {
+                console.error("Table element not found. Cannot render scale bars.");
+                return;
+            }
 
-    const row = tableElement.insertRow(-1);
+            const blends = [
+                { blend: best_aft_blend },
+                { blend: cheapest_blend },
+                { blend: balanced_blend },
+                { blend: current_blend }
+            ];
 
-    const labelCell = row.insertCell(0);
-    labelCell.textContent = "Slagging & Fouling";
-    labelCell.style.fontWeight = "bold";
-    labelCell.style.textAlign = "center";
+            const row = tableElement.insertRow(-1);
 
-    blends.forEach(({ blend }) => {
-        const cell = row.insertCell(-1);
+            const labelCell = row.insertCell(0);
+            labelCell.textContent = "Slagging Propensity";
+            labelCell.style.fontWeight = "bold";
+            labelCell.style.textAlign = "center";
 
-        const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+            blends.forEach(({ blend }) => {
+                const cell = row.insertCell(-1);
 
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "flex";
-        wrapper.style.flexDirection = "column";
-        wrapper.style.alignItems = "center";
+                const { slaggingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
 
-        const valueDisplay = document.createElement("div");
-        valueDisplay.textContent = `S: ${slaggingPotential.toFixed(2)}, F: ${foulingPotential.toFixed(2)}`;
-        valueDisplay.style.fontWeight = "bold";
-        valueDisplay.style.marginBottom = "5px";
+                const wrapper = document.createElement("div");
+                wrapper.style.display = "flex";
+                wrapper.style.flexDirection = "column";
+                wrapper.style.alignItems = "center";
 
-        const barWrapper = document.createElement("div");
-        barWrapper.style.width = "100%";
-        barWrapper.style.height = "32px";
-        barWrapper.style.border = "1px solid black";
-        barWrapper.style.borderRadius = "12px";
-        barWrapper.style.position = "relative";
-        barWrapper.style.display = "flex";
+                const valueDisplay = document.createElement("div");
+                valueDisplay.textContent = slaggingPotential.toFixed(2);
+                valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.marginBottom = "5px";
 
-        const slaggingPercentage = (slaggingPotential / 10) * 100;
-        const foulingPercentage = (foulingPotential / 10) * 100;
+                const barWrapper = document.createElement("div");
+                barWrapper.style.width = "100%";
+                barWrapper.style.height = "32px";
+                barWrapper.style.border = "1px solid black";
+                barWrapper.style.borderRadius = "12px";
+                barWrapper.style.position = "relative";
+                barWrapper.style.display = "flex";
 
-        const slaggingBar = document.createElement("div");
-        slaggingBar.style.height = "100%";
-        slaggingBar.style.width = `${slaggingPercentage}%`;
-        slaggingBar.style.borderRadius = "12px 0 0 12px";
-        slaggingBar.style.backgroundColor = getScaleColor(slaggingPotential);
+                const valuePercentage = (slaggingPotential / 20) * 100;
 
-        const foulingBar = document.createElement("div");
-        foulingBar.style.height = "100%";
-        foulingBar.style.width = `${foulingPercentage}%`;
-        foulingBar.style.borderRadius = "0 12px 12px 0";
-        foulingBar.style.backgroundColor = getScaleColor(foulingPotential);
+                const valueBar = document.createElement("div");
+                valueBar.style.height = "100%";
+                valueBar.style.width = `${valuePercentage}%`;
+                valueBar.style.borderRadius = valuePercentage >= 100 ? "12px" : "12px 0 0 12px";
+                valueBar.style.backgroundColor = getScaleColor(slaggingPotential);
 
-        barWrapper.appendChild(slaggingBar);
-        barWrapper.appendChild(foulingBar);
+                barWrapper.appendChild(valueBar);
 
-        wrapper.appendChild(valueDisplay);
-        wrapper.appendChild(barWrapper);
-        cell.appendChild(wrapper);
-    });
-}
+                for (let i = 0; i <= 20; i++) {
+                    const tick = document.createElement("div");
+                    tick.style.position = "absolute";
+                    tick.style.left = `${(i / 20) * 100}%`;
+                    tick.style.top = "50%";
+                    tick.style.transform = "translateY(-50%)";
+                    tick.style.height = "10px";
+                    tick.style.width = "1px";
+                    tick.style.backgroundColor = "black";
 
-function getScaleColor(value) {
-    if (value < 4) {
-        return "#5de65d"; // Green
-    } else if (value < 7) {
-        return "#ffff76"; // Yellow
-    } else {
-        return "#e24242"; // Red
-    }
-}
+                    const label = document.createElement("span");
+                    label.style.position = "absolute";
+                    label.style.marginTop = "5px";
+                    label.style.left = `${(i / 20) * 100}%`;
+                    label.style.top = "100%";
+                    label.style.transform = "translateX(-50%)";
+                    label.style.fontSize = "12px";
+                    label.textContent = i;
+
+                    barWrapper.appendChild(tick);
+                    barWrapper.appendChild(label);
+                }
+
+                wrapper.appendChild(valueDisplay);
+                wrapper.appendChild(barWrapper);
+                cell.appendChild(wrapper);
+            });
+        }
+
+        function getScaleColor(value) {
+            if (value < 8) {
+                return "#5de65d";
+            }
+            if (value < 14) {
+                return "#ffff76";
+            }
+            return "#e24242";
+        }
 
         function updatePlot(blendsWithAFT) {
             const ternaryPlotElement = document.getElementById('ternary-plot');
