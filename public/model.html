@@ -706,7 +706,7 @@
                         const cheapestPct = cheapestBlend.blend[i] || 0;
                         const balancedPct = balancedBlend.blend[i] || 0;
                         const currentPct = currentBlend.blend[i] || 0;
-                        const uom = "%"; // Set UoM to "%" for type of coals
+                        const currency = document.querySelector(`#currency${i}`)?.value || "INR"; // Fixed the invalid character issue by ensuring proper syntax for dynamic currency display
 
                         return `
                             <tr>
@@ -715,7 +715,7 @@
                                 <td>${bestAftPct}%</td>
                                 <td>${cheapestPct}%</td>
                                 <td>${balancedPct}%</td>
-                                <td>${document.querySelector(`#currency${i}`)?.value || "INR"}</td>
+                                <td>${currency}</td>
                             </tr>
                         `;
                     }).join('')}
