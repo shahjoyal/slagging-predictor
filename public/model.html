@@ -830,6 +830,8 @@ function calculateSlaggingAndFouling(blend, otherBlends = []) {
 }
 
 function displayScaleBars(data) {
+    console.log("displayScaleBars called with data:", data); // Debugging log
+
     const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
     const tableElement = document.querySelector("#optimization-result table");
@@ -852,8 +854,13 @@ function displayScaleBars(data) {
     labelCell.style.fontWeight = "bold";
     labelCell.style.textAlign = "center";
 
-    blends.forEach(({ blend }) => {
+    blends.forEach(({ blend }, index) => {
         const cell = row.insertCell(-1);
+
+        if (!blend) {
+            console.error(`Blend data missing for index ${index}`);
+            return;
+        }
 
         const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
 
@@ -879,7 +886,7 @@ function displayScaleBars(data) {
         bar.style.borderRadius = "12px";
         bar.style.backgroundColor = getScaleColor(totalScore);
 
-        const valueDisplay = document.createElement("span");git 
+        const valueDisplay = document.createElement("span");
         valueDisplay.textContent = totalScore.toFixed(2); // Display the score inside the bar
         valueDisplay.style.position = "absolute";
         valueDisplay.style.left = "50%";
@@ -891,6 +898,8 @@ function displayScaleBars(data) {
         barWrapper.appendChild(valueDisplay);
         wrapper.appendChild(barWrapper);
         cell.appendChild(wrapper);
+
+        console.log(`Rendered scale bar for blend index ${index} with totalScore: ${totalScore}`); // Debugging log
     });
 }
 
@@ -1169,21 +1178,22 @@ function getColor(score) {
 
 // Base color of checkbox segment depends only on totalScore
 function getCheckboxBaseColor(score) {
-    if (score < 3) return "#5de65d";
-    if (score < 6.5) return "#fddf05";
-    return "#e24242";
+    if (score < 3) return "#a6e3a6";
+    if (score < 6.5) return "yellow";
+    return "red";
 }
 
-// Hatch overlay color depends on totalCombined
-function getHatchColor(totalCombined) {
-    if (totalCombined > 6.5) return "red";
-    if (totalCombined > 3) return "yellow";
-    return "green";
+// Hatching lines for checkbox segment
+function getHatchingLines(color) {
+    return `repeating-linear-gradient(
+        45deg,
+        ${color},
+        ${color} 10px,
+        transparent 10px,
+        transparent 20px
+    )`;
 }
 
-function getHatchingLines(hatchColor) {
-    return `repeating-linear-gradient(45deg, transparent, transparent 5px, ${hatchColor} 5px, ${hatchColor} 10px)`;
-}
     </script>
 </body>
 
