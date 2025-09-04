@@ -1006,15 +1006,14 @@ function getScaleColor(value) {
 
             barWrapper.appendChild(gcvBar);
 
-            // Add tick marks and labels at intervals of 3
+            // Add tick marks (teeth) and labels at intervals of 3
             for (let i = minValue; i <= maxValue; i += interval) {
                 const tick = document.createElement("div");
                 tick.style.position = "absolute";
                 tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                tick.style.top = "50%";
-                tick.style.transform = "translateY(-50%)";
-                tick.style.height = "10px";
-                tick.style.width = "1px";
+                tick.style.bottom = "0";
+                tick.style.height = "10px"; // Height of the tick (teeth)
+                tick.style.width = "2px"; // Width of the tick
                 tick.style.backgroundColor = "black";
 
                 const label = document.createElement("span");
