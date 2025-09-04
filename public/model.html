@@ -548,7 +548,7 @@
                 const rangeValue = parseFloat(range.value) || 0;
                 totalCurrentRange += rangeValue;
             });
-            document.getElementById("totalRange").textContent = totalCurrentRange;
+            document.getElementById("totalCurrentRange").textContent = totalCurrentRange;
         }
 
         function removeBlend(button) {
@@ -990,7 +990,7 @@ function getScaleColor(value) {
 
             const barWrapper = document.createElement("div");
             barWrapper.style.width = "100%";
-            barWrapper.style.height = "50px"; // Increased height for better visibility
+            barWrapper.style.height = "60px"; // Increased height for better visibility
             barWrapper.style.border = "2px solid black"; // Thicker border for better visibility
             barWrapper.style.borderRadius = "12px";
             barWrapper.style.position = "relative";
@@ -1012,7 +1012,7 @@ function getScaleColor(value) {
                 tick.style.position = "absolute";
                 tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
                 tick.style.bottom = "0";
-                tick.style.height = i % interval === 0 ? "15px" : "8px"; // Longer ticks for intervals of 3
+                tick.style.height = i % interval === 0 ? "20px" : "10px"; // Longer ticks for intervals of 3
                 tick.style.width = "2px"; // Width of the tick
                 tick.style.backgroundColor = "black";
 
@@ -1021,9 +1021,9 @@ function getScaleColor(value) {
                     label.style.position = "absolute";
                     label.style.marginTop = "5px";
                     label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                    label.style.bottom = "-20px"; // Adjusted position for better visibility
+                    label.style.bottom = "-25px"; // Adjusted position for better visibility
                     label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "14px"; // Increased font size for better visibility
+                    label.style.fontSize = "16px"; // Increased font size for better visibility
                     label.style.fontWeight = "bold"; // Bold labels for emphasis
                     label.textContent = i;
                     barWrapper.appendChild(label);
