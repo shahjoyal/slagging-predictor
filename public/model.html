@@ -862,11 +862,6 @@ function displayScaleBars(data) {
         wrapper.style.flexDirection = "column";
         wrapper.style.alignItems = "center";
 
-        const valueDisplay = document.createElement("div");
-        valueDisplay.textContent = `S: ${slaggingPotential.toFixed(2)}, F: ${foulingPotential.toFixed(2)}`;
-        valueDisplay.style.fontWeight = "bold";
-        valueDisplay.style.marginBottom = "5px";
-
         const barWrapper = document.createElement("div");
         barWrapper.style.width = "100%";
         barWrapper.style.height = "32px";
@@ -874,16 +869,26 @@ function displayScaleBars(data) {
         barWrapper.style.borderRadius = "12px";
         barWrapper.style.position = "relative";
         barWrapper.style.display = "flex";
+        barWrapper.style.alignItems = "center";
 
         const totalScore = slaggingPotential + foulingPotential;
+
         const bar = document.createElement("div");
         bar.style.height = "100%";
-        bar.style.width = "100%"; // Make it one color
+        bar.style.width = `${(totalScore / 10) * 100}%`; // Scale the width based on the score
         bar.style.borderRadius = "12px";
-        bar.style.backgroundColor = getScaleColor(totalScore); // Use a single color based on the score
+        bar.style.backgroundColor = getScaleColor(totalScore);
+
+        const valueDisplay = document.createElement("span");
+        valueDisplay.textContent = totalScore.toFixed(2); // Display the score inside the bar
+        valueDisplay.style.position = "absolute";
+        valueDisplay.style.left = "50%";
+        valueDisplay.style.transform = "translateX(-50%)";
+        valueDisplay.style.color = "white";
+        valueDisplay.style.fontWeight = "bold";
 
         barWrapper.appendChild(bar);
-        wrapper.appendChild(valueDisplay);
+        barWrapper.appendChild(valueDisplay);
         wrapper.appendChild(barWrapper);
         cell.appendChild(wrapper);
     });
