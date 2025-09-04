@@ -535,7 +535,7 @@
             currentRangeInput.addEventListener("input", updateTotalRange);
 
             const blendRow = document.querySelector(".blend-row");
-            blendRow.appendChild(blendDiv);
+           
 
             populateDropdown(blendDiv.querySelector(`#coal${index}`));
             updateTotalRange();
@@ -878,20 +878,14 @@ function displayScaleBars(data) {
         const slaggingPercentage = (slaggingPotential / 10) * 100;
         const foulingPercentage = (foulingPotential / 10) * 100;
 
-        const slaggingBar = document.createElement("div");
-        slaggingBar.style.height = "100%";
-        slaggingBar.style.width = `${slaggingPercentage}%`;
-        slaggingBar.style.borderRadius = "12px 0 0 12px";
-        slaggingBar.style.backgroundColor = getScaleColor(slaggingPotential);
+        // Updated to use a single color for both slagging and fouling bars.
+        const combinedBar = document.createElement("div");
+        combinedBar.style.height = "100%";
+        combinedBar.style.width = `${Math.min(slaggingPercentage + foulingPercentage, 100)}%`;
+        combinedBar.style.borderRadius = "12px";
+        combinedBar.style.backgroundColor = getScaleColor(slaggingPotential + foulingPotential);
 
-        const foulingBar = document.createElement("div");
-        foulingBar.style.height = "100%";
-        foulingBar.style.width = `${foulingPercentage}%`;
-        foulingBar.style.borderRadius = "0 12px 12px 0";
-        foulingBar.style.backgroundColor = getScaleColor(foulingPotential);
-
-        barWrapper.appendChild(slaggingBar);
-        barWrapper.appendChild(foulingBar);
+        barWrapper.appendChild(combinedBar);
 
         wrapper.appendChild(valueDisplay);
         wrapper.appendChild(barWrapper);
