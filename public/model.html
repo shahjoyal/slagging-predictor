@@ -875,20 +875,14 @@ function displayScaleBars(data) {
         barWrapper.style.position = "relative";
         barWrapper.style.display = "flex";
 
-        const slaggingPercentage = (slaggingPotential / 10) * 100;
-        const foulingPercentage = (foulingPotential / 10) * 100;
+        const totalScore = slaggingPotential + foulingPotential;
+        const bar = document.createElement("div");
+        bar.style.height = "100%";
+        bar.style.width = "100%"; // Make it one color
+        bar.style.borderRadius = "12px";
+        bar.style.backgroundColor = getScaleColor(totalScore); // Use a single color based on the score
 
-        const slaggingBar = document.createElement("div");
-        slaggingBar.style.height = "100%";
-        slaggingBar.style.width = `${slaggingPercentage + foulingPercentage}%`;
-        slaggingBar.style.borderRadius = "12px 0 0 12px";
-        slaggingBar.style.backgroundColor = getScaleColor(slaggingPotential+foulingPotential);
-
-        
-
-        barWrapper.appendChild(slaggingBar);
-        barWrapper.appendChild(foulingBar);
-
+        barWrapper.appendChild(bar);
         wrapper.appendChild(valueDisplay);
         wrapper.appendChild(barWrapper);
         cell.appendChild(wrapper);
