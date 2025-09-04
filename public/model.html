@@ -981,9 +981,9 @@ function getScaleColor(value) {
         }
 
         function createHorizontalScaleBar(containerId, gcvValue) {
-            const minValue = 1;
+            const minValue = 0;
             const maxValue = 10;
-            const interval = 3;
+            const interval = 3; // Interval for the scale
 
             const container = document.getElementById(containerId);
             container.innerHTML = "";
@@ -1006,7 +1006,8 @@ function getScaleColor(value) {
 
             barWrapper.appendChild(gcvBar);
 
-            for (let i = minValue; i <= maxValue; i+=interval) {
+            // Add tick marks and labels at intervals of 3
+            for (let i = minValue; i <= maxValue; i += interval) {
                 const tick = document.createElement("div");
                 tick.style.position = "absolute";
                 tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
