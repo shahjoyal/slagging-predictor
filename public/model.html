@@ -992,11 +992,16 @@ function getScaleColor(value) {
             const interval = 3; // Interval for the scale
 
             const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container with ID '${containerId}' not found.`);
+                return;
+            }
+
             container.innerHTML = "";
 
             const barWrapper = document.createElement("div");
             barWrapper.style.width = "100%";
-            barWrapper.style.height = "60px"; // Increased height for better visibility
+            barWrapper.style.height = "80px"; // Increased height for better visibility
             barWrapper.style.border = "2px solid black"; // Thicker border for better visibility
             barWrapper.style.borderRadius = "12px";
             barWrapper.style.position = "relative";
@@ -1018,7 +1023,7 @@ function getScaleColor(value) {
                 tick.style.position = "absolute";
                 tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
                 tick.style.bottom = "0";
-                tick.style.height = i % interval === 0 ? "20px" : "10px"; // Longer ticks for intervals of 3
+                tick.style.height = i % interval === 0 ? "30px" : "15px"; // Longer ticks for intervals of 3
                 tick.style.width = "2px"; // Width of the tick
                 tick.style.backgroundColor = "black";
 
@@ -1027,9 +1032,9 @@ function getScaleColor(value) {
                     label.style.position = "absolute";
                     label.style.marginTop = "5px";
                     label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                    label.style.bottom = "-30px"; // Adjusted position for better visibility
+                    label.style.bottom = "-40px"; // Adjusted position for better visibility
                     label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "16px"; // Increased font size for better visibility
+                    label.style.fontSize = "18px"; // Increased font size for better visibility
                     label.style.fontWeight = "bold"; // Bold labels for emphasis
                     label.textContent = i;
                     barWrapper.appendChild(label);
@@ -1162,7 +1167,6 @@ function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
         label.textContent = i;
 
         overallGraphContainer.appendChild(tick);
-        overallGraphContainer.appendChild(label);
     }
 
     // Display score
