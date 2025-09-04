@@ -830,84 +830,69 @@ function calculateSlaggingAndFouling(blend, otherBlends = []) {
 }
 
 function displayScaleBars(data) {
-    const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
+            const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
-    const tableElement = document.querySelector("#optimization-result table");
-    if (!tableElement) {
-        console.error("Table element not found. Cannot render scale bars.");
-        return;
-    }
+            const tableElement = document.querySelector("#optimization-result table");
+            if (!tableElement) {
+                console.error("Table element not found. Cannot render scale bars.");
+                return;
+            }
 
-    const blends = [
-        { blend: best_aft_blend },
-        { blend: cheapest_blend },
-        { blend: balanced_blend },
-        { blend: current_blend }
-    ];
+            const blends = [
+                { blend: best_aft_blend },
+                { blend: cheapest_blend },
+                { blend: balanced_blend },
+                { blend: current_blend }
+            ];
 
-    const row = tableElement.insertRow(-1);
+            const row = tableElement.insertRow(-1);
 
-    const labelCell = row.insertCell(0);
-    labelCell.textContent = "Slagging & Fouling";
-    labelCell.style.fontWeight = "bold";
-    labelCell.style.textAlign = "center";
+            const labelCell = row.insertCell(0);
+            labelCell.textContent = "Slagging & Fouling Combined";
+            labelCell.style.fontWeight = "bold";
+            labelCell.style.textAlign = "center";
 
-    blends.forEach(({ blend }) => {
-        const cell = row.insertCell(-1);
+            blends.forEach(({ blend }) => {
+                const cell = row.insertCell(-1);
 
-        const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+                const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
 
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "flex";
-        wrapper.style.flexDirection = "column";
-        wrapper.style.alignItems = "center";
+                // Combine slagging and fouling into a single score
+                const combinedScore = Math.min(slaggingPotential + foulingPotential, 10);
 
-        const valueDisplay = document.createElement("div");
-        valueDisplay.textContent = `S: ${slaggingPotential.toFixed(2)}, F: ${foulingPotential.toFixed(2)}`;
-        valueDisplay.style.fontWeight = "bold";
-        valueDisplay.style.marginBottom = "5px";
+                const wrapper = document.createElement("div");
+                wrapper.style.display = "flex";
+                wrapper.style.flexDirection = "column";
+                wrapper.style.alignItems = "center";
 
-        const barWrapper = document.createElement("div");
-        barWrapper.style.width = "100%";
-        barWrapper.style.height = "32px";
-        barWrapper.style.border = "1px solid black";
-        barWrapper.style.borderRadius = "12px";
-        barWrapper.style.position = "relative";
-        barWrapper.style.display = "flex";
+                const valueDisplay = document.createElement("div");
+                valueDisplay.textContent = `Combined: ${combinedScore.toFixed(2)}`;
+                valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.marginBottom = "5px";
 
-        const slaggingPercentage = (slaggingPotential / 10) * 100;
-        const foulingPercentage = (foulingPotential / 10) * 100;
+                const barWrapper = document.createElement("div");
+                barWrapper.style.width = "100%";
+                barWrapper.style.height = "32px";
+                barWrapper.style.border = "1px solid black";
+                barWrapper.style.borderRadius = "12px";
+                barWrapper.style.position = "relative";
+                barWrapper.style.display = "flex";
 
-        const slaggingBar = document.createElement("div");
-        slaggingBar.style.height = "100%";
-        slaggingBar.style.width = `${slaggingPercentage}%`;
-        slaggingBar.style.borderRadius = "12px 0 0 12px";
-        slaggingBar.style.backgroundColor = getScaleColor(slaggingPotential);
+                const combinedPercentage = (combinedScore / 10) * 100;
 
-        const foulingBar = document.createElement("div");
-        foulingBar.style.height = "100%";
-        foulingBar.style.width = `${foulingPercentage}%`;
-        foulingBar.style.borderRadius = "0 12px 12px 0";
-        foulingBar.style.backgroundColor = getScaleColor(foulingPotential);
+                const combinedBar = document.createElement("div");
+                combinedBar.style.height = "100%";
+                combinedBar.style.width = `${combinedPercentage}%`;
+                combinedBar.style.borderRadius = "12px";
+                combinedBar.style.backgroundColor = getScaleColor(combinedScore);
 
-        barWrapper.appendChild(slaggingBar);
-        barWrapper.appendChild(foulingBar);
+                barWrapper.appendChild(combinedBar);
 
-        wrapper.appendChild(valueDisplay);
-        wrapper.appendChild(barWrapper);
-        cell.appendChild(wrapper);
-    });
-}
-
-function getScaleColor(value) {
-    if (value < 4) {
-        return "#5de65d"; // Green
-    } else if (value < 7) {
-        return "#ffff76"; // Yellow
-    } else {
-        return "#e24242"; // Red
-    }
-}
+                wrapper.appendChild(valueDisplay);
+                wrapper.appendChild(barWrapper);
+                cell.appendChild(wrapper);
+            });
+        }
 
         function updatePlot(blendsWithAFT) {
             const ternaryPlotElement = document.getElementById('ternary-plot');
