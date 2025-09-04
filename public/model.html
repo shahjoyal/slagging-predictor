@@ -542,13 +542,19 @@
         }
 
         function updateTotalRange() {
+            const totalRangeElement = document.getElementById("totalRange");
+            if (!totalRangeElement) {
+                console.error("Element with ID 'totalRange' not found in the DOM.");
+                return;
+            }
+
             let totalCurrentRange = 0;
             const ranges = document.querySelectorAll('input[id^="currentrange"]');
             ranges.forEach(range => {
                 const rangeValue = parseFloat(range.value) || 0;
                 totalCurrentRange += rangeValue;
             });
-            document.getElementById("totalCurrentRange").textContent = totalCurrentRange;
+            totalRangeElement.textContent = totalCurrentRange;
         }
 
         function removeBlend(button) {
