@@ -1007,26 +1007,28 @@ function getScaleColor(value) {
             barWrapper.appendChild(gcvBar);
 
             // Add tick marks (teeth) and labels at intervals of 3
-            for (let i = minValue; i <= maxValue; i += interval) {
+            for (let i = minValue; i <= maxValue; i++) {
                 const tick = document.createElement("div");
                 tick.style.position = "absolute";
                 tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
                 tick.style.bottom = "0";
-                tick.style.height = "10px"; // Height of the tick (teeth)
+                tick.style.height = i % interval === 0 ? "10px" : "5px"; // Longer ticks for intervals of 3
                 tick.style.width = "2px"; // Width of the tick
                 tick.style.backgroundColor = "black";
 
                 const label = document.createElement("span");
-                label.style.position = "absolute";
-                label.style.marginTop = "5px";
-                label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                label.style.top = "100%";
-                label.style.transform = "translateX(-50%)";
-                label.style.fontSize = "12px";
-                label.textContent = i;
+                if (i % interval === 0) { // Add labels only for intervals of 3
+                    label.style.position = "absolute";
+                    label.style.marginTop = "5px";
+                    label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                    label.style.top = "100%";
+                    label.style.transform = "translateX(-50%)";
+                    label.style.fontSize = "12px";
+                    label.textContent = i;
+                    barWrapper.appendChild(label);
+                }
 
                 barWrapper.appendChild(tick);
-                barWrapper.appendChild(label);
             }
 
             container.appendChild(barWrapper);
