@@ -1106,16 +1106,16 @@ function getScaleColor(value) {
 function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
     const minValue = 0;
     const maxValue = 10;
+    const interval = 3; // Interval for the scale
 
     // Graph container
     const overallGraphContainer = document.createElement("div");
-    overallGraphContainer.style.width = "550px";
-    overallGraphContainer.style.height = "32px";
-    overallGraphContainer.style.border = "1px solid black";
+    overallGraphContainer.style.width = "100%";
+    overallGraphContainer.style.height = "80px"; // Increased height for better visibility
+    overallGraphContainer.style.border = "2px solid black"; // Thicker border for better visibility
     overallGraphContainer.style.borderRadius = "12px";
     overallGraphContainer.style.position = "relative";
     overallGraphContainer.style.marginBottom = "20px";
-    overallGraphContainer.style.marginLeft = "50px";
     overallGraphContainer.style.display = "flex";
 
     let sfWidth = (totalScore / maxValue) * 100;
@@ -1146,25 +1146,28 @@ function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
     overallGraphContainer.appendChild(sfBar);
     overallGraphContainer.appendChild(cbBar);
 
-    // Tick marks
+    // Tick marks and labels at intervals of 3
     for (let i = minValue; i <= maxValue; i++) {
         const tick = document.createElement("div");
         tick.style.position = "absolute";
         tick.style.left = `${(i / maxValue) * 100}%`;
-        tick.style.top = "50%";
-        tick.style.transform = "translateY(-50%)";
-        tick.style.height = "10px";
-        tick.style.width = "1px";
+        tick.style.bottom = "0";
+        tick.style.height = i % interval === 0 ? "30px" : "15px"; // Longer ticks for intervals of 3
+        tick.style.width = "2px"; // Width of the tick
         tick.style.backgroundColor = "black";
 
         const label = document.createElement("span");
-        label.style.position = "absolute";
-        label.style.marginTop = "5px";
-        label.style.left = `${(i / maxValue) * 100}%`;
-        label.style.top = "100%";
-        label.style.transform = "translateX(-50%)";
-        label.style.fontSize = "12px";
-        label.textContent = i;
+        if (i % interval === 0) { // Add labels only for intervals of 3
+            label.style.position = "absolute";
+            label.style.marginTop = "5px";
+            label.style.left = `${(i / maxValue) * 100}%`;
+            label.style.bottom = "-40px"; // Adjusted position for better visibility
+            label.style.transform = "translateX(-50%)";
+            label.style.fontSize = "18px"; // Increased font size for better visibility
+            label.style.fontWeight = "bold"; // Bold labels for emphasis
+            label.textContent = i;
+            overallGraphContainer.appendChild(label);
+        }
 
         overallGraphContainer.appendChild(tick);
     }
@@ -1173,31 +1176,32 @@ function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
     const totalDisplay = document.createElement("div");
     totalDisplay.style.marginBottom = "10px";
     totalDisplay.style.marginTop = "10px";
-    totalDisplay.style.marginLeft = "80px";
     totalDisplay.style.fontSize = "18px";
     totalDisplay.style.fontWeight = "bold";
     totalDisplay.textContent = `Overall Score: ${overallTotal.toFixed(1)} (Slagging + Fouling: ${totalScore.toFixed(1)}, O&M Score: ${checkboxScore.toFixed(1)})`;
 
     const rightContainerDiv = document.getElementById("resultsContainer");
+    if (!rightContainerDiv) {
+        console.error("Container with ID 'resultsContainer' not found.");
+        return;
+    }
+
     rightContainerDiv.appendChild(totalDisplay);
     rightContainerDiv.appendChild(overallGraphContainer);
 }
 
-// Main score color
 function getColor(score) {
     if (score < 3) return "#a6e3a6";
     if (score < 6.5) return "yellow";
     return "red";
 }
 
-// Base color of checkbox segment depends only on totalScore
 function getCheckboxBaseColor(score) {
     if (score < 3) return "#a6e3a6";
     if (score < 6.5) return "yellow";
     return "red";
 }
 
-// Hatching lines for checkbox segment
 function getHatchingLines(color) {
     return `repeating-linear-gradient(
         45deg,
