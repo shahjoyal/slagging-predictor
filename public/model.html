@@ -894,6 +894,7 @@
                 barWrapper.style.position = "relative";
                 barWrapper.style.display = "flex";
                 barWrapper.style.alignItems = "center";
+                barWrapper.style.overflow = "visible"; // ensure labels visible if any
 
                 const totalScore = slaggingPotential + foulingPotential;
 
@@ -910,15 +911,54 @@
                 valueDisplay.style.transform = "translateX(-50%)";
                 valueDisplay.style.color = "white";
                 valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.userSelect = "none";
 
                 barWrapper.appendChild(bar);
                 barWrapper.appendChild(valueDisplay);
                 wrapper.appendChild(barWrapper);
+
+                // --- Add horizontal scale with ticks and labels ---
+                const scaleContainer = document.createElement("div");
+                scaleContainer.style.position = "relative";
+                scaleContainer.style.width = "100%";
+                scaleContainer.style.height = "30px";
+                scaleContainer.style.marginTop = "8px";
+                scaleContainer.style.borderTop = "1px solid black";
+
+                const scaleValues = [0, 3, 6, 10];
+                scaleValues.forEach(value => {
+                    const posPercent = (value / 10) * 100; // max scale is 10
+
+                    // Tick mark
+                    const tick = document.createElement("div");
+                    tick.style.position = "absolute";
+                    tick.style.left = `${posPercent}%`;
+                    tick.style.top = "0";
+                    tick.style.width = "2px";
+                    tick.style.height = "10px";
+                    tick.style.backgroundColor = "black";
+                    tick.style.transform = "translateX(-50%)";
+                    scaleContainer.appendChild(tick);
+
+                    // Label
+                    const label = document.createElement("span");
+                    label.textContent = value;
+                    label.style.position = "absolute";
+                    label.style.left = `${posPercent}%`;
+                    label.style.top = "12px";
+                    label.style.fontSize = "12px";
+                    label.style.transform = "translateX(-50%)";
+                    scaleContainer.appendChild(label);
+                });
+
+                wrapper.appendChild(scaleContainer);
+
                 cell.appendChild(wrapper);
 
                 console.log(`Rendered scale bar for blend index ${index} with totalScore: ${totalScore}`); // Debugging log
             });
         }
+
 
         function getScaleColor(value) {
             if (value < 4) {
