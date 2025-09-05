@@ -912,7 +912,6 @@
                 valueDisplay.style.color = "black";
                 valueDisplay.style.zIndex = "10";           // on top of bar
                 valueDisplay.style.backgroundColor = "rgba(255,255,255,0.7)"; // semi-transparent white bg behind text for contrast
-
                 valueDisplay.style.fontWeight = "bold";
                 valueDisplay.style.userSelect = "none";
 
@@ -927,6 +926,11 @@
                 scaleContainer.style.height = "30px";
                 scaleContainer.style.marginTop = "8px";
                 scaleContainer.style.borderTop = "1px solid black";
+
+                // Initially hidden
+                scaleContainer.style.opacity = "0";
+                scaleContainer.style.pointerEvents = "none";
+                scaleContainer.style.transition = "opacity 0.3s ease";
 
                 const scaleValues = [0, 3, 6, 10];
                 scaleValues.forEach(value => {
@@ -956,12 +960,22 @@
 
                 wrapper.appendChild(scaleContainer);
 
+                // Hover show/hide scale lines and labels
+                wrapper.addEventListener("mouseenter", () => {
+                    scaleContainer.style.opacity = "1";
+                    scaleContainer.style.pointerEvents = "auto";
+                });
+
+                wrapper.addEventListener("mouseleave", () => {
+                    scaleContainer.style.opacity = "0";
+                    scaleContainer.style.pointerEvents = "none";
+                });
+
                 cell.appendChild(wrapper);
 
                 console.log(`Rendered scale bar for blend index ${index} with totalScore: ${totalScore}`); // Debugging log
             });
         }
-
 
         function getScaleColor(value) {
             if (value < 4) {
