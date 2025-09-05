@@ -12,7 +12,7 @@
         * {
             box-sizing: border-box;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -39,12 +39,16 @@
         }
 
         .navbar img {
-            height: 70px; /* Adjusted height to fit the page */
+            height: 70px;
+            /* Adjusted height to fit the page */
             margin-right: 20px;
-            margin-left: 10px; /* Added margin to center-align better */
+            margin-left: 10px;
+            /* Added margin to center-align better */
             display: block;
-            max-width: 100%; /* Ensures the logo scales within the navbar */
-            object-fit: contain; /* Maintains aspect ratio */
+            max-width: 100%;
+            /* Ensures the logo scales within the navbar */
+            object-fit: contain;
+            /* Maintains aspect ratio */
         }
 
         .nav-buttons {
@@ -84,7 +88,8 @@
         }
 
         .content {
-            margin-top: 200px; /* Ensure content starts below the navbar */
+            margin-top: 200px;
+            /* Ensure content starts below the navbar */
             width: 100%;
             padding: 100px;
             display: flex;
@@ -133,8 +138,10 @@
         }
 
         table {
-            table-layout: fixed; /* Ensures all columns, including the last one, are sized equally */
-            width: 100%; /* Ensures the table spans the full width */
+            table-layout: fixed;
+            /* Ensures all columns, including the last one, are sized equally */
+            width: 100%;
+            /* Ensures the table spans the full width */
             border-collapse: collapse;
             background: white;
             border-radius: 8px;
@@ -161,8 +168,10 @@
             font-size: 14px;
             border: 1px solid #ddd;
             color: #333;
-            width: 25%; /* Ensures all columns, including the last one, are the same size */
-            word-wrap: break-word; /* Prevents content overflow */
+            width: 25%;
+            /* Ensures all columns, including the last one, are the same size */
+            word-wrap: break-word;
+            /* Prevents content overflow */
         }
 
         /* Ensure the last column is the same size as the rest */
@@ -330,13 +339,13 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        
+
         #totalRangeContainer {
             text-align: center;
             margin: 15px 0;
             font-weight: bold;
         }
-        
+
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
@@ -364,7 +373,8 @@
                 align-items: stretch;
             }
 
-            .blend select, .blend input {
+            .blend select,
+            .blend input {
                 width: 100%;
                 margin-bottom: 5px;
             }
@@ -384,7 +394,8 @@
                 justify-content: space-between;
             }
 
-            .blend select, .blend input {
+            .blend select,
+            .blend input {
                 flex: 1;
                 min-width: 150px;
                 margin: 5px;
@@ -616,7 +627,7 @@
             document.getElementById("coalPropertiesModal").style.display = "none";
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById("coalPropertiesModal");
             if (event.target === modal) {
                 modal.style.display = "none";
@@ -683,12 +694,12 @@
                 },
                 body: JSON.stringify({ blends })
             })
-            .then(res => res.json())
-            .then(data => {
-                console.log("Optimization Result:", data);
-                displayOptimizationResult(data, blends);
-            })
-            .catch(err => console.error("Error optimizing blend:", err));
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Optimization Result:", data);
+                    displayOptimizationResult(data, blends);
+                })
+                .catch(err => console.error("Error optimizing blend:", err));
         }
 
         function displayOptimizationResult(data, blends) {
@@ -708,13 +719,13 @@
                         <th>UoM</th>
                     </tr>
                     ${blends.map((blend, i) => {
-                        const bestAftPct = bestAftBlend.blend[i] || 0;
-                        const cheapestPct = cheapestBlend.blend[i] || 0;
-                        const balancedPct = balancedBlend.blend[i] || 0;
-                        const currentPct = currentBlend.blend[i] || 0;
-                        const currency = document.querySelector(`#currency${i}`)?.value || "INR"; // Fixed the invalid character issue by ensuring proper syntax for dynamic currency display
+                const bestAftPct = bestAftBlend.blend[i] || 0;
+                const cheapestPct = cheapestBlend.blend[i] || 0;
+                const balancedPct = balancedBlend.blend[i] || 0;
+                const currentPct = currentBlend.blend[i] || 0;
+                const currency = document.querySelector(`#currency${i}`)?.value || "INR"; // Fixed the invalid character issue by ensuring proper syntax for dynamic currency display
 
-                        return `
+                return `
                             <tr>
                                 <td>${blend.coal}</td>
                                 <td>${currentPct}%</td>
@@ -724,7 +735,7 @@
                                 <td>${currency}</td>
                             </tr>
                         `;
-                    }).join('')}
+            }).join('')}
                     <tr>
                         <td>AFT (°C)</td>
                         <td>${currentBlend.predicted_aft.toFixed(2)}</td>
@@ -797,127 +808,127 @@
         }
 
         // Refined the slagging and fouling calculations to align with the provided formulas.
-function calculateSlaggingAndFouling(blend, otherBlends = []) {
-    if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
-        console.error("Invalid blend data or missing blended_oxides.", blend);
-        return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
-    }
-
-    let blended_oxides = blend.blended_oxides;
-
-    if (!blended_oxides || blended_oxides.length === 0) {
-        blended_oxides = otherBlends.reduce((acc, otherBlend) => {
-            if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
-                otherBlend.blended_oxides.forEach((value, index) => {
-                    acc[index] = (acc[index] || 0) + value;
-                });
+        function calculateSlaggingAndFouling(blend, otherBlends = []) {
+            if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
+                console.error("Invalid blend data or missing blended_oxides.", blend);
+                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
             }
-            return acc;
-        }, []).map(value => value / otherBlends.length);
-    }
 
-    const [SiO2 = 0, Al2O3 = 0, Fe2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0, TiO2 = 0, SO3 = 0] = blended_oxides;
+            let blended_oxides = blend.blended_oxides;
 
-    // Slagging Potential Calculation
-    const acidicOxides = SiO2 + Al2O3 + TiO2;
-    const basicOxides = CaO + MgO + Na2O + K2O;
-    const slaggingPotential = basicOxides / acidicOxides;
+            if (!blended_oxides || blended_oxides.length === 0) {
+                blended_oxides = otherBlends.reduce((acc, otherBlend) => {
+                    if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
+                        otherBlend.blended_oxides.forEach((value, index) => {
+                            acc[index] = (acc[index] || 0) + value;
+                        });
+                    }
+                    return acc;
+                }, []).map(value => value / otherBlends.length);
+            }
 
-    // Fouling Potential Calculation
-    const foulingPotential = (Na2O + K2O + SO3) / (SiO2 + 1);
+            const [SiO2 = 0, Al2O3 = 0, Fe2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0, TiO2 = 0, SO3 = 0] = blended_oxides;
 
-    // Normalize values for scale (0-10)
-    const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
-    const normalizedFouling = Math.min(foulingPotential * 10, 10);
+            // Slagging Potential Calculation
+            const acidicOxides = SiO2 + Al2O3 + TiO2;
+            const basicOxides = CaO + MgO + Na2O + K2O;
+            const slaggingPotential = basicOxides / acidicOxides;
 
-    const finalScore = normalizedSlagging + normalizedFouling;
+            // Fouling Potential Calculation
+            const foulingPotential = (Na2O + K2O + SO3) / (SiO2 + 1);
 
-    return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
-}
+            // Normalize values for scale (0-10)
+            const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
+            const normalizedFouling = Math.min(foulingPotential * 10, 10);
 
-function displayScaleBars(data) {
-    console.log("displayScaleBars called with data:", data); // Debugging log
+            const finalScore = normalizedSlagging + normalizedFouling;
 
-    const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
-
-    const tableElement = document.querySelector("#optimization-result table");
-    if (!tableElement) {
-        console.error("Table element not found. Cannot render scale bars.");
-        return;
-    }
-
-    const blends = [
-        { blend: best_aft_blend },
-        { blend: cheapest_blend },
-        { blend: balanced_blend },
-        { blend: current_blend }
-    ];
-
-    const row = tableElement.insertRow(-1);
-
-    const labelCell = row.insertCell(0);
-    labelCell.textContent = "Slagging & Fouling";
-    labelCell.style.fontWeight = "bold";
-    labelCell.style.textAlign = "center";
-
-    blends.forEach(({ blend }, index) => {
-        const cell = row.insertCell(-1);
-
-        if (!blend) {
-            console.error(`Blend data missing for index ${index}`);
-            return;
+            return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
         }
 
-        const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+        function displayScaleBars(data) {
+            console.log("displayScaleBars called with data:", data); // Debugging log
 
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "flex";
-        wrapper.style.flexDirection = "column";
-        wrapper.style.alignItems = "center";
+            const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
 
-        const barWrapper = document.createElement("div");
-        barWrapper.style.width = "100%";
-        barWrapper.style.height = "32px";
-        barWrapper.style.border = "1px solid black";
-        barWrapper.style.borderRadius = "12px";
-        barWrapper.style.position = "relative";
-        barWrapper.style.display = "flex";
-        barWrapper.style.alignItems = "center";
+            const tableElement = document.querySelector("#optimization-result table");
+            if (!tableElement) {
+                console.error("Table element not found. Cannot render scale bars.");
+                return;
+            }
 
-        const totalScore = slaggingPotential + foulingPotential;
+            const blends = [
+                { blend: best_aft_blend },
+                { blend: cheapest_blend },
+                { blend: balanced_blend },
+                { blend: current_blend }
+            ];
 
-        const bar = document.createElement("div");
-        bar.style.height = "100%";
-        bar.style.width = `${(totalScore / 10) * 100}%`; // Scale the width based on the score
-        bar.style.borderRadius = "12px";
-        bar.style.backgroundColor = getScaleColor(totalScore);
+            const row = tableElement.insertRow(-1);
 
-        const valueDisplay = document.createElement("span");
-        valueDisplay.textContent = totalScore.toFixed(2); // Display the score inside the bar
-        valueDisplay.style.position = "absolute";
-        valueDisplay.style.left = "50%";
-        valueDisplay.style.transform = "translateX(-50%)";
-        valueDisplay.style.color = "white";
-        valueDisplay.style.fontWeight = "bold";
+            const labelCell = row.insertCell(0);
+            labelCell.textContent = "Slagging & Fouling";
+            labelCell.style.fontWeight = "bold";
+            labelCell.style.textAlign = "center";
 
-        barWrapper.appendChild(bar);
-        barWrapper.appendChild(valueDisplay);
-        wrapper.appendChild(barWrapper);
-        cell.appendChild(wrapper);
+            blends.forEach(({ blend }, index) => {
+                const cell = row.insertCell(-1);
 
-        console.log(`Rendered scale bar for blend index ${index} with totalScore: ${totalScore}`); // Debugging log
-    });
-}
+                if (!blend) {
+                    console.error(`Blend data missing for index ${index}`);
+                    return;
+                }
 
-function getScaleColor(value) {
-    if (value < 4) {
-        return "#5de65d"; // Green
-    } else if (value < 7) {
-        return "#ffff76"; // Yellow
-    } else {
-        return "#e24242"; // Red
-    }
-}
+                const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
+
+                const wrapper = document.createElement("div");
+                wrapper.style.display = "flex";
+                wrapper.style.flexDirection = "column";
+                wrapper.style.alignItems = "center";
+
+                const barWrapper = document.createElement("div");
+                barWrapper.style.width = "100%";
+                barWrapper.style.height = "32px";
+                barWrapper.style.border = "1px solid black";
+                barWrapper.style.borderRadius = "12px";
+                barWrapper.style.position = "relative";
+                barWrapper.style.display = "flex";
+                barWrapper.style.alignItems = "center";
+
+                const totalScore = slaggingPotential + foulingPotential;
+
+                const bar = document.createElement("div");
+                bar.style.height = "100%";
+                bar.style.width = `${(totalScore / 10) * 100}%`; // Scale the width based on the score
+                bar.style.borderRadius = "12px";
+                bar.style.backgroundColor = getScaleColor(totalScore);
+
+                const valueDisplay = document.createElement("span");
+                valueDisplay.textContent = totalScore.toFixed(2); // Display the score inside the bar
+                valueDisplay.style.position = "absolute";
+                valueDisplay.style.left = "50%";
+                valueDisplay.style.transform = "translateX(-50%)";
+                valueDisplay.style.color = "white";
+                valueDisplay.style.fontWeight = "bold";
+
+                barWrapper.appendChild(bar);
+                barWrapper.appendChild(valueDisplay);
+                wrapper.appendChild(barWrapper);
+                cell.appendChild(wrapper);
+
+                console.log(`Rendered scale bar for blend index ${index} with totalScore: ${totalScore}`); // Debugging log
+            });
+        }
+
+        function getScaleColor(value) {
+            if (value < 4) {
+                return "#5de65d"; // Green
+            } else if (value < 7) {
+                return "#ffff76"; // Yellow
+            } else {
+                return "#e24242"; // Red
+            }
+        }
 
         function updatePlot(blendsWithAFT) {
             const ternaryPlotElement = document.getElementById('ternary-plot');
@@ -1023,27 +1034,25 @@ function getScaleColor(value) {
                 tick.style.position = "absolute";
                 tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
                 tick.style.bottom = "0";
-                tick.style.height = i % interval === 0 ? "30px" : "15px"; // Longer ticks for intervals of 3
-                tick.style.width = "2px"; // Width of the tick
+                tick.style.height = i % interval === 0 ? "30px" : "15px";
+                tick.style.width = "2px";
                 tick.style.backgroundColor = "black";
 
                 const label = document.createElement("span");
-                if (i % interval === 0) { // Add labels only for intervals of 3
+                if (i % interval === 0 || i === maxValue) { // 👈 Fix: Include maxValue (10)
                     label.style.position = "absolute";
                     label.style.marginTop = "5px";
                     label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                    label.style.bottom = "-40px"; // Adjusted position for better visibility
+                    label.style.bottom = "-40px";
                     label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "18px"; // Increased font size for better visibility
-                    label.style.fontWeight = "bold"; // Bold labels for emphasis
+                    label.style.fontSize = "18px";
+                    label.style.fontWeight = "bold";
                     label.textContent = i;
                     barWrapper.appendChild(label);
                 }
 
                 barWrapper.appendChild(tick);
             }
-
-            container.appendChild(barWrapper);
         }
 
         function getGcvColor(gcvValue) {
@@ -1103,114 +1112,114 @@ function getScaleColor(value) {
         }
 
         // Updated the horizontal scale graphs to reflect the calculated slagging and fouling values based on the provided formulas.
-function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
-    const minValue = 0;
-    const maxValue = 10;
-    const interval = 3; // Interval for the scale
+        function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
+            const minValue = 0;
+            const maxValue = 10;
+            const interval = 3; // Interval for the scale
 
-    // Graph container
-    const overallGraphContainer = document.createElement("div");
-    overallGraphContainer.style.width = "100%";
-    overallGraphContainer.style.height = "80px"; // Increased height for better visibility
-    overallGraphContainer.style.border = "2px solid black"; // Thicker border for better visibility
-    overallGraphContainer.style.borderRadius = "12px";
-    overallGraphContainer.style.position = "relative";
-    overallGraphContainer.style.marginBottom = "20px";
-    overallGraphContainer.style.display = "flex";
+            // Graph container
+            const overallGraphContainer = document.createElement("div");
+            overallGraphContainer.style.width = "100%";
+            overallGraphContainer.style.height = "80px"; // Increased height for better visibility
+            overallGraphContainer.style.border = "2px solid black"; // Thicker border for better visibility
+            overallGraphContainer.style.borderRadius = "12px";
+            overallGraphContainer.style.position = "relative";
+            overallGraphContainer.style.marginBottom = "20px";
+            overallGraphContainer.style.display = "flex";
 
-    let sfWidth = (totalScore / maxValue) * 100;
-    sfWidth = sfWidth > 100 ? 100 : sfWidth;
+            let sfWidth = (totalScore / maxValue) * 100;
+            sfWidth = sfWidth > 100 ? 100 : sfWidth;
 
-    let cbWidth = ((totalScore + checkboxScore) > maxValue) 
-        ? Math.max(0, (maxValue - totalScore) / maxValue * 100) 
-        : (checkboxScore / maxValue) * 100;
+            let cbWidth = ((totalScore + checkboxScore) > maxValue)
+                ? Math.max(0, (maxValue - totalScore) / maxValue * 100)
+                : (checkboxScore / maxValue) * 100;
 
-    const totalCombined = totalScore + checkboxScore;
+            const totalCombined = totalScore + checkboxScore;
 
-    // Slagging + Fouling Score Bar
-    const sfBar = document.createElement("div");
-    sfBar.style.height = "100%";
-    sfBar.style.width = `${sfWidth}%`;
-    sfBar.style.borderRadius = totalCombined >= maxValue ? "12px" : "12px 0 0 12px";
-    sfBar.style.backgroundColor = getColor(totalScore);
+            // Slagging + Fouling Score Bar
+            const sfBar = document.createElement("div");
+            sfBar.style.height = "100%";
+            sfBar.style.width = `${sfWidth}%`;
+            sfBar.style.borderRadius = totalCombined >= maxValue ? "12px" : "12px 0 0 12px";
+            sfBar.style.backgroundColor = getColor(totalScore);
 
-    // Checkbox Score Bar (overlay)
-    const cbBar = document.createElement("div");
-    cbBar.style.height = "100%";
-    cbBar.style.width = `${cbWidth}%`;
-    cbBar.style.borderRadius = totalCombined >= maxValue ? "0 12px 12px 0" : "0";
-    cbBar.style.backgroundColor = getCheckboxBaseColor(totalScore); // base color
-    cbBar.style.backgroundImage = getHatchingLines(getHatchColor(totalCombined)); // hatch color depends on total
+            // Checkbox Score Bar (overlay)
+            const cbBar = document.createElement("div");
+            cbBar.style.height = "100%";
+            cbBar.style.width = `${cbWidth}%`;
+            cbBar.style.borderRadius = totalCombined >= maxValue ? "0 12px 12px 0" : "0";
+            cbBar.style.backgroundColor = getCheckboxBaseColor(totalScore); // base color
+            cbBar.style.backgroundImage = getHatchingLines(getHatchColor(totalCombined)); // hatch color depends on total
 
-    // Append bars
-    overallGraphContainer.appendChild(sfBar);
-    overallGraphContainer.appendChild(cbBar);
+            // Append bars
+            overallGraphContainer.appendChild(sfBar);
+            overallGraphContainer.appendChild(cbBar);
 
-    // Tick marks and labels at intervals of 3
-    for (let i = minValue; i <= maxValue; i++) {
-        const tick = document.createElement("div");
-        tick.style.position = "absolute";
-        tick.style.left = `${(i / maxValue) * 100}%`;
-        tick.style.bottom = "0";
-        tick.style.height = i % interval === 0 ? "30px" : "15px"; // Longer ticks for intervals of 3
-        tick.style.width = "2px"; // Width of the tick
-        tick.style.backgroundColor = "black";
+            // Tick marks and labels at intervals of 3
+            for (let i = minValue; i <= maxValue; i++) {
+                const tick = document.createElement("div");
+                tick.style.position = "absolute";
+                tick.style.left = `${(i / maxValue) * 100}%`;
+                tick.style.bottom = "0";
+                tick.style.height = i % interval === 0 ? "30px" : "15px"; // Longer ticks for intervals of 3
+                tick.style.width = "2px"; // Width of the tick
+                tick.style.backgroundColor = "black";
 
-        const label = document.createElement("span");
-        if (i % interval === 0) { // Add labels only for intervals of 3
-            label.style.position = "absolute";
-            label.style.marginTop = "5px";
-            label.style.left = `${(i / maxValue) * 100}%`;
-            label.style.bottom = "-40px"; // Adjusted position for better visibility
-            label.style.transform = "translateX(-50%)";
-            label.style.fontSize = "18px"; // Increased font size for better visibility
-            label.style.fontWeight = "bold"; // Bold labels for emphasis
-            label.textContent = i;
-            overallGraphContainer.appendChild(label);
+                const label = document.createElement("span");
+                if (i % interval === 0) { // Add labels only for intervals of 3
+                    label.style.position = "absolute";
+                    label.style.marginTop = "5px";
+                    label.style.left = `${(i / maxValue) * 100}%`;
+                    label.style.bottom = "-40px"; // Adjusted position for better visibility
+                    label.style.transform = "translateX(-50%)";
+                    label.style.fontSize = "18px"; // Increased font size for better visibility
+                    label.style.fontWeight = "bold"; // Bold labels for emphasis
+                    label.textContent = i;
+                    overallGraphContainer.appendChild(label);
+                }
+
+                overallGraphContainer.appendChild(tick);
+            }
+
+            // Display score
+            const totalDisplay = document.createElement("div");
+            totalDisplay.style.marginBottom = "10px";
+            totalDisplay.style.marginTop = "10px";
+            totalDisplay.style.fontSize = "18px";
+            totalDisplay.style.fontWeight = "bold";
+            totalDisplay.textContent = `Overall Score: ${overallTotal.toFixed(1)} (Slagging + Fouling: ${totalScore.toFixed(1)}, O&M Score: ${checkboxScore.toFixed(1)})`;
+
+            const rightContainerDiv = document.getElementById("resultsContainer");
+            if (!rightContainerDiv) {
+                console.error("Container with ID 'resultsContainer' not found.");
+                return;
+            }
+
+            rightContainerDiv.appendChild(totalDisplay);
+            rightContainerDiv.appendChild(overallGraphContainer);
         }
 
-        overallGraphContainer.appendChild(tick);
-    }
+        function getColor(score) {
+            if (score < 3) return "#a6e3a6";
+            if (score < 6.5) return "yellow";
+            return "red";
+        }
 
-    // Display score
-    const totalDisplay = document.createElement("div");
-    totalDisplay.style.marginBottom = "10px";
-    totalDisplay.style.marginTop = "10px";
-    totalDisplay.style.fontSize = "18px";
-    totalDisplay.style.fontWeight = "bold";
-    totalDisplay.textContent = `Overall Score: ${overallTotal.toFixed(1)} (Slagging + Fouling: ${totalScore.toFixed(1)}, O&M Score: ${checkboxScore.toFixed(1)})`;
+        function getCheckboxBaseColor(score) {
+            if (score < 3) return "#a6e3a6";
+            if (score < 6.5) return "yellow";
+            return "red";
+        }
 
-    const rightContainerDiv = document.getElementById("resultsContainer");
-    if (!rightContainerDiv) {
-        console.error("Container with ID 'resultsContainer' not found.");
-        return;
-    }
-
-    rightContainerDiv.appendChild(totalDisplay);
-    rightContainerDiv.appendChild(overallGraphContainer);
-}
-
-function getColor(score) {
-    if (score < 3) return "#a6e3a6";
-    if (score < 6.5) return "yellow";
-    return "red";
-}
-
-function getCheckboxBaseColor(score) {
-    if (score < 3) return "#a6e3a6";
-    if (score < 6.5) return "yellow";
-    return "red";
-}
-
-function getHatchingLines(color) {
-    return `repeating-linear-gradient(
+        function getHatchingLines(color) {
+            return `repeating-linear-gradient(
         45deg,
         ${color},
         ${color} 10px,
         transparent 10px,
         transparent 20px
     )`;
-}
+        }
 
     </script>
 </body>
