@@ -532,11 +532,13 @@
                 <input type="number" id="minrange${index}" placeholder="Min Range (%)" min="0" max="100">
                 <input type="number" id="maxrange${index}" placeholder="Max Range (%)" min="0" max="100">
                 <input type="number" id="cost${index}" placeholder="Cost" min="0">
-                <select id="currency${index}" class="currency-select">
-                    <option value="INR">INR</option>
-                    <option value="USD">USD</option>
-                    <option value="DIR">DIR</option>
-                </select>
+                <input 
+    type="text" 
+    id="currency${index}" 
+    class="currency-select" 
+    pattern="INR|USD|DIR" 
+    title="Allowed currencies: INR, USD, DIR" 
+/>
                 <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
                 <button type="button" class="properties-btn" onclick="fetchCoalProperties(${index})">Properties</button>
                 <div id="properties${index}"></div>
