@@ -909,7 +909,10 @@
                 valueDisplay.style.position = "absolute";
                 valueDisplay.style.left = "50%";
                 valueDisplay.style.transform = "translateX(-50%)";
-                valueDisplay.style.text = "black";
+                valueDisplay.style.color = "black";
+                valueDisplay.style.zIndex = "10";           // on top of bar
+                valueDisplay.style.backgroundColor = "rgba(255,255,255,0.7)"; // semi-transparent white bg behind text for contrast
+
                 valueDisplay.style.fontWeight = "bold";
                 valueDisplay.style.userSelect = "none";
 
