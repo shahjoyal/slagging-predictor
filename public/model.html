@@ -1030,29 +1030,32 @@
 
             // Add tick marks (teeth) and labels at intervals of 3
             for (let i = minValue; i <= maxValue; i++) {
+                const positionPercent = ((i - minValue) / (maxValue - minValue)) * 100;
+
+                // Create the tick mark
                 const tick = document.createElement("div");
                 tick.style.position = "absolute";
-                tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
+                tick.style.left = `${positionPercent}%`;
                 tick.style.bottom = "0";
-                tick.style.height = i % interval === 0 ? "30px" : "15px";
+                tick.style.height = (i % interval === 0 || i === maxValue) ? "30px" : "15px";
                 tick.style.width = "2px";
                 tick.style.backgroundColor = "black";
+                barWrapper.appendChild(tick);
 
-                const label = document.createElement("span");
-                if (i % interval === 0 || i === maxValue) { // 👈 Fix: Include maxValue (10)
+                // Create the label
+                if (i % interval === 0 || i === maxValue) {
+                    const label = document.createElement("div");
                     label.style.position = "absolute";
-                    label.style.marginTop = "5px";
-                    label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                    label.style.bottom = "-40px";
+                    label.style.left = `${positionPercent}%`;
+                    label.style.bottom = "-25px"; // Position below the tick
                     label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "18px";
+                    label.style.fontSize = "16px";
                     label.style.fontWeight = "bold";
                     label.textContent = i;
                     barWrapper.appendChild(label);
                 }
-
-                barWrapper.appendChild(tick);
             }
+
         }
 
         function getGcvColor(gcvValue) {
