@@ -237,7 +237,8 @@ loginForm.addEventListener('submit', function(e) {
 
         // Dummy login validation
         if(email === 'coalblend@abhitech.com' && password === 'password123') {
-            message.style.color = 'green';
+           localStorage.setItem('isLoggedIn', 'true'); 
+           message.style.color = 'green';
             message.textContent = 'Login successful!';
             // Redirect to homepage
             window.location.href = '/slagging_coal_page.html';
