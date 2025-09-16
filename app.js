@@ -19,7 +19,7 @@ app.use(express.static('js'));
 
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'slagging_coal_page.html'));
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 

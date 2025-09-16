@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Combustion Analyzer</title>
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f0ff, #ffffff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 70px; /* To avoid navbar overlap */
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            width: 100%;
+            background-color: #004691;
+            display: flex;
+            align-items: center;
+            padding: 10px 30px;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 70px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar img {
+            height: 50px;
+            margin-right: 20px;
+        }
+
+        .navbar h1 {
+            font-size: 22px;
+        }
+
+        /* Login Container */
+        .login-container {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: #004691;
+            font-size: 26px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        /* Input Fields Styling */
+        input {
+            width: 100%;
+            padding: 14px 12px;
+            margin: 12px 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: #004691;
+            box-shadow: 0 0 6px rgba(0,70,145,0.3);
+            outline: none;
+        }
+
+        /* Button Styling */
+        button {
+            background: #004691;
+            width: 100%;
+            font-size: 18px;
+            border-radius: 8px;
+            padding: 14px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #013b79;
+            transform: scale(1.02);
+        }
+
+        /* Text and Links */
+        p {
+            color: #555;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        a {
+            color: #004691;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .navbar h1 {
+                font-size: 18px;
+            }
+
+            input, button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <img src="/images/abhitech-logo.png" alt="Company Logo">
+    <h1>Combustion Analyzer</h1>
+</div>
+
+<div class="login-container">
+    <h2>LOGIN</h2>
+    <form id="loginForm">
+        <input type="text" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <p id="message"></p>
+</div>
+
+<script>
+    const loginForm = document.getElementById('loginForm');
+    const message = document.getElementById('message');
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if(!email || !password) {
+            message.textContent = 'Please fill in both fields.';
+            return;
+        }
+
+        // Dummy login validation
+        if(email === 'coalblend@abhitech.com' && password === 'password123') {
+            message.style.color = 'green';
+            message.textContent = 'Login successful!';
+            // Redirect to homepage
+            window.location.href = '/slagging_coal_pages.html';
+        } else {
+            message.style.color = 'red';
+            message.textContent = 'Invalid email or password.';
+        }
+    });
+</script>
+
+</body>
+</html>
