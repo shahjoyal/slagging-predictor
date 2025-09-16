@@ -436,6 +436,14 @@
             border-radius: 10px;
         }
     </style>
+    <script>
+if(localStorage.getItem('isLoggedIn') !== 'true') {
+    alert('You must login first!');
+    window.location.href = '/login.html'; 
+} else {
+    document.body.style.display = 'block';
+}
+</script>
 </head>
 
 <body>
