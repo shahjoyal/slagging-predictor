@@ -122,7 +122,7 @@
           #delete-selected-btn:hover {
             background-color: #0300b5;
           }
-   #downloadPDF {
+   #downloadPdf {
   position: fixed;
   top: 120px;
   right: 20px;
@@ -139,7 +139,7 @@
   z-index: 9999; /* keeps it above everything */
 }
 
-#downloadPDF:hover {
+#downloadPdf:hover {
   background: #1e40af;
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.2);
@@ -173,7 +173,20 @@ button:hover {
 
 #delete-selected-btn { background: #dc2626; }
 #delete-selected-btn:hover { background: #b91c1c; }
+.navbar .logout-btn {
+  padding: 10px 16px;
+  background-color: red !important;
+  color: #fff !important;
+  border: none;
+  cursor: pointer;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
 
+.navbar .logout-btn:hover {
+  background-color: darkred !important;
+}
         
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -186,6 +199,10 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 } else {
     document.body.style.display = 'block';
 }
+      function logoutUser() {
+  localStorage.setItem('isLoggedIn', 'false'); 
+  window.location.href = 'login.html'; 
+}      
 </script>
 </head>
 <body>
@@ -197,6 +214,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
             <button onclick="window.location.href='model.html'">Model</button>
             <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
          <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
+         <button class="logout-btn" onclick="logoutUser()">Logout</button>
          
            
     </div>
@@ -208,7 +226,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
     <button class="btn" onclick="downloadExcel()">Download Template</button>
     <input type="file" id="fileInput" accept=".xlsx, .xls" class="btn btn-upload">
     <button id="delete-selected-btn" style="background-color: #02008a; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px;">Delete Selected</button>
-    <button id="downloadPDF">⬇️ Download PDF</button>
+    <button id="downloadPDF" class="btn">⬇️ Download PDF</button>
 </div>
 
 <div class="table-container">
