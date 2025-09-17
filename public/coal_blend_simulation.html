@@ -270,6 +270,28 @@
     .dropdown {
   font-size:0.6rem;
     }
+       #downloadPDF {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: #2563eb; /* nice blue */
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  z-index: 9999; /* keeps it above everything */
+}
+
+#downloadPDF:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -292,7 +314,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
       <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
       <button onclick="window.location.href='coal_table.html'">Coal Properties</button>
       <button onclick="window.location.href='model.html'">Model</button>
-      <button id="downloadPDF">Download PDF</button>
+      
     </div>
   </div>
   <div style="margin-top:8px;">
@@ -301,7 +323,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
   </div>
 
   <div id="loader">Loading... please wait</div>
-
+<button id="downloadPDF">⬇️ Download PDF</button>
   <div class="main-container">
     <div class="mills-grid" id="millsGrid">
       <!-- header row -->
