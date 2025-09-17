@@ -145,9 +145,40 @@
   box-shadow: 0 6px 14px rgba(0,0,0,0.2);
 }
         
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+}
+
+/* Specific colors */
+.btn { background: #16a34a; color: #fff; }
+.btn:hover { background: #15803d; }
+
+.btn-upload { background: #2563eb; color: #fff; }
+.btn-upload:hover { background: #1e40af; }
+
+.navbar button { background: #02008a; color: #fff; }
+.navbar button:hover { background: #001cbb; }
+
+#delete-selected-btn { background: #dc2626; }
+#delete-selected-btn:hover { background: #b91c1c; }
 
         
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
 if(localStorage.getItem('isLoggedIn') !== 'true') {
     alert('You must login first!');
