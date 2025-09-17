@@ -306,6 +306,41 @@
 .navbar .logout-btn:hover {
   background-color: darkred !important;
 }
+        .icon-btn {
+  background: #02008a;  /* same as navbar */
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+
+/* Tooltip */
+.icon-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.icon-btn:hover::after {
+  opacity: 1;
+}
 
 
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
@@ -346,7 +381,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
   </div>
 
   <div id="loader">Loading... please wait</div>
-<button id="downloadPDF">⬇️ Download PDF</button>
+<button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
   <div class="main-container">
     <div class="mills-grid" id="millsGrid">
       <!-- header row -->
