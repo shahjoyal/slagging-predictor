@@ -95,71 +95,73 @@
             background-color: white; /* Ensure it doesn't become transparent */
             z-index: 2;
         }
-        .btn {
-            margin-left: 20%;
-            margin-top: 25px;
-            padding: 10px 15px;
-            border-radius: 8px;
-            background-color: green;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-upload {
-            background-color: blue;
-        }
-
-        #delete-selected-btn {
-            background-color: #02008a;
-            color: white;
-            border: none;
-            margin-left: 50px;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 5px;
-          }
-          
-          #delete-selected-btn:hover {
-            background-color: #0300b5;
-          }
-   #downloadPdf {
-  position: fixed;
-  top: 120px;
-  right: 20px;
-  background: #2563eb; /* nice blue */
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  transition: all 0.3s ease;
-  z-index: 9999; /* keeps it above everything */
+.container {
+  margin-top: 100px;  /* pushes content below navbar */
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-#downloadPdf:hover {
-  background: #1e40af;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-        
+/* Base Button Styling */
 button {
-  padding: 10px 16px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
 }
+
+/* Download Template */
+.btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+}
+
+
+/* Upload new data */
+/* Upload New Data button (same style as others) */
+.btn-upload {
+  display: inline-block;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  cursor: pointer;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+}
+
+/* Hide actual input */
+#fileInput {
+  display: none;
+}
+
+
+/* Delete button */
+#delete-selected-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+}
+
+
+/* Download PDF - match navbar button */
+#downloadPDF {
+  background: #02008a;
+  color: #fff;
+}
+
 
 /* Specific colors */
 .btn { background: #16a34a; color: #fff; }
@@ -224,7 +226,8 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 
 <div class="container">
     <button class="btn" onclick="downloadExcel()">Download Template</button>
-    <input type="file" id="fileInput" accept=".xlsx, .xls" class="btn btn-upload">
+    <label for="fileInput" class="btn-upload">📤 Upload New Data</label>
+<input type="file" id="fileInput" accept=".xlsx, .xls" style="display:none;">
     <button id="delete-selected-btn" style="background-color: #02008a; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px;">Delete Selected</button>
     <button id="downloadPDF" class="btn">⬇️ Download PDF</button>
 </div>
