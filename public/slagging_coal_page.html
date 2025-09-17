@@ -359,6 +359,20 @@
             padding-top: 10px;
             
         }
+        .navbar .logout-btn {
+  padding: 10px 16px;
+  background-color: red !important;
+  color: #fff !important;
+  border: none;
+  cursor: pointer;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.navbar .logout-btn:hover {
+  background-color: darkred !important;
+}
         
 </style>
      <script>
@@ -368,6 +382,10 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 } else {
     document.body.style.display = 'block';
 }
+         function logoutUser() {
+  localStorage.setItem('isLoggedIn', 'false'); 
+  window.location.href = 'login.html'; 
+} 
 </script>
 </head>
 <body>
@@ -378,7 +396,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
             <button onclick="window.location.href='coal_table.html'">Coal Properties</button>
             <button onclick="window.location.href='model.html'">Model</button>
             <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
-            
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
     </div>
     <div class="content">
