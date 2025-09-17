@@ -292,6 +292,22 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.2);
 }
+       .logout-btn {
+  padding: 10px 16px;
+  background-color: transparent;
+  color: #b71c1c;
+  border: 2px solid #b71c1c;
+  cursor: pointer;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #b71c1c;
+  color: #fff;
+}
+
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -304,6 +320,11 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 } else {
     document.body.style.display = 'block';
 }
+    function logoutUser() {
+  localStorage.setItem('isLoggedIn', 'false'); 
+  window.location.href = 'login.html'; 
+}
+
 </script>
 </head>
 <body>
@@ -314,6 +335,8 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
       <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
       <button onclick="window.location.href='coal_table.html'">Coal Properties</button>
       <button onclick="window.location.href='model.html'">Model</button>
+      <button class="logout-btn" onclick="logoutUser()">Logout</button>
+
       
     </div>
   </div>
