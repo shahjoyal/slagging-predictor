@@ -450,6 +450,8 @@
   background-color: darkred !important;
 }
     </style>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
 if(localStorage.getItem('isLoggedIn') !== 'true') {
     alert('You must login first!');
@@ -477,6 +479,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
     </div>
 
     <div class="content">
+        <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
         <form id="coalForm">
             <div id="coalBlends">
                 <h2>Coal Type</h2>
@@ -1310,7 +1313,81 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
         transparent 20px
     )`;
         }
+   document.getElementById("downloadPDF").addEventListener("click", function () {
+  const { jsPDF } = window.jspdf;
+  const element = document.body; // ✅ capture whole page including navbar
 
+  html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    onclone: (clonedDoc) => {
+      // Handle input & textarea values
+      const inputs = clonedDoc.querySelectorAll("input, textarea");
+      inputs.forEach(input => {
+        const text = clonedDoc.createElement("span");
+        text.textContent = input.value;
+
+        text.style.position = "absolute";
+        text.style.left = input.offsetLeft + "px";
+        text.style.top = input.offsetTop + "px";
+        text.style.width = input.offsetWidth + "px";
+        text.style.height = input.offsetHeight + "px";
+        text.style.lineHeight = input.offsetHeight + "px";
+        text.style.textAlign = "center";
+        text.style.font = window.getComputedStyle(input).font;
+        text.style.color = window.getComputedStyle(input).color;
+
+        clonedDoc.body.appendChild(text);
+        input.style.visibility = "hidden";
+      });
+
+      // Handle select dropdowns (coal names)
+      const selects = clonedDoc.querySelectorAll("select");
+      selects.forEach(select => {
+        const selectedText = select.options[select.selectedIndex]?.text || "";
+        const text = clonedDoc.createElement("span");
+        text.textContent = selectedText;
+
+        text.style.position = "absolute";
+        text.style.left = select.offsetLeft + "px";
+        text.style.top = select.offsetTop + "px";
+        text.style.width = select.offsetWidth + "px";
+        text.style.height = select.offsetHeight + "px";
+        text.style.lineHeight = select.offsetHeight + "px";
+        text.style.textAlign = "center";
+        text.style.font = window.getComputedStyle(select).font;
+        text.style.color = window.getComputedStyle(select).color;
+
+        clonedDoc.body.appendChild(text);
+        select.style.visibility = "hidden";
+      });
+    }
+  }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("Coal_Blending_Ratio.pdf");
+  });
+});
     </script>
 </body>
 
