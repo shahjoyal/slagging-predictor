@@ -378,42 +378,42 @@
         /* Icon button styles */
 .icon-btn {
   position: absolute;
-  top: 70px;        /* adjust distance below navbar */
+  top: 80px;        /* a little lower below navbar */
   right: 20px;      /* align on right side */
   background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   color: #1f2937;   /* same as navbar buttons */
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease;
   z-index: 1000;    /* ensure it stays on top */
 }
 
 .icon-btn:hover {
-  color: #000;
-  transform: scale(1.2);
+  color: #000;      /* only color change, no resize */
 }
 
+/* Tooltip styling */
 .icon-btn::after {
   content: attr(title);
   position: absolute;
-  bottom: -35px;
+  top: 120%;             /* place directly below icon */
   left: 50%;
-  transform: translateX(-50%) translateY(5px);
-  background: #111;
+  transform: translateX(-50%);
+  background: #111;      /* black box */
   color: #fff;
   font-size: 0.75rem;
-  padding: 5px 8px;
-  border-radius: 5px;
+  padding: 4px 6px;
+  border-radius: 4px;
   opacity: 0;
   pointer-events: none;
   white-space: nowrap;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
+/* Show tooltip on hover */
 .icon-btn:hover::after {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
         
