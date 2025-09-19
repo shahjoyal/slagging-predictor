@@ -373,6 +373,48 @@
 .navbar .logout-btn:hover {
   background-color: darkred !important;
 }
+        /* Icon button styles */
+.icon-btn {
+  position: absolute;
+  top: 10px;          /* distance from top */
+  left: 15px;         /* distance from left */
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;  /* size of icon */
+  cursor: pointer;
+  color: #1f2937;     /* dark gray (like navbar button) */
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* Hover effect */
+.icon-btn:hover {
+  color: #000;        /* darker shade on hover */
+  transform: scale(1.2);
+}
+
+/* Tooltip styling */
+.icon-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -35px;
+  left: 0;
+  background: #111;       /* black box */
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  border-radius: 5px;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Show tooltip on hover */
+.icon-btn:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
         
 </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -401,8 +443,9 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
             <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
     </div>
+    <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
     <div class="content">
-        <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
+        
     <div class="left-container">
         <form id="coalForm">
             <div id="coalBlends">
