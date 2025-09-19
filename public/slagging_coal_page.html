@@ -84,6 +84,8 @@
             display: flex;
             border-radius: 4px;
             flex-direction: column;
+            position: relative;
+            padding: 1rem;
         }
         
         .blend-row {
@@ -443,9 +445,9 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
             <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
     </div>
-    <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
+    
     <div class="content">
-        
+    <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>    
     <div class="left-container">
         <form id="coalForm">
             <div id="coalBlends">
