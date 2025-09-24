@@ -341,10 +341,14 @@
 .icon-btn:hover::after {
   opacity: 1;
 }
- .layout {
-      display: inline-block;
-      position: relative;
-    }
+.layout {
+    position: relative;
+    transform: scale(0.8);
+    transform-origin: top left;
+}
+
+
+
 
     .bunker-row {
       display: flex;
@@ -404,11 +408,11 @@
     }
 
     /* bunker capacity table */
-    .capacity-table {
+    /* .capacity-table {
       border-collapse: collapse;
       width: 300px;
       margin-top: 60px; /* align vertically with bunkers */
-    }
+    /* }
 
     .capacity-table th, .capacity-table td {
       border: 1px solid black;
@@ -424,9 +428,110 @@
 
     .capacity-table th {
       background: #f0f0f0;
-    }
+    } */ 
+/* new wrapper - rename freely (diagram-row / summary-layout / panel) */
+.diagram-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start; /* top aligned */
+  flex-wrap: nowrap;       /* keep them on one row; change to wrap if you want mobile stacking */
+}
+
+/* optional: make sure summary stays its natural size */
+.diagram-row .summary-table {
+  width: 280px; /* same as before */
+  flex: 0 0 auto;
+}
+
+/* ensure layout sits to the right and scales the diagram */
+.diagram-row .layout {
+  flex: 1 0 auto; /* takes remaining space (if you want) */
+  transform: scale(0.8);      /* your desired scale */
+  transform-origin: top left;
+  position: relative;
+}
 
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
+
+    /* Media query for screens smaller than 900px */
+@media (max-width: 900px) {
+  body {
+    padding: 80px 6px 6px;
+  }
+
+  .main-container {
+    max-width: 100%;
+  }
+
+  .mills-grid {
+    grid-template-columns: 1fr; /* stack columns vertically */
+    gap: 6px;
+    font-size: 0.72rem;
+  }
+
+  .mill {
+    width: 100%;
+    min-height: 28px;
+    font-size: 0.72rem;
+    padding: 4px;
+  }
+
+  .dropdown,
+  .percentage-input,
+  .flow-input,
+  .cost-input,
+  .gcv-box,
+  .generation-input {
+    width: 100%;
+    font-size: 0.72rem;
+    padding: 4px;
+  }
+
+  .diagram-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .diagram-row .layout {
+    transform: scale(0.7); /* scale diagram for smaller screen */
+    width: 100%;
+  }
+
+  .diagram-row .summary-table {
+    width: 100%;
+  }
+
+  .top-line {
+    width: 100%; /* stretch top line */
+    left: 0;
+  }
+
+  .arrow {
+    left: auto !important; /* remove fixed left positions */
+    margin-left: calc(50% - 1px); /* center arrows */
+  }
+
+  #downloadPDF {
+    top: auto;
+    bottom: 20px;
+    right: 10px;
+  }
+
+  .navbar img {
+    height: 60px; /* reduce logo size */
+  }
+
+  .navbar h1 {
+    font-size: 16px;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+    gap: 6px;
+    margin-right: 0;
+  }
+}
+
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -536,66 +641,10 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
       <div></div>
     </div>
 
-    <div class="layout">
-    <!-- top line -->
-    <div class="top-line"></div>
-
-    <!-- arrows -->
-    <div class="arrow" style="height:60px; left:60px;"></div>
-    <div class="arrow" style="height:60px; left:200px;"></div>
-    <div class="arrow" style="height:60px; left:340px;"></div>
-    <div class="arrow" style="height:60px; left:480px;"></div>
-    <div class="arrow" style="height:60px; left:620px;"></div>
-    <div class="arrow" style="height:60px; left:760px;"></div>
-
-    <!-- bunkers row -->
-    <div class="bunker-row">
-      <div class="bunker">
-        <svg viewBox="0 0 100 150">
-          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-        </svg>
-        <div class="label">Bunker 1</div>
-      </div>
-
-      <div class="bunker">
-        <svg viewBox="0 0 100 150">
-          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-        </svg>
-        <div class="label">Bunker 2</div>
-      </div>
-
-      <div class="bunker">
-        <svg viewBox="0 0 100 150">
-          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-        </svg>
-        <div class="label">Bunker 3</div>
-      </div>
-
-      <div class="bunker">
-        <svg viewBox="0 0 100 150">
-          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-        </svg>
-        <div class="label">Bunker 4</div>
-      </div>
-
-      <div class="bunker">
-        <svg viewBox="0 0 100 150">
-          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-        </svg>
-        <div class="label">Bunker 5</div>
-      </div>
-
-      <div class="bunker">
-        <svg viewBox="0 0 100 150">
-          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-        </svg>
-        <div class="label">Bunker 6</div>
-      </div>
-    </div>
-  </div>
+    
 
   <!-- bunker capacity table beside bunkers -->
-  <table class="capacity-table">
+  <!-- <table class="capacity-table">
     <tr>
       <th>Bunker</th>
       <th>Capacity</th>
@@ -606,29 +655,84 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
     <tr><td>Bunker 4</td><td><input type="text" placeholder="Enter capacity"></td></tr>
     <tr><td>Bunker 5</td><td><input type="text" placeholder="Enter capacity"></td></tr>
     <tr><td>Bunker 6</td><td><input type="text" placeholder="Enter capacity"></td></tr>
-  </table>
+  </table> -->
 
-    <!-- Summary -->
-    <div class="summary-table" aria-hidden="false">
-      <div class="summary-cell summary-header">Generation (MW)</div>
-      <div class="summary-cell"><input id="generation" class="generation-input" placeholder="MW" /></div>
 
-      <div class="summary-cell summary-header">Total Coal Flow(TPH)</div>
-      <div class="summary-cell" id="totalFlow">0</div>
+<!-- diagram + summary wrapper (rename class if you prefer) -->
+<div class="diagram-row">
+  <!-- Summary (left) -->
+  <div class="summary-table" aria-hidden="false">
+    <div class="summary-cell summary-header">Generation (MW)</div>
+    <div class="summary-cell"><input id="generation" class="generation-input" placeholder="MW" /></div>
 
-      <div class="summary-cell summary-header">Average GCV(Kcal/kg)</div>
-      <div class="summary-cell" id="avgGCV">0</div>
+    <div class="summary-cell summary-header">Total Coal Flow(TPH)</div>
+    <div class="summary-cell" id="totalFlow">0</div>
 
-      <div class="summary-cell summary-header">Average AFT(°C)</div>
-      <div class="summary-cell" id="avgAFT">--</div>
+    <div class="summary-cell summary-header">Average GCV(Kcal/kg)</div>
+    <div class="summary-cell" id="avgGCV">0</div>
 
-      <div class="summary-cell summary-header">Heat Rate(Kcal/kWh)</div>
-      <div class="summary-cell" id="heatRate">--</div>
-      
-      <div class="summary-cell summary-header">Cost/MT</div>
-      <div class="summary-cell" id="COSTRATE">--</div>
+    <div class="summary-cell summary-header">Average AFT(°C)</div>
+    <div class="summary-cell" id="avgAFT">--</div>
+
+    <div class="summary-cell summary-header">Heat Rate(Kcal/kWh)</div>
+    <div class="summary-cell" id="heatRate">--</div>
+
+    <div class="summary-cell summary-header">Cost/MT</div>
+    <div class="summary-cell" id="COSTRATE">--</div>
+  </div>
+
+  <!-- Layout / diagram (right) -->
+  <div class="layout">
+    <div class="top-line"></div>
+
+    <div class="arrow" style="height:60px; left:60px;"></div>
+    <div class="arrow" style="height:60px; left:200px;"></div>
+    <div class="arrow" style="height:60px; left:340px;"></div>
+    <div class="arrow" style="height:60px; left:480px;"></div>
+    <div class="arrow" style="height:60px; left:620px;"></div>
+    <div class="arrow" style="height:60px; left:760px;"></div>
+
+    <div class="bunker-row">
+      <!-- your 6 bunkers -->
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 1</div>
+      </div>
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 2</div>
+      </div>
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 3</div>
+      </div>
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 4</div>
+      </div>
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 5</div>
+      </div>
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 6</div>
+      </div>
     </div>
   </div>
+</div>
 
 <script>
   let excelData = [];
