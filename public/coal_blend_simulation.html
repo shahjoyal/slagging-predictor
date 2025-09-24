@@ -306,7 +306,7 @@
 .navbar .logout-btn:hover {
   background-color: darkred !important;
 }
-        .icon-btn {
+  .icon-btn {
   background: #02008a;  /* same as navbar */
   color: #fff;
   border: none;
@@ -341,7 +341,90 @@
 .icon-btn:hover::after {
   opacity: 1;
 }
+ .layout {
+      display: inline-block;
+      position: relative;
+    }
 
+    .bunker-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 60px; /* space for arrows */
+    }
+
+    .bunker {
+      width: 120px;
+      height: 160px;
+      position: relative;
+    }
+
+    .bunker svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .bunker path {
+      fill: none;
+      stroke: black;
+      stroke-width: 2;
+    }
+
+    .label {
+      text-align: center;
+      margin-top: -10px;
+      font-weight: bold;
+    }
+
+    /* top horizontal line */
+  .top-line {
+  position: absolute;
+  top: 0;
+  left: 5px; /* start a bit earlier than first arrow */
+  width: 755px; /* adjust width to still end at last arrow */
+  height: 2px;
+  background: black;
+}
+
+    /* arrows */
+    .arrow {
+      position: absolute;
+      width: 2px;
+      background: black;
+    }
+
+    .arrow::after {
+      content: '';
+      position: absolute;
+      left: -6px;
+      bottom: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 10px solid black;
+    }
+
+    /* bunker capacity table */
+    .capacity-table {
+      border-collapse: collapse;
+      width: 300px;
+      margin-top: 60px; /* align vertically with bunkers */
+    }
+
+    .capacity-table th, .capacity-table td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .capacity-table input {
+      width: 100px;
+      padding: 5px;
+      text-align: center;
+    }
+
+    .capacity-table th {
+      background: #f0f0f0;
+    }
 
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
   </style>
@@ -452,6 +535,78 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
       <div></div>
       <div></div>
     </div>
+
+    <div class="layout">
+    <!-- top line -->
+    <div class="top-line"></div>
+
+    <!-- arrows -->
+    <div class="arrow" style="height:60px; left:60px;"></div>
+    <div class="arrow" style="height:60px; left:200px;"></div>
+    <div class="arrow" style="height:60px; left:340px;"></div>
+    <div class="arrow" style="height:60px; left:480px;"></div>
+    <div class="arrow" style="height:60px; left:620px;"></div>
+    <div class="arrow" style="height:60px; left:760px;"></div>
+
+    <!-- bunkers row -->
+    <div class="bunker-row">
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 1</div>
+      </div>
+
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 2</div>
+      </div>
+
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 3</div>
+      </div>
+
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 4</div>
+      </div>
+
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 5</div>
+      </div>
+
+      <div class="bunker">
+        <svg viewBox="0 0 100 150">
+          <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+        </svg>
+        <div class="label">Bunker 6</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- bunker capacity table beside bunkers -->
+  <table class="capacity-table">
+    <tr>
+      <th>Bunker</th>
+      <th>Capacity</th>
+    </tr>
+    <tr><td>Bunker 1</td><td><input type="text" placeholder="Enter capacity"></td></tr>
+    <tr><td>Bunker 2</td><td><input type="text" placeholder="Enter capacity"></td></tr>
+    <tr><td>Bunker 3</td><td><input type="text" placeholder="Enter capacity"></td></tr>
+    <tr><td>Bunker 4</td><td><input type="text" placeholder="Enter capacity"></td></tr>
+    <tr><td>Bunker 5</td><td><input type="text" placeholder="Enter capacity"></td></tr>
+    <tr><td>Bunker 6</td><td><input type="text" placeholder="Enter capacity"></td></tr>
+  </table>
 
     <!-- Summary -->
     <div class="summary-table" aria-hidden="false">
@@ -750,6 +905,7 @@ if(generation > 0 && totalFlow > 0){
           // update blended calculations and header colors after revert
           calculateBlended();
           validateMillPercentages();
+          updateBunkerColors();
           return;
         }
 
@@ -758,6 +914,7 @@ if(generation > 0 && totalFlow > 0){
         // update calculations & visuals
         calculateBlended();
         validateMillPercentages();
+        updateBunkerColors();
       });
     });
 
@@ -857,7 +1014,66 @@ if(generation > 0 && totalFlow > 0){
     pdf.save("Coal_Blending_Ratio.pdf");
   });
 });
+function updateBunkerColors() {
+  const coalColors = ["#f39c12", "#3498db", "#2ecc71"]; // row 1,2,3
+  const numBunkers = 6;
 
+  // Coordinates (same scale as your SVG viewBox)
+  const svgWidth = 100;
+  const svgHeight = 150;
+  const topY = 10;
+  const midY = 100;   // where sides start slanting
+  const bottomY = 140;
+  const usableH = bottomY - topY; // 130
+
+  // closed outline used only for clipping (fills)
+  const outlinePath = `M10 ${topY} L10 ${midY} L45 ${bottomY} L55 ${bottomY} L90 ${midY} L90 ${topY} Z`;
+
+  for (let b = 0; b < numBunkers; b++) {
+    const bunker = document.querySelectorAll(".bunker")[b];
+    if (!bunker) continue;
+    const svg = bunker.querySelector("svg");
+    if (!svg) continue;
+
+    // read percentages
+    const p1 = parseFloat(document.querySelector(`.percentage-input[data-row="1"][data-mill="${b}"]`)?.value) || 0;
+    const p2 = parseFloat(document.querySelector(`.percentage-input[data-row="2"][data-mill="${b}"]`)?.value) || 0;
+    const p3 = parseFloat(document.querySelector(`.percentage-input[data-row="3"][data-mill="${b}"]`)?.value) || 0;
+    const percentages = [p1, p2, p3];
+
+    // build svg content
+    const clipId = `clip-bunker-${b}`;
+    let svgInner = `<defs><clipPath id="${clipId}"><path d="${outlinePath}" /></clipPath></defs>`;
+
+    // stacking from bottom up
+    let cumHeight = 0;
+    const rects = [];
+    for (let i = 0; i < percentages.length; i++) {
+      const pct = Math.max(0, Math.min(100, percentages[i]));
+      if (pct === 0) continue;
+      const h = (pct / 100) * usableH;
+      const y = bottomY - (cumHeight + h);
+      cumHeight += h;
+      // full-width rect clipped by the bunker clipPath
+      rects.push(`<rect x="0" y="${y}" width="${svgWidth}" height="${h}" fill="${coalColors[i]}" clip-path="url(#${clipId})" />`);
+    }
+    svgInner += rects.join("\n");
+
+    // draw outline segments (only the lines you want)
+    // 1) left vertical from top to slant start
+    svgInner += `<path d="M10 ${topY} L10 ${midY}" stroke="black" fill="none" stroke-width="2" />`;
+    // 2) right vertical from top to slant start
+    svgInner += `<path d="M90 ${topY} L90 ${midY}" stroke="black" fill="none" stroke-width="2" />`;
+    // 3) left slanted side downwards (open at very bottom - no connector)
+    svgInner += `<path d="M10 ${midY} L45 ${bottomY}" stroke="black" fill="none" stroke-width="2" />`;
+    // 4) right slanted side downwards (open at very bottom - no connector)
+    svgInner += `<path d="M90 ${midY} L55 ${bottomY}" stroke="black" fill="none" stroke-width="2" />`;
+
+    // set viewBox and apply
+    svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
+    svg.innerHTML = svgInner;
+  }
+}
 
 
 </script>
