@@ -571,17 +571,17 @@
 
 .summary-table {
   position: fixed;
-  top: 160px;          /* adjust so it’s below header/nav */
-  right: 20px;        /* stick to right edge */
-  width: 260px;
+  top: 160px;          /* adjust for header spacing */
+  right: 20px;        /* distance from right edge */
+  width: 220px;       /* reduced width */
   display: grid;
-  grid-template-columns: 140px 1fr;
+  grid-template-columns: 110px 1fr;  /* adjust columns */
   gap: 6px;
-  font-size: 0.85rem;
-  background: white;  /* optional, to cover background */
-  padding: 10px;
+  font-size: 0.8rem;  /* slightly smaller text */
+  background: white;
+  padding: 8px;
   border-radius: 8px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
 
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <body>
  <div class="navbar">
-    <img src="/images/abhitech-logo.png" alt="Company Logo">
+    <img src="/abhitech-logo.png" alt="Company Logo">
     <h1>COAL BLENDING RATIO</h1>
     <div class="nav-buttons">
       <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
