@@ -417,13 +417,16 @@
   padding: 6px;
 }
 
-/* make summary fixed to the right side of the page (keeps same class name) */
 .summary-table {
-  position: fixed;
-  right: 250px;
-  top: 140px; /* below navbar */
-  z-index: 9998;
+  position: static; /* Remove fixed */
+  margin-top: 20px;
+  width: 280px;
+  background: transparent;
+  z-index: initial;
+  right: auto;
+  top: auto;
 }
+
 
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
 
@@ -510,24 +513,116 @@
     margin-right: 0;
   }
 }
+.tab-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #2442ba 30%, #5ce6d8 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 13px 0;
+  font-size: 1.05rem;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.22s, box-shadow 0.22s;
+  box-shadow: 0 2px 8px rgba(67,108,194,0.05);
+  outline: none;
+}
+.tab-btn.active {
+  background: linear-gradient(90deg, #00bcd4 8%, #2442ba 92%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0,188,212,0.22);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+#tabSidebar {
+  min-width: 160px;   /* smaller */
+  max-width: 160px;   /* keep fixed */
+  padding: 16px 8px;  /* reduce padding */
+}
+.tab-btn {
+  font-size: 0.9rem;  /* shrink text size */
+  padding: 10px 0;    /* shrink button height */
+  margin-bottom: 10px;
+}
+
+.single-bunker-wrapper {
+  display: flex;
+  justify-content: center;     /* Center horizontally */
+  align-items: flex-start;     /* Stick to top, so we can push down */
+  height: 100%;
+  padding-top: 190px;           /* Push bunker down (adjust px as needed) */
+}
+
+.single-bunker-wrapper .bunker {
+  transform: scale(3.8);       
+  transform-origin: center;    
+}
+.overview-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;   /* space between main and summary */
+}
+
+.main-container {
+  flex: 1; /* take remaining width */
+}
+
+.summary-table {
+  position: fixed;
+  top: 160px;          /* adjust so it’s below header/nav */
+  right: 20px;        /* stick to right edge */
+  width: 280px;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 6px;
+  font-size: 0.85rem;
+  background: white;  /* optional, to cover background */
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+
+
+
 
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script>
-if(localStorage.getItem('isLoggedIn') !== 'true') {
-    alert('You must login first!');
-    window.location.href = '/login.html'; 
-} else {
-    document.body.style.display = 'block';
-}
-    function logoutUser() {
-  localStorage.setItem('isLoggedIn', 'false'); 
-  window.location.href = 'login.html'; 
-}
-</script>
+
 </head>
+  <script>
+const tabBtns = document.querySelectorAll('.tab-btn');
+const panels = document.querySelectorAll('.tab-panel');
+
+function showTab(tabName) {
+  panels.forEach(panel => {
+    panel.style.display = 'none';
+  });
+  document.getElementById(tabName + "Tab").style.display = 'block';
+}
+
+tabBtns.forEach(btn => {
+  btn.onclick = function() {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showTab(btn.dataset.tab);
+  };
+});
+
+// Hide all on load
+document.addEventListener('DOMContentLoaded', function() {
+  panels.forEach(panel => panel.style.display = 'none');
+  // Optional: uncomment if you WANT overview shown at load!
+  // showTab('overview');
+  // tabBtns[0].classList.add('active');
+});
+
+
+</script>
 <body>
  <div class="navbar">
     <img src="/images/abhitech-logo.png" alt="Company Logo">
@@ -548,7 +643,26 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 
   <div id="loader">Loading... please wait</div>
 <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
-  <div class="main-container">
+
+<!-- Tabs Sidebar and Main Content -->
+<div style="display: flex; width: 100%; align-items: flex-start; margin-top: 32px;">
+  <!-- Sidebar (Tabs) -->
+  <div id="tabSidebar" style="min-width: 210px; background: #2d3543; border-radius: 12px; margin-right: 24px; padding: 22px 12px; box-shadow: 0 3px 16px rgba(23,32,41,0.06);">
+    <div style="font-weight: bold; font-size: 1.1rem; color: white; margin-bottom: 34px; text-align: center;">Select Section</div>
+    <button class="tab-btn" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="bunker1">Bunker 1</button>
+    <button class="tab-btn" data-tab="bunker2">Bunker 2</button>
+    <button class="tab-btn" data-tab="bunker3">Bunker 3</button>
+    <button class="tab-btn" data-tab="bunker4">Bunker 4</button>
+    <button class="tab-btn" data-tab="bunker5">Bunker 5</button>
+    <button class="tab-btn" data-tab="bunker6">Bunker 6</button>
+  </div>
+
+  <!-- Main Tab Content -->
+  <div id="tabContent" style="flex: 1; background: #fff; border-radius: 13px; box-shadow: 0 1px 8px rgba(34,53,65,0.10); padding: 28px; min-height: 680px;">
+    <div id="overviewTab" class="tab-panel" style="display:none;">
+    <div class="overview-wrapper"></div>
+      <div class="main-container">
     <div class="mills-grid" id="millsGrid">
       <!-- header row -->
       <div></div>
@@ -697,6 +811,27 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
   <div class="summary-cell summary-header">Cost/MT</div>
   <div class="summary-cell" id="COSTRATE">--</div>
 </div>
+    </div>
+<div id="bunker1Tab" class="tab-panel" style="display:none;">
+  <div class="single-bunker-wrapper">
+    <div class="bunker">
+      <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+        <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+      </svg>
+      <div class="label">Bunker 1</div>
+    </div>
+  </div>
+</div>
+</div>
+
+    <div id="bunker2Tab" class="tab-panel" style="display:none;"> </div>
+    <div id="bunker3Tab" class="tab-panel" style="display:none;"> </div>
+    <div id="bunker4Tab" class="tab-panel" style="display:none;"> </div>
+    <div id="bunker5Tab" class="tab-panel" style="display:none;"> </div>
+    <div id="bunker6Tab" class="tab-panel" style="display:none;"> </div>
+  </div>
+</div>
+
 
 <script>
   let excelData = [];
@@ -1142,6 +1277,41 @@ function updateBunkerColors() {
     svg.innerHTML = svgInner;
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  function showTab(tabName) {
+    panels.forEach(panel => panel.style.display = 'none');
+    document.getElementById(tabName + "Tab").style.display = 'block';
+  }
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabName = btn.dataset.tab;
+      const panel = document.getElementById(tabName + "Tab");
+      const isCurrentlyVisible = panel.style.display === 'block';
+
+      if (isCurrentlyVisible) {
+        // Hide the currently visible panel and deactivate tab
+        panel.style.display = 'none';
+        btn.classList.remove('active');
+      } else {
+        // Hide all panels and remove active class from all tabs
+        panels.forEach(p => p.style.display = 'none');
+        tabBtns.forEach(b => b.classList.remove('active'));
+
+        // Show clicked tab panel and set active
+        panel.style.display = 'block';
+        btn.classList.add('active');
+      }
+    });
+  });
+
+  // On load, hide all tab panels
+  panels.forEach(panel => panel.style.display = 'none');
+});
 
 
 </script>
