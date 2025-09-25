@@ -1225,47 +1225,47 @@ const header = Array.from(document.querySelectorAll(".mills-grid > .mill"))
     scale: 2,
     useCORS: true,
     onclone: (clonedDoc) => {
-      // Handle input & textarea values
-      const inputs = clonedDoc.querySelectorAll("input, textarea");
-      inputs.forEach(input => {
-        const text = clonedDoc.createElement("span");
-        text.textContent = input.value;
+  const inputs = clonedDoc.querySelectorAll("input, textarea");
+  inputs.forEach(input => {
+    const text = clonedDoc.createElement("span");
+    text.textContent = input.value;
 
-        text.style.position = "absolute";
-        text.style.left = input.offsetLeft + "px";
-        text.style.top = input.offsetTop + "px";
-        text.style.width = input.offsetWidth + "px";
-        text.style.height = input.offsetHeight + "px";
-        text.style.lineHeight = input.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(input).font;
-        text.style.color = window.getComputedStyle(input).color;
+    const style = window.getComputedStyle(input);
+    text.style.position = "absolute";
+    text.style.left = input.offsetLeft + "px";
+    text.style.top = input.offsetTop + "px";
+    text.style.width = input.offsetWidth + "px";
+    text.style.height = input.offsetHeight + "px";
+    text.style.font = style.font;
+    text.style.color = style.color;
+    text.style.lineHeight = style.lineHeight;
+    text.style.textAlign = style.textAlign;
 
-        clonedDoc.body.appendChild(text);
-        input.style.visibility = "hidden";
-      });
+    input.parentElement.appendChild(text);
+    input.style.display = "none";
+  });
 
-      // Handle select dropdowns (coal names)
-      const selects = clonedDoc.querySelectorAll("select");
-      selects.forEach(select => {
-        const selectedText = select.options[select.selectedIndex]?.text || "";
-        const text = clonedDoc.createElement("span");
-        text.textContent = selectedText;
+  const selects = clonedDoc.querySelectorAll("select");
+  selects.forEach(select => {
+    const selectedText = select.options[select.selectedIndex]?.text || "";
+    const text = clonedDoc.createElement("span");
+    text.textContent = selectedText;
 
-        text.style.position = "absolute";
-        text.style.left = select.offsetLeft + "px";
-        text.style.top = select.offsetTop + "px";
-        text.style.width = select.offsetWidth + "px";
-        text.style.height = select.offsetHeight + "px";
-        text.style.lineHeight = select.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(select).font;
-        text.style.color = window.getComputedStyle(select).color;
+    const style = window.getComputedStyle(select);
+    text.style.position = "absolute";
+    text.style.left = select.offsetLeft + "px";
+    text.style.top = select.offsetTop + "px";
+    text.style.width = select.offsetWidth + "px";
+    text.style.height = select.offsetHeight + "px";
+    text.style.font = style.font;
+    text.style.color = style.color;
+    text.style.lineHeight = style.lineHeight;
+    text.style.textAlign = style.textAlign;
 
-        clonedDoc.body.appendChild(text);
-        select.style.visibility = "hidden";
-      });
-    }
+    select.parentElement.appendChild(text);
+    select.style.display = "none";
+  });
+}
   }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
