@@ -515,7 +515,7 @@
 }
 .tab-btn {
   width: 100%;
-  background: linear-gradient(90deg, #2442ba 30%, #5ce6d8 100%);
+  background: #02008a;
   border: none;
   color: #fff;
   font-weight: 600;
@@ -583,6 +583,7 @@
   border-radius: 8px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
+
 body {
   overflow: hidden; /* to prevent scrolling */
 }
@@ -649,8 +650,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Tabs Sidebar and Main Content -->
 <div style="display: flex; width: 100%; align-items: flex-start; margin-top: 32px;">
   <!-- Sidebar (Tabs) -->
-  <div id="tabSidebar" style="min-width: 210px; background: #2d3543; border-radius: 12px; margin-right: 24px; padding: 22px 12px; box-shadow: 0 3px 16px rgba(23,32,41,0.06);">
-    <div style="font-weight: bold; font-size: 1.1rem; color: white; margin-bottom: 34px; text-align: center;">Select Section</div>
+  <div id="tabSidebar" style="min-width: 210px; background: #fff; border-radius: 12px; margin-right: 24px; padding: 22px 12px; box-shadow: 0 3px 16px rgba(23,32,41,0.06);">
+    <div style="font-weight: bold; font-size: 1.1rem; color: #02008a; margin-bottom: 34px; text-align: center;">Select Section</div>
     <button class="tab-btn" data-tab="overview">Overview</button>
     <button class="tab-btn" data-tab="bunker1">Bunker 1</button>
     <button class="tab-btn" data-tab="bunker2">Bunker 2</button>
@@ -814,17 +815,89 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="summary-cell" id="COSTRATE">--</div>
 </div>
     </div>
-<div id="bunker1Tab" class="tab-panel" style="display:none;">
-  <div class="single-bunker-wrapper">
-    <div class="bunker">
-      <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-        <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-      </svg>
-      <div class="label">Bunker 1</div>
+<div id="bunker1Tab" class="tab-panel" style="display: none;">
+  <div class="main-container">
+    <div class="mills-grid" id="millsGrid">
+      <!-- BUNKER 1 Header -->
+      <div class="mill green">BUNKER 1</div>
+      <!-- GCV & Cost Headers: hide these in bunker tab if not needed, else include -->
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
+
+      <!-- Row 1: Coal selection + % input + GCV + Cost -->
+      <div class="mill select">
+        <select class="dropdown" id="coalDrop1">
+          <option value="">-- Select Coal --</option>
+        </select>
+      </div>
+      <div class="mill">
+        <input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%" />
+      </div>
+      <div class="mill">
+        <div id="gcvBox1" class="gcv-box">--</div>
+      </div>
+      <div class="mill">
+        <input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT" />
+      </div>
+
+      <!-- Row 2: Coal selection + % input + GCV + Cost -->
+      <div class="mill select">
+        <select class="dropdown" id="coalDrop2">
+          <option value="">-- Select Coal --</option>
+        </select>
+      </div>
+      <div class="mill">
+        <input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%" />
+      </div>
+      <div class="mill">
+        <div id="gcvBox2" class="gcv-box">--</div>
+      </div>
+      <div class="mill">
+        <input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT" />
+      </div>
+
+      <!-- Row 3: Coal selection + % input + GCV + Cost -->
+      <div class="mill select">
+        <select class="dropdown" id="coalDrop3">
+          <option value="">-- Select Coal --</option>
+        </select>
+      </div>
+      <div class="mill">
+        <input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%" />
+      </div>
+      <div class="mill">
+        <div id="gcvBox3" class="gcv-box">--</div>
+      </div>
+      <div class="mill">
+        <input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT" />
+      </div>
+    </div>
+
+    <!-- Bunker 1 Diagram, Coal flow, AFT -->
+    <div style="margin: 24px 0 0 0;">
+      <div class="single-bunker-wrapper">
+        <div class="bunker">
+          <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+            <path d="M10 10 V100 L45 140 M55 140 L90 100 V10 Z" fill="none" stroke="black" stroke-width="2"/>
+          </svg>
+          <div class="label">Bunker 1</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:18px; margin:26px auto 0 auto; max-width:380px;">
+        <div style="display: flex; flex-direction: column; gap:12px;">
+          <div class="mill coal-flow">Coal Flow(TPH)</div>
+          <div class="mill aft-head">AFT(°C)</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap:12px;">
+          <input type="text" class="flow-input" data-mill="0" placeholder="TPH" />
+          <div class="mill aft" data-mill="0">0.00</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-</div>
+
 
     <div id="bunker2Tab" class="tab-panel" style="display:none;"> </div>
     <div id="bunker3Tab" class="tab-panel" style="display:none;"> </div>
@@ -1319,5 +1392,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
 
