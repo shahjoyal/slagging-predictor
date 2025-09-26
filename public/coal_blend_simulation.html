@@ -507,6 +507,9 @@ h1 {
   right: -1800px;                /* adjust horizontal position */
 }
 
+.diagram-container, .bunker svg {
+  pointer-events: none;
+}
 
 
 
@@ -809,467 +812,322 @@ h1 {
 
     <!-- Bunker 2 Panel -->
     <div id="bunker2Tab" class="tab-panel" style="display:none;">
-<div class="main-container">
-        <div class="mills-grid" id="millsGrid">
-          <!-- header row -->
-          <div></div>
-          <!-- changed headers to BUNKER 1..6 -->
-          <div class="mill green">BUNKER 2</div>
-          <div class="mill gcv">GCV(Kcal/kg)</div>
-          <div class="mill cost-head">Cost/MT</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+<div class="bunker-layout">
+    
+    <!-- LEFT SIDE: TABLE -->
+    <div class="mills-grid" id="millsGrid">
+      <!-- header row -->
+      <div></div>
+      <div class="mill green">BUNKER 2</div>
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
-          <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 1 -->
+      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 2: Coal selection 2 -->
-          <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 2 -->
+      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 3: Coal selection 3 -->
-          <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 3 -->
+      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- NEW: Diagram row placed inside the grid so it aligns with Bunker 1..6 columns -->
-          <div></div>
-          <div class="diagram-in-grid" style="padding:8px;">
-            <div class="layout">
-              <div class="top-lines"></div>
-              <div class="arrow" style="height:60px; left:40px;"></div>
-              <div class="bunkers-grid">
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 2</div>
-                </div>
-              </div>
-            </div>
+      <!-- Row 4: Coal Flow -->
+      <div class="mill coal-flow">Coal Flow(TPH)</div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+
+      <!-- Row 5: AFT -->
+      <div class="mill aft-head">AFT(°C)</div>
+      <div class="mill aft" data-mill="0">--</div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div> <!-- end mills-grid -->
+
+    <!-- RIGHT SIDE: DIAGRAM -->
+    <div class="diagram-container">
+      <div class="layout">
+        <div class="top-lines"></div>
+        <div class="arrow" style="height:60px; left:40px;"></div>
+        <div class="bunkers-grid">
+          <div class="bunker">
+            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+            </svg>
+            <div class="label">Bunker 2</div>
           </div>
-          <div></div>
-          <div></div>
+        </div>
+      </div>
+    </div> <!-- end diagram-container -->
 
-          <!-- Row 4: Coal Flow (moved down because diagram inserted above) -->
-          <div class="mill coal-flow">Coal Flow(TPH)</div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 5: AFT (calculated per mill) -->
-          <div class="mill aft-head">AFT(°C)</div>
-          <div class="mill aft" data-mill="0">--</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div> <!-- end mills-grid -->
-      </div> <!-- end main-container -->
+  </div> <!-- end bunker-layout -->
     </div>
 
     <!-- Bunker 3 Panel -->
     <div id="bunker3Tab" class="tab-panel" style="display:none;">
-<div class="main-container">
-        <div class="mills-grid" id="millsGrid">
-          <!-- header row -->
-          <div></div>
-          <!-- changed headers to BUNKER 1..6 -->
-          <div class="mill green">BUNKER 3</div>
-          <div class="mill gcv">GCV(Kcal/kg)</div>
-          <div class="mill cost-head">Cost/MT</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+<div class="bunker-layout">
+    
+    <!-- LEFT SIDE: TABLE -->
+    <div class="mills-grid" id="millsGrid">
+      <!-- header row -->
+      <div></div>
+      <div class="mill green">BUNKER 3</div>
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
-          <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 1 -->
+      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 2: Coal selection 2 -->
-          <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 2 -->
+      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 3: Coal selection 3 -->
-          <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 3 -->
+      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- NEW: Diagram row placed inside the grid so it aligns with Bunker 1..6 columns -->
-          <div></div>
-          <div class="diagram-in-grid" style="padding:8px;">
-            <div class="layout">
-              <div class="top-lines"></div>
-              <div class="arrow" style="height:60px; left:40px;"></div>
-              <div class="bunkers-grid">
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 3</div>
-                </div>
-              </div>
-            </div>
+      <!-- Row 4: Coal Flow -->
+      <div class="mill coal-flow">Coal Flow(TPH)</div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+
+      <!-- Row 5: AFT -->
+      <div class="mill aft-head">AFT(°C)</div>
+      <div class="mill aft" data-mill="0">--</div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div> <!-- end mills-grid -->
+
+    <!-- RIGHT SIDE: DIAGRAM -->
+    <div class="diagram-container">
+      <div class="layout">
+        <div class="top-lines"></div>
+        <div class="arrow" style="height:60px; left:40px;"></div>
+        <div class="bunkers-grid">
+          <div class="bunker">
+            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+            </svg>
+            <div class="label">Bunker 3</div>
           </div>
-          <div></div>
-          <div></div>
+        </div>
+      </div>
+    </div> <!-- end diagram-container -->
 
-          <!-- Row 4: Coal Flow (moved down because diagram inserted above) -->
-          <div class="mill coal-flow">Coal Flow(TPH)</div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 5: AFT (calculated per mill) -->
-          <div class="mill aft-head">AFT(°C)</div>
-          <div class="mill aft" data-mill="0">--</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div> <!-- end mills-grid -->
-      </div> <!-- end main-container -->
+  </div> <!-- end bunker-layout -->
     </div>
 
     <!-- Bunker 4 Panel -->
     <div id="bunker4Tab" class="tab-panel" style="display:none;">
-    <div class="main-container">
-        <div class="mills-grid" id="millsGrid">
-          <!-- header row -->
-          <div></div>
-          <!-- changed headers to BUNKER 1..6 -->
-          <div class="mill green">BUNKER 4</div>
-          <div class="mill gcv">GCV(Kcal/kg)</div>
-          <div class="mill cost-head">Cost/MT</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+    <div class="bunker-layout">
+    
+    <!-- LEFT SIDE: TABLE -->
+    <div class="mills-grid" id="millsGrid">
+      <!-- header row -->
+      <div></div>
+      <div class="mill green">BUNKER 4</div>
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
-          <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 1 -->
+      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 2: Coal selection 2 -->
-          <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 2 -->
+      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 3: Coal selection 3 -->
-          <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 3 -->
+      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- NEW: Diagram row placed inside the grid so it aligns with Bunker 1..6 columns -->
-          <div></div>
-          <div class="diagram-in-grid" style="padding:8px;">
-            <div class="layout">
-              <div class="top-lines"></div>
-              <div class="arrow" style="height:60px; left:40px;"></div>
-              <div class="bunkers-grid">
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 4</div>
-                </div>
-              </div>
-            </div>
+      <!-- Row 4: Coal Flow -->
+      <div class="mill coal-flow">Coal Flow(TPH)</div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+
+      <!-- Row 5: AFT -->
+      <div class="mill aft-head">AFT(°C)</div>
+      <div class="mill aft" data-mill="0">--</div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div> <!-- end mills-grid -->
+
+    <!-- RIGHT SIDE: DIAGRAM -->
+    <div class="diagram-container">
+      <div class="layout">
+        <div class="top-lines"></div>
+        <div class="arrow" style="height:60px; left:40px;"></div>
+        <div class="bunkers-grid">
+          <div class="bunker">
+            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+            </svg>
+            <div class="label">Bunker 4</div>
           </div>
-          <div></div>
-          <div></div>
+        </div>
+      </div>
+    </div> <!-- end diagram-container -->
 
-          <!-- Row 4: Coal Flow (moved down because diagram inserted above) -->
-          <div class="mill coal-flow">Coal Flow(TPH)</div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 5: AFT (calculated per mill) -->
-          <div class="mill aft-head">AFT(°C)</div>
-          <div class="mill aft" data-mill="0">--</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div> <!-- end mills-grid -->
-      </div> <!-- end main-container -->
+  </div> <!-- end bunker-layout -->
     </div>
 
     <!-- Bunker 5 Panel -->
     <div id="bunker5Tab" class="tab-panel" style="display:none;">
-<div class="main-container">
-        <div class="mills-grid" id="millsGrid">
-          <!-- header row -->
-          <div></div>
-          <!-- changed headers to BUNKER 1..6 -->
-          <div class="mill green">BUNKER 5</div>
-          <div class="mill gcv">GCV(Kcal/kg)</div>
-          <div class="mill cost-head">Cost/MT</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+<div class="bunker-layout">
+    
+    <!-- LEFT SIDE: TABLE -->
+    <div class="mills-grid" id="millsGrid">
+      <!-- header row -->
+      <div></div>
+      <div class="mill green">BUNKER 5</div>
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
-          <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 1 -->
+      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 2: Coal selection 2 -->
-          <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 2 -->
+      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 3: Coal selection 3 -->
-          <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 3 -->
+      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- NEW: Diagram row placed inside the grid so it aligns with Bunker 1..6 columns -->
-          <div></div>
-          <div class="diagram-in-grid" style="padding:8px;">
-            <div class="layout">
-              <div class="top-lines"></div>
-              <div class="arrow" style="height:60px; left:40px;"></div>
-              <div class="bunkers-grid">
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 5</div>
-                </div>
-              </div>
-            </div>
+      <!-- Row 4: Coal Flow -->
+      <div class="mill coal-flow">Coal Flow(TPH)</div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+
+      <!-- Row 5: AFT -->
+      <div class="mill aft-head">AFT(°C)</div>
+      <div class="mill aft" data-mill="0">--</div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div> <!-- end mills-grid -->
+
+    <!-- RIGHT SIDE: DIAGRAM -->
+    <div class="diagram-container">
+      <div class="layout">
+        <div class="top-lines"></div>
+        <div class="arrow" style="height:60px; left:40px;"></div>
+        <div class="bunkers-grid">
+          <div class="bunker">
+            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+            </svg>
+            <div class="label">Bunker 5</div>
           </div>
-          <div></div>
-          <div></div>
+        </div>
+      </div>
+    </div> <!-- end diagram-container -->
 
-          <!-- Row 4: Coal Flow (moved down because diagram inserted above) -->
-          <div class="mill coal-flow">Coal Flow(TPH)</div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 5: AFT (calculated per mill) -->
-          <div class="mill aft-head">AFT(°C)</div>
-          <div class="mill aft" data-mill="0">--</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div> <!-- end mills-grid -->
-      </div> <!-- end main-container -->
+  </div> <!-- end bunker-layout -->
     </div>
 
     <!-- Bunker 6 Panel -->
     <div id="bunker6Tab" class="tab-panel" style="display:none;">
-<div class="main-container">
-        <div class="mills-grid" id="millsGrid">
-          <!-- header row -->
-          <div></div>
-          <!-- changed headers to BUNKER 1..6 -->
-          <div class="mill green">BUNKER 6</div>
-          <div class="mill gcv">GCV(Kcal/kg)</div>
-          <div class="mill cost-head">Cost/MT</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+<div class="bunker-layout">
+    
+    <!-- LEFT SIDE: TABLE -->
+    <div class="mills-grid" id="millsGrid">
+      <!-- header row -->
+      <div></div>
+      <div class="mill green">BUNKER 6</div>
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
-          <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 1 -->
+      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 2: Coal selection 2 -->
-          <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 2 -->
+      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- Row 3: Coal selection 3 -->
-          <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+      <!-- Row 3 -->
+      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
+      <div></div><div></div><div></div><div></div><div></div>
 
-          <!-- NEW: Diagram row placed inside the grid so it aligns with Bunker 1..6 columns -->
-          <div></div>
-          <div class="diagram-in-grid" style="padding:8px;">
-            <div class="layout">
-              <div class="top-lines"></div>
-              <div class="arrow" style="height:60px; left:40px;"></div>
-              <div class="bunkers-grid">
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 6</div>
-                </div>
-              </div>
-            </div>
+      <!-- Row 4: Coal Flow -->
+      <div class="mill coal-flow">Coal Flow(TPH)</div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+
+      <!-- Row 5: AFT -->
+      <div class="mill aft-head">AFT(°C)</div>
+      <div class="mill aft" data-mill="0">--</div>
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div> <!-- end mills-grid -->
+
+    <!-- RIGHT SIDE: DIAGRAM -->
+    <div class="diagram-container">
+      <div class="layout">
+        <div class="top-lines"></div>
+        <div class="arrow" style="height:60px; left:40px;"></div>
+        <div class="bunkers-grid">
+          <div class="bunker">
+            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
+            </svg>
+            <div class="label">Bunker 6</div>
           </div>
-          <div></div>
-          <div></div>
+        </div>
+      </div>
+    </div> <!-- end diagram-container -->
 
-          <!-- Row 4: Coal Flow (moved down because diagram inserted above) -->
-          <div class="mill coal-flow">Coal Flow(TPH)</div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 5: AFT (calculated per mill) -->
-          <div class="mill aft-head">AFT(°C)</div>
-          <div class="mill aft" data-mill="0">--</div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div> <!-- end mills-grid -->
-      </div> <!-- end main-container -->
+  </div> <!-- end bunker-layout -->
     </div>
 
   </div> <!-- end tabContent -->
