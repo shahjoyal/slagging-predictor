@@ -5,7 +5,7 @@
   <title>Coal Blending Ratio — light theme</title>
     <style>
 /* =========================
-   Variables css styles are here
+   Variables
    ========================= */
 :root{
   --bg: #F7F8FA;
@@ -1133,27 +1133,13 @@ h1 {
   </div> <!-- end tabContent -->
 </div> <!-- end outer flex container -->
 
-
-
 <script>
 /* ---------- shared state ---------- */
-/* Robust Excel -> panel loader + panel-scoped init
-   Paste this in your page (after HTML). It will:
-   - read the excel file (requires XLSX lib present)
-   - extract unique coal names
-   - populate dropdowns in every .tab-panel
-   - map some likely excel column names (GCV, Cost, Percentage1..6, SiO2, etc)
-   - call per-panel update/init functions (calculateBlended, updateGCVCostBoxes, etc)
-*/
+let excelData = [];
 
-/* ---------- shared state ---------- */
-let excelData = []; // array of row objects from sheet
-
-/* ---------- util: safe value get ---------- */
+/* ---------- small helpers ---------- */
 function safeTrim(v){ return (v===undefined || v===null) ? "" : String(v).trim(); }
 function asNumber(v){ if(v===undefined || v===null || v==="") return 0; const n = Number(v); return isNaN(n) ? 0 : n; }
-
-/* ---------- helper: find possible column key (case-insensitive) ---------- */
 function findKeyIgnoreCase(obj, candidates){
   if(!obj) return null;
   const keys = Object.keys(obj);
@@ -1162,7 +1148,6 @@ function findKeyIgnoreCase(obj, candidates){
     const found = keys.find(k => k.toLowerCase() === lower);
     if(found) return found;
   }
-  // next: partial match
   for(const c of candidates){
     const lower = c.toLowerCase();
     const found = keys.find(k => k.toLowerCase().includes(lower));
@@ -1171,20 +1156,16 @@ function findKeyIgnoreCase(obj, candidates){
   return null;
 }
 
-/* ---------- excel file handler ---------- */
+/* ---------- Excel upload handling ---------- */
 const excelInput = document.getElementById('excelFile');
 if(excelInput){
   excelInput.addEventListener('change', handleFile, false);
-} else {
-  console.warn('No #excelFile input found in DOM — file upload will not work.');
 }
 
 function handleFile(e){
   const file = e?.target?.files?.[0];
-  if(!file) { console.warn('No file selected'); return; }
-  try {
-    document.getElementById('loader')?.style && (document.getElementById('loader').style.display = 'block');
-  } catch(e){}
+  if(!file) return;
+  try { document.getElementById('loader')?.style && (document.getElementById('loader').style.display = 'block'); } catch(e){}
   const reader = new FileReader();
   reader.onload = function(ev){
     try {
@@ -1194,138 +1175,44 @@ function handleFile(e){
       const worksheet = workbook.Sheets[sheetName];
       excelData = XLSX.utils.sheet_to_json(worksheet, { defval: null });
 
-      console.log('Excel loaded — rows:', excelData.length);
-      if(excelData.length === 0){
-        console.warn('Excel contains no rows');
-      }
-
-      // normalize header keys present in first row
-      const first = excelData[0] || {};
-      console.log('Detected columns:', Object.keys(first));
-
-      // build unique coal list
-      const coalSet = new Set();
-      excelData.forEach(r => {
-        const coalKey = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
-        const val = coalKey ? safeTrim(r[coalKey]) : null;
-        if(val) coalSet.add(val);
-      });
-      const coalList = Array.from(coalSet);
-      console.log('Extracted coalList:', coalList);
-
-      // For every panel: populate dropdowns and set defaults, then initPanel or update if already inited
+      // populate dropdowns & boxes for all panels (force populate cost/gcv from sheet)
       const panels = Array.from(document.querySelectorAll('.tab-panel'));
       panels.forEach(panel => {
-        // populate dropdown options
-        const dropdowns = Array.from(panel.querySelectorAll('.dropdown'));
-        dropdowns.forEach((drop, idx) => {
-          // ensure each dropdown has a data-row attribute so code can match percentages
-          if(!drop.dataset.row) drop.dataset.row = String(idx + 1);
-
-          // clear and add options
-          drop.innerHTML = '';
-          const emptyOpt = document.createElement('option');
-          emptyOpt.value = '';
-          emptyOpt.textContent = '-- Select Coal --';
-          drop.appendChild(emptyOpt);
-          coalList.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c;
-            opt.textContent = c;
-            drop.appendChild(opt);
-          });
-
-          // decide selected value: if excel has rows and a coal for this index, choose it,
-          // else choose first coal available
-          const prefer = coalList[idx] || coalList[0] || '';
-          drop.value = prefer;
-        });
-
-        // fill cost/gcv boxes if matching excel rows exist
-        // For each dropdown, find excel row by coal and fill respective gcv-box / cost-input
-        const drops = Array.from(panel.querySelectorAll('.dropdown'));
-        drops.forEach((drop, i) => {
-          const coalName = drop.value;
-          const row = excelData.find(r => {
-            const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
-            return key && safeTrim(r[key]) === coalName;
-          });
-          // gcvBox (if exists)
-          const gcvBox = panel.querySelectorAll('.gcv-box')[i];
-          if(gcvBox){
-            const gcvKey = findKeyIgnoreCase(row, ['GCV','gcv','Gcv','G.C.V']);
-            gcvBox.innerText = row && gcvKey ? (safeTrim(row[gcvKey]) !== '' ? Number(row[gcvKey]).toFixed(2) : '--') : '--';
-          }
-          // cost input
-          const costInput = panel.querySelectorAll('.cost-input')[i];
-          if(costInput && row){
-            const costKey = findKeyIgnoreCase(row, ['Cost','COST','Price','PRICE']);
-            costInput.value = costKey ? (row[costKey] ?? '') : (row['Cost'] ?? row['Price'] ?? '');
-          }
-          // Try to pre-fill percentage inputs for this coal if sheet has Percentage columns
-          // We'll look for Percentage1..6 or Perc1..6 or P1..6 etc
-          const percCandidates = ['Percentage','Perc','P','MillPercent','Percent'];
-          for(let m = 0; m < 6; m++){
-            // look for exact keys like Percentage1, Perc1, P1
-            const poss = [
-              `Percentage${m+1}`,
-              `Perc${m+1}`,
-              `P${m+1}`,
-              `Percent${m+1}`,
-              `Mill${m+1}`,
-              `M${m+1}`
-            ];
-            const key = findKeyIgnoreCase(row, poss);
-            if(key){
-              const input = panel.querySelector(`.percentage-input[data-row="${i+1}"][data-mill="${m}"]`);
-              if(input) input.value = row[key] ?? '';
-            }
-          }
-        });
-
-        // mark excel-loaded on panel so initPanel uses data immediately
+        if (excelData && excelData.length) populateDropdownsForPanel(panel);
         panel._excelLoaded = true;
-
-        // if panel is already initialized, run updates; else keep for init on first open
-        if(panel._inited){
-          updateGCVCostBoxes(panel);
+        if (panel._inited) {
+          updateGCVCostBoxes(panel, true); // FORCE using excel values when loading file
           calculateBlended(panel);
           validateMillPercentages(panel);
           updateBunkerColors(panel);
         }
       });
 
-      // If overview visible, update its global summary immediately
-      const visibleOverview = document.getElementById('overviewTab');
-      if(visibleOverview && visibleOverview.style.display === 'block'){
-        updateGCVCostBoxes(visibleOverview);
-        calculateBlended(visibleOverview);
-        validateMillPercentages(visibleOverview);
-        updateBunkerColors(visibleOverview);
+      // ensure overview summary is updated if visible
+      const overview = document.getElementById('overviewTab');
+      if (overview) {
+        updateGCVCostBoxes(overview, true);
+        calculateBlended(overview);
+        validateMillPercentages(overview);
+        updateBunkerColors(overview);
       }
-
-      console.log('Excel distribution complete — panels updated.');
-
     } catch(err){
-      console.error('Error processing excel:', err);
-      alert('Failed to read Excel file. See console for details.');
+      console.error(err);
+      alert('Error reading Excel. See console.');
     } finally {
       try { document.getElementById('loader')?.style && (document.getElementById('loader').style.display = 'none'); } catch(e){}
     }
   };
-  reader.onerror = function(err){
-    console.error('FileReader error', err);
-    alert('Error reading file.');
-  };
   reader.readAsArrayBuffer(file);
-}// filled by your file reader
+}
 
-/* ---------- helper Excel functions (shared) ---------- */
+/* ---------- helpers to read excel rows ---------- */
 function findRowForCoal(coalName) {
   if (!coalName) return null;
   return excelData.find(r => {
-    const c = r["Coal"];
-    return (c !== undefined && c !== null && String(c).trim() === String(coalName).trim());
+    const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
+    const val = key ? r[key] : undefined;
+    return (val !== undefined && val !== null && String(val).trim() === String(coalName).trim());
   }) || null;
 }
 function getValue(coalName, key) {
@@ -1336,20 +1223,21 @@ function getValue(coalName, key) {
   return Number(v) || 0;
 }
 
-/* ---------- populate dropdown options for a panel (if excelData present) ---------- */
+/* ---------- populate dropdowns ---------- */
 function populateDropdownsForPanel(panel) {
   if (!panel) return;
   const dropdowns = panel.querySelectorAll('.dropdown');
   dropdowns.forEach(drop => {
-    // clear existing
     drop.innerHTML = '';
     const empty = document.createElement('option');
     empty.value = '';
     empty.textContent = '-- Select Coal --';
     drop.appendChild(empty);
-    // add excel values
     const set = new Set();
-    excelData.forEach(r => { if (r.Coal && String(r.Coal).trim()) set.add(String(r.Coal).trim()) });
+    excelData.forEach(r => {
+      const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
+      if (key && r[key] && String(r[key]).trim()) set.add(String(r[key]).trim());
+    });
     Array.from(set).forEach(v => {
       const opt = document.createElement('option');
       opt.value = v;
@@ -1359,25 +1247,35 @@ function populateDropdownsForPanel(panel) {
   });
 }
 
-/* ---------- panel-scoped update functions ---------- */
-function updateGCVCostBoxes(panel) {
+/* ---------- update GCV & cost boxes inside a panel ---------- */
+/* NOTE: added 'force' parameter. If force===true, always fill cost inputs from excel.
+   Otherwise, we only fill cost inputs when the input is empty so user-entered costs are preserved. */
+function updateGCVCostBoxes(panel, force = false) {
   if (!panel) return;
   const drops = Array.from(panel.querySelectorAll('.dropdown'));
   const gcvBoxes = Array.from(panel.querySelectorAll('.gcv-box'));
   const costInputs = Array.from(panel.querySelectorAll('.cost-input'));
-  for (let i = 0; i < 3; i++) {
+  for(let i=0;i<3;i++){
     const coalName = drops[i]?.value || '';
-    const row = findRowForCoal(coalName);
+    const row = excelData.find(r => {
+      const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
+      return key && safeTrim(r[key]) === coalName;
+    });
     if (gcvBoxes[i]) {
-      gcvBoxes[i].innerText = row ? ((row.GCV!==undefined && row.GCV!==null && row.GCV!=='') ? Number(row.GCV).toFixed(2) : '--') : '--';
+      const gcvKey = findKeyIgnoreCase(row, ['GCV','gcv','Gcv','G.C.V']);
+      gcvBoxes[i].innerText = row && gcvKey ? (safeTrim(row[gcvKey]) !== '' ? Number(row[gcvKey]).toFixed(2) : '--') : '--';
     }
     if (costInputs[i]) {
       const c = row ? (row.Cost ?? row.COST ?? row.Price ?? '') : '';
-      costInputs[i].value = c !== undefined ? String(c) : '';
+      // only overwrite cost if force OR the input is empty (so user edits are preserved)
+      if (force || String(costInputs[i].value).trim() === '') {
+        costInputs[i].value = c !== undefined ? String(c) : '';
+      }
     }
   }
 }
 
+/* ---------- AFT calculation ---------- */
 function calcAFT(ox){
   const total = Object.values(ox).reduce((a,b)=>a+b,0);
   if(total === 0) return 0;
@@ -1393,57 +1291,44 @@ function calcAFT(ox){
   return Number(aft);
 }
 
+/* ---------- calculate blended (panel-scoped) + update overview summary when overview panel ---------- */
 function calculateBlended(panel) {
   if (!panel) return;
   const drops = Array.from(panel.querySelectorAll('.dropdown'));
   const coal1 = drops[0]?.value || '';
   const coal2 = drops[1]?.value || '';
   const coal3 = drops[2]?.value || '';
-
   const oxKeys = ["SiO₂","Al₂O₃","Fe₂O₃","CaO","MgO","Na₂O","K₂O","SO₃","TiO₂"];
 
-  let totalFlow = 0, weightedGCV = 0, weightedAFT = 0;
+  // per-mill blended & AFT
+  const blendedGCVs = new Array(6).fill(0);
+  const aftVals = new Array(6).fill(0);
+  const flows = new Array(6).fill(0);
 
   for (let m = 0; m < 6; m++) {
     const p1 = parseFloat(panel.querySelector(`.percentage-input[data-row="1"][data-mill="${m}"]`)?.value) || 0;
     const p2 = parseFloat(panel.querySelector(`.percentage-input[data-row="2"][data-mill="${m}"]`)?.value) || 0;
     const p3 = parseFloat(panel.querySelector(`.percentage-input[data-row="3"][data-mill="${m}"]`)?.value) || 0;
-
     const gcv1 = getValue(coal1, "GCV"), gcv2 = getValue(coal2, "GCV"), gcv3 = getValue(coal3, "GCV");
     const blendedGCV = (gcv1*(p1/100)) + (gcv2*(p2/100)) + (gcv3*(p3/100));
-
     let ox = {};
     oxKeys.forEach(k => {
       ox[k] = (getValue(coal1,k)*(p1/100)) + (getValue(coal2,k)*(p2/100)) + (getValue(coal3,k)*(p3/100));
     });
-
     const aftVal = calcAFT(ox);
+
     const aftCell = panel.querySelector(`.aft[data-mill="${m}"]`);
-    if (aftCell) aftCell.innerText = isFinite(aftVal) ? Number(aftVal).toFixed(2) : '--';
+    if (aftCell) aftCell.innerText = isFinite(aftVal) && aftVal>0 ? Number(aftVal).toFixed(2) : '--';
+    const gcvCell = panel.querySelectorAll('.gcv-box')[m];
+    if (gcvCell) gcvCell.innerText = blendedGCV > 0 ? Number(blendedGCV).toFixed(2) : '--';
 
-    const flow = parseFloat(panel.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
-    if (flow > 0) {
-      totalFlow += flow;
-      weightedGCV += (flow * blendedGCV);
-      weightedAFT += (flow * aftVal);
-    }
+    const flowVal = parseFloat(panel.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
+    blendedGCVs[m] = blendedGCV;
+    aftVals[m] = aftVal;
+    flows[m] = flowVal;
   }
 
-  // If this is overview panel, update global summary boxes:
-  if (panel.id === 'overviewTab') {
-    const totalFlowEl = document.getElementById('totalFlow');
-    const avgGCVEl = document.getElementById('avgGCV');
-    const avgAFTEl = document.getElementById('avgAFT');
-    if (totalFlowEl) totalFlowEl.innerText = Number(totalFlow).toFixed(2);
-    if (avgGCVEl) avgGCVEl.innerText = totalFlow>0 ? Number(weightedGCV/totalFlow).toFixed(2) : 0;
-    if (avgAFTEl) avgAFTEl.innerText = totalFlow>0 ? Number(weightedAFT/totalFlow).toFixed(2) : '--';
-    // heat rate & costrate only update overview's global boxes
-    const generation = parseFloat(document.getElementById('generation')?.value) || 0;
-    if (generation > 0 && totalFlow > 0) document.getElementById('heatRate').innerText = Number((totalFlow*(weightedGCV/totalFlow))/generation).toFixed(2);
-    else document.getElementById('heatRate').innerText = '--';
-  }
-
-  // compute costrate for panel (if needed) or update overview global COSTRATE only if panel is overview
+  // cost rate for this panel
   const costInputs = panel.querySelectorAll('.cost-input');
   const c1 = parseFloat(costInputs[0]?.value) || 0;
   const c2 = parseFloat(costInputs[1]?.value) || 0;
@@ -1463,28 +1348,82 @@ function calculateBlended(panel) {
   if (panel.id === 'overviewTab') {
     const costEl = document.getElementById('COSTRATE');
     if (costEl) costEl.innerText = costRate.toFixed(2);
+    // update the visible summary
+    updateOverviewSummaryFromOverviewPanel();
   }
 }
 
-/* ---------- validate sums and header color (panel-scoped) ---------- */
+/* ---------- compute overview summary reading values from the overview panel DOM ---------- */
+function updateOverviewSummaryFromOverviewPanel(){
+  const overview = document.getElementById('overviewTab');
+  if(!overview) return;
+
+  let totalFlow = 0;
+  let weightedGCV = 0;
+  let weightedAFT = 0;
+
+  for(let m=0;m<6;m++){
+    const blendedGCV = parseFloat(overview.querySelectorAll('.gcv-box')[m]?.innerText) || 0;
+    const aftVal = parseFloat(overview.querySelector(`.aft[data-mill="${m}"]`)?.innerText) || 0;
+    const flow = parseFloat(overview.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
+    if(flow > 0){
+      totalFlow += flow;
+      weightedGCV += flow * blendedGCV;
+      weightedAFT += flow * aftVal;
+    }
+  }
+
+  const avgGCV = totalFlow > 0 ? (weightedGCV/totalFlow) : 0;
+  const avgAFT = totalFlow > 0 ? (weightedAFT/totalFlow) : 0;
+  const generation = parseFloat(document.getElementById('generation')?.value) || 0;
+  const heatRate = (generation > 0 && totalFlow > 0 && avgGCV > 0) ? ((totalFlow * avgGCV) / generation) : null;
+
+  // write to DOM (IDs used in your HTML)
+  const tfEl = document.getElementById('totalFlow'); if(tfEl) tfEl.innerText = totalFlow ? Number(totalFlow).toFixed(2) : '0';
+  const gcvEl = document.getElementById('avgGCV'); if(gcvEl) gcvEl.innerText = avgGCV>0 ? Number(avgGCV).toFixed(2) : '--';
+  const aftEl = document.getElementById('avgAFT'); if(aftEl) aftEl.innerText = avgAFT>0 ? Number(avgAFT).toFixed(2) : '--';
+  const hrEl = document.getElementById('heatRate'); if(hrEl) hrEl.innerText = heatRate !== null ? Number(heatRate).toFixed(2) : '--';
+  // COSTRATE is updated in calculateBlended when overview triggers it
+}
+
+/* ---------- validate mill percentages & header color ---------- */
 function validateMillPercentages(panel) {
   if (!panel) return;
-  for (let m = 0; m < 6; m++) {
+
+  const isBunkerPanel = /^bunker\d+Tab$/.test(panel.id);
+  let bunkerIndex = null;
+  if (isBunkerPanel) {
+    const numMatch = panel.id.match(/\d+/);
+    bunkerIndex = numMatch ? (Number(numMatch[0]) - 1) : null;
+  }
+
+  const millsToCheck = isBunkerPanel ? [bunkerIndex] : [0,1,2,3,4,5];
+
+  for (const m of millsToCheck) {
+    if (m === null || m === undefined) continue;
     let hasPercent = false;
-    for (let r = 1; r <= 3; r++) {
-      const val = parseFloat(panel.querySelector(`.percentage-input[data-row="${r}"][data-mill="${m}"]`)?.value) || 0;
-      if (val > 0) { hasPercent = true; break; }
+    for (let r = 1; r <= 3; r++){
+      const sel = isBunkerPanel ? `.percentage-input[data-row="${r}"][data-mill="0"]` : `.percentage-input[data-row="${r}"][data-mill="${m}"]`;
+      const v = parseFloat(panel.querySelector(sel)?.value) || 0;
+      if (v > 0) { hasPercent = true; break; }
     }
-    const flow = parseFloat(panel.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
-    const headers = Array.from(panel.querySelectorAll('.mills-grid > .mill'));
-    const header = headers.find(el => el.textContent.trim().startsWith(`BUNKER ${m+1}`));
+    const flowSel = isBunkerPanel ? `.flow-input[data-mill="0"]` : `.flow-input[data-mill="${m}"]`;
+    const flow = parseFloat(panel.querySelector(flowSel)?.value) || 0;
+
+    const header = Array.from(panel.querySelectorAll('.mill'))
+      .find(el => {
+        const txt = (el.textContent || '').replace(/\s+/g,' ').trim().toUpperCase();
+        return txt.startsWith(`BUNKER ${m + 1}`);
+      });
+
     if (!header) continue;
     header.classList.remove('red','green');
-    if (hasPercent && flow > 0) header.classList.add('red'); else header.classList.add('green');
+    if (hasPercent && flow > 0) header.classList.add('red');
+    else header.classList.add('green');
   }
 }
 
-/* ---------- update bunker SVG fill (panel-scoped) ---------- */
+/* ---------- update bunker SVG visuals ---------- */
 function updateBunkerColors(panel) {
   if (!panel) return;
   const coalColors = ['#f39c12','#3498db','#2ecc71'];
@@ -1516,57 +1455,115 @@ function updateBunkerColors(panel) {
   });
 }
 
-/* ---------- initialize a panel once (attach handlers) ---------- */
+/* ---------- Overview -> Bunker sync helpers ---------- */
+function syncOverviewToBunker(bunkerIndex) {
+  const overview = document.getElementById('overviewTab');
+  const bunkerPanel = document.getElementById(`bunker${bunkerIndex}Tab`);
+  if (!overview || !bunkerPanel) return;
+
+  // copy dropdowns
+  const overviewDrops = Array.from(overview.querySelectorAll('.dropdown'));
+  const bunkerDrops = Array.from(bunkerPanel.querySelectorAll('.dropdown'));
+  overviewDrops.forEach((d,i)=> { if(bunkerDrops[i]) bunkerDrops[i].value = d.value || ''; });
+
+  // map overview[data-mill = bunkerIndex] -> bunker[data-mill = 0]
+  for (let row=1; row<=3; row++){
+    const src = overview.querySelector(`.percentage-input[data-row="${row}"][data-mill="${bunkerIndex-1}"]`);
+    const dst = bunkerPanel.querySelector(`.percentage-input[data-row="${row}"][data-mill="0"]`);
+    if (src && dst) dst.value = src.value || '';
+  }
+
+  // flow
+  const srcFlow = overview.querySelector(`.flow-input[data-mill="${bunkerIndex-1}"]`);
+  const dstFlow = bunkerPanel.querySelector(`.flow-input[data-mill="0"]`);
+  if (srcFlow && dstFlow) dstFlow.value = srcFlow.value || '';
+
+  // costs: copy overview's cost inputs to bunker
+  const srcCosts = overview.querySelectorAll('.cost-input');
+  const dstCosts = bunkerPanel.querySelectorAll('.cost-input');
+  srcCosts.forEach((c,i)=> { if(dstCosts[i]) dstCosts[i].value = c.value || ''; });
+
+  // recalc this bunker panel (will not affect overview)
+  updateGCVCostBoxes(bunkerPanel);
+  calculateBlended(bunkerPanel);
+  validateMillPercentages(bunkerPanel);
+  updateBunkerColors(bunkerPanel);
+}
+
+function propagateOverviewToAllBunkers() {
+  for (let i=1;i<=6;i++) syncOverviewToBunker(i);
+  // after copying, re-run overview summary to keep it guaranteed up-to-date
+  const overview = document.getElementById('overviewTab');
+  if (overview) {
+    updateGCVCostBoxes(overview);
+    calculateBlended(overview);
+    validateMillPercentages(overview);
+    updateBunkerColors(overview);
+    updateOverviewSummaryFromOverviewPanel();
+  }
+}
+
+/* ---------- init panel once (attach handlers) ---------- */
 function initPanel(panel) {
   if (!panel) return;
-  if (panel._inited) return; // avoid double init
-  // populate dropdowns (if Excel loaded)
+  if (panel._inited) return;
   if (excelData && excelData.length) populateDropdownsForPanel(panel);
 
-  // Attach percentage input handlers
+  // percentage inputs
   panel.querySelectorAll('.percentage-input').forEach(inp => {
     inp.dataset.prev = inp.value || '';
-    inp.addEventListener('focus', () => inp.dataset.prev = inp.value);
+    inp.addEventListener('focus', ()=> inp.dataset.prev = inp.value);
     inp.addEventListener('input', function(){
       const millIndex = Number(this.dataset.mill);
       let sum = 0;
-      for (let r=1; r<=3; r++){
-        sum += parseFloat(panel.querySelector(`.percentage-input[data-row="${r}"][data-mill="${millIndex}"]`)?.value) || 0;
+      const checkMill = this.dataset.mill;
+      for (let r=1;r<=3;r++){
+        sum += parseFloat(panel.querySelector(`.percentage-input[data-row="${r}"][data-mill="${checkMill}"]`)?.value) || 0;
       }
       if (sum > 100) {
         this.value = this.dataset.prev || '';
-        alert(`Total for Mill ${String.fromCharCode(65+millIndex)} cannot exceed 100%`);
+        alert(`Total for Mill ${String.fromCharCode(65 + (parseInt(checkMill)||0))} cannot exceed 100%`);
         calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
         return;
       }
       this.dataset.prev = this.value;
       calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
+      if (panel.id === 'overviewTab') propagateOverviewToAllBunkers();
     });
   });
 
   // flow & cost inputs
   panel.querySelectorAll('.flow-input, .cost-input').forEach(inp => {
-    inp.addEventListener('input', () => { calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel); });
+    inp.addEventListener('input', () => {
+      calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
+      if (panel.id === 'overviewTab') propagateOverviewToAllBunkers();
+    });
   });
 
-  // dropdown change
+  // dropdown changes
   panel.querySelectorAll('.dropdown').forEach(d => {
-    d.addEventListener('change', () => { updateGCVCostBoxes(panel); calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel); });
+    d.addEventListener('change', () => {
+      updateGCVCostBoxes(panel);
+      calculateBlended(panel);
+      validateMillPercentages(panel);
+      updateBunkerColors(panel);
+      if (panel.id === 'overviewTab') propagateOverviewToAllBunkers();
+    });
   });
 
-  // mark initialized
   panel._inited = true;
-
-  // run initial calculations for the panel
-  updateGCVCostBoxes(panel); calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
+  updateGCVCostBoxes(panel);
+  calculateBlended(panel);
+  validateMillPercentages(panel);
+  updateBunkerColors(panel);
 }
 
-/* ---------- tab show logic: init panel when shown ---------- */
+/* ---------- tab show logic ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.tab-panel');
 
-  function hideAll() {
+  function hideAll(){
     panels.forEach(p => p.style.display = 'none');
     tabBtns.forEach(b => b.classList.remove('active'));
   }
@@ -1582,17 +1579,87 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAll();
         panel.style.display = 'block';
         btn.classList.add('active');
-        // initialize this panel now (safe & idempotent)
+
+        // if opening bunker, sync latest overview state into it
+        if (tabName.startsWith('bunker')) {
+          const bunkerNum = Number(tabName.replace('bunker','')) || null;
+          if (bunkerNum) syncOverviewToBunker(bunkerNum);
+        }
+
         initPanel(panel);
       }
     });
   });
 
-  // Optionally initialize overview immediately if it's visible by default:
+  // init overview if visible by default
   const overview = document.getElementById('overviewTab');
   if (overview && overview.style.display === 'block') initPanel(overview);
+
+  // attach download PDF handler (if present)
+  const downloadBtn = document.getElementById('downloadPDF');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', function () {
+      const { jsPDF } = window.jspdf;
+      const element = document.body;
+      html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        onclone: (clonedDoc) => {
+          const inputs = clonedDoc.querySelectorAll("input, textarea");
+          inputs.forEach(input => {
+            const text = clonedDoc.createElement("span");
+            text.textContent = input.value;
+            const style = window.getComputedStyle(input);
+            text.style.position = "absolute";
+            text.style.left = (input.offsetLeft) + "px";
+            text.style.top = (input.offsetTop) + "px";
+            text.style.width = input.offsetWidth + "px";
+            text.style.height = input.offsetHeight + "px";
+            text.style.font = style.font;
+            text.style.color = style.color;
+            text.style.lineHeight = style.lineHeight;
+            text.style.textAlign = style.textAlign;
+            input.parentElement.appendChild(text);
+            input.style.display = "none";
+          });
+
+          const selects = clonedDoc.querySelectorAll("select");
+          selects.forEach(select => {
+            const selectedText = select.options[select.selectedIndex]?.text || "";
+            const text = clonedDoc.createElement("span");
+            text.textContent = selectedText;
+            const style = window.getComputedStyle(select);
+            text.style.position = "absolute";
+            text.style.left = (select.offsetLeft) + "px";
+            text.style.top = (select.offsetTop) + "px";
+            text.style.width = select.offsetWidth + "px";
+            text.style.height = select.offsetHeight + "px";
+            text.style.font = style.font;
+            text.style.color = style.color;
+            text.style.lineHeight = style.lineHeight;
+            text.style.textAlign = style.textAlign;
+            select.parentElement.appendChild(text);
+            select.style.display = "none";
+          });
+        }
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'pt', 'a4');
+        const pdfW = pdf.internal.pageSize.getWidth();
+        const pdfH = (canvas.height * pdfW) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+        pdf.save('page.pdf');
+      }).catch(err => {
+        console.error('PDF generation error', err);
+        alert('Failed to generate PDF (see console).');
+      });
+    });
+  }
 });
 </script>
+
+
+
 
 </body>
 </html>
