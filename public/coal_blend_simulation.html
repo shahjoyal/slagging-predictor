@@ -1248,11 +1248,11 @@ function populateDropdownsForPanel(panel) {
 }
 
 /* ---------- update GCV & cost boxes inside a panel ---------- */
-/* NOTE: added 'force' parameter. If force===true, always fill cost inputs from excel.
-   Otherwise, we only fill cost inputs when the input is empty so user-entered costs are preserved. */
+/* NOTE: 'force' param: when true, overwrite cost inputs from sheet; otherwise preserve user-entered costs */
 function updateGCVCostBoxes(panel, force = false) {
   if (!panel) return;
   const drops = Array.from(panel.querySelectorAll('.dropdown'));
+  // scope gcv boxes and cost inputs to this panel
   const gcvBoxes = Array.from(panel.querySelectorAll('.gcv-box'));
   const costInputs = Array.from(panel.querySelectorAll('.cost-input'));
   for(let i=0;i<3;i++){
@@ -1261,13 +1261,14 @@ function updateGCVCostBoxes(panel, force = false) {
       const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
       return key && safeTrim(r[key]) === coalName;
     });
+    // fill gcv box from sheet (this represents the coal's GCV from sheet)
     if (gcvBoxes[i]) {
       const gcvKey = findKeyIgnoreCase(row, ['GCV','gcv','Gcv','G.C.V']);
       gcvBoxes[i].innerText = row && gcvKey ? (safeTrim(row[gcvKey]) !== '' ? Number(row[gcvKey]).toFixed(2) : '--') : '--';
     }
+    // cost input: only overwrite if force OR empty
     if (costInputs[i]) {
       const c = row ? (row.Cost ?? row.COST ?? row.Price ?? '') : '';
-      // only overwrite cost if force OR the input is empty (so user edits are preserved)
       if (force || String(costInputs[i].value).trim() === '') {
         costInputs[i].value = c !== undefined ? String(c) : '';
       }
@@ -1291,7 +1292,10 @@ function calcAFT(ox){
   return Number(aft);
 }
 
-/* ---------- calculate blended (panel-scoped) + update overview summary when overview panel ---------- */
+/* ---------- calculate blended (panel-scoped) ---------- */
+/* IMPORTANT: This function computes blended values per mill and updates AFT & per-mill results.
+   It NO LONGER writes into '.gcv-box' (that element shows the coal's own GCV and must be maintained
+   by updateGCVCostBoxes). Removing that overwrite fixes the GCV-misalignment bug. */
 function calculateBlended(panel) {
   if (!panel) return;
   const drops = Array.from(panel.querySelectorAll('.dropdown'));
@@ -1300,15 +1304,17 @@ function calculateBlended(panel) {
   const coal3 = drops[2]?.value || '';
   const oxKeys = ["SiO₂","Al₂O₃","Fe₂O₃","CaO","MgO","Na₂O","K₂O","SO₃","TiO₂"];
 
-  // per-mill blended & AFT
+  // per-mill blended & AFT and flows (for overview summary later)
   const blendedGCVs = new Array(6).fill(0);
   const aftVals = new Array(6).fill(0);
   const flows = new Array(6).fill(0);
 
   for (let m = 0; m < 6; m++) {
+    // read percentages for this mill (for overview). In bunker-single-view the 1 local column has data-mill="0"
     const p1 = parseFloat(panel.querySelector(`.percentage-input[data-row="1"][data-mill="${m}"]`)?.value) || 0;
     const p2 = parseFloat(panel.querySelector(`.percentage-input[data-row="2"][data-mill="${m}"]`)?.value) || 0;
     const p3 = parseFloat(panel.querySelector(`.percentage-input[data-row="3"][data-mill="${m}"]`)?.value) || 0;
+
     const gcv1 = getValue(coal1, "GCV"), gcv2 = getValue(coal2, "GCV"), gcv3 = getValue(coal3, "GCV");
     const blendedGCV = (gcv1*(p1/100)) + (gcv2*(p2/100)) + (gcv3*(p3/100));
     let ox = {};
@@ -1317,18 +1323,18 @@ function calculateBlended(panel) {
     });
     const aftVal = calcAFT(ox);
 
+    // write AFT cell for this mill (if panel contains it)
     const aftCell = panel.querySelector(`.aft[data-mill="${m}"]`);
     if (aftCell) aftCell.innerText = isFinite(aftVal) && aftVal>0 ? Number(aftVal).toFixed(2) : '--';
-    const gcvCell = panel.querySelectorAll('.gcv-box')[m];
-    if (gcvCell) gcvCell.innerText = blendedGCV > 0 ? Number(blendedGCV).toFixed(2) : '--';
 
-    const flowVal = parseFloat(panel.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
+    // store values for overview aggregate calculation
     blendedGCVs[m] = blendedGCV;
     aftVals[m] = aftVal;
+    const flowVal = parseFloat(panel.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
     flows[m] = flowVal;
   }
 
-  // cost rate for this panel
+  // cost rate calculation for this panel (works same as before)
   const costInputs = panel.querySelectorAll('.cost-input');
   const c1 = parseFloat(costInputs[0]?.value) || 0;
   const c2 = parseFloat(costInputs[1]?.value) || 0;
@@ -1348,7 +1354,7 @@ function calculateBlended(panel) {
   if (panel.id === 'overviewTab') {
     const costEl = document.getElementById('COSTRATE');
     if (costEl) costEl.innerText = costRate.toFixed(2);
-    // update the visible summary
+    // update the visible overview summary (reads blendedGCVs/flows/AFT from the DOM)
     updateOverviewSummaryFromOverviewPanel();
   }
 }
@@ -1363,7 +1369,19 @@ function updateOverviewSummaryFromOverviewPanel(){
   let weightedAFT = 0;
 
   for(let m=0;m<6;m++){
-    const blendedGCV = parseFloat(overview.querySelectorAll('.gcv-box')[m]?.innerText) || 0;
+    // blendedGCVs were not stored in elements; instead use the gcv-values computed earlier per mill if you have cells
+    // In your layout we have AFT cells per mill and flow inputs; blendedGCV for the mill is calculated in memory by calculateBlended when overview was last run.
+    // To be robust, recompute blendedGCV for summary here using current drop selections & percentages:
+    const drops = Array.from(overview.querySelectorAll('.dropdown'));
+    const coal1 = drops[0]?.value || '';
+    const coal2 = drops[1]?.value || '';
+    const coal3 = drops[2]?.value || '';
+    const gcv1 = getValue(coal1, "GCV"), gcv2 = getValue(coal2, "GCV"), gcv3 = getValue(coal3, "GCV");
+    const p1 = parseFloat(overview.querySelector(`.percentage-input[data-row="1"][data-mill="${m}"]`)?.value) || 0;
+    const p2 = parseFloat(overview.querySelector(`.percentage-input[data-row="2"][data-mill="${m}"]`)?.value) || 0;
+    const p3 = parseFloat(overview.querySelector(`.percentage-input[data-row="3"][data-mill="${m}"]`)?.value) || 0;
+    const blendedGCV = (gcv1*(p1/100)) + (gcv2*(p2/100)) + (gcv3*(p3/100));
+
     const aftVal = parseFloat(overview.querySelector(`.aft[data-mill="${m}"]`)?.innerText) || 0;
     const flow = parseFloat(overview.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
     if(flow > 0){
@@ -1423,7 +1441,7 @@ function validateMillPercentages(panel) {
   }
 }
 
-/* ---------- update bunker SVG visuals ---------- */
+/* ---------- update bunker visuals ---------- */
 function updateBunkerColors(panel) {
   if (!panel) return;
   const coalColors = ['#f39c12','#3498db','#2ecc71'];
@@ -1657,6 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+
 
 
 
