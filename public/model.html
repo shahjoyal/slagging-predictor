@@ -494,6 +494,16 @@
   opacity: 1;
   transform: translateY(0);
 }
+/* Add near your existing rules */
+.blend-row {
+  max-height: 60vh; /* prevent the page from exploding when many rows */
+  overflow-y: auto;
+  padding-right: 8px;
+}
+.blend { gap: 8px; align-items: center; }
+.blend .remove-blend-btn { min-width: 40px; }
+
+
     </style>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -550,890 +560,539 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
         <div id="scale-bars-container" style="margin-top: 20px;"></div>
     </div>
 
-    <script>
-        function populateDropdown(selectElement) {
-            selectElement.innerHTML = '<option value="">Select Coal Type</option>';
-            if (window.coalData) {
-                window.coalData.forEach(coal => {
-                    const opt = document.createElement('option');
-                    opt.value = coal.id;
-                    opt.textContent = coal.transportId
-                        ? `${coal.coalType} – ${coal.transportId}`
-                        : coal.coalType;
-                    selectElement.appendChild(opt);
-                });
-            }
-        }
-
-        function prefillValues(index, coalId) {
-            const coalInfo = window.coalData.find(coal => coal.id === coalId);
-            if (!coalInfo) return;
-
-            const currentRangeInput = document.querySelector(`#currentrange${index}`);
-            const minRangeInput = document.querySelector(`#minrange${index}`);
-            const maxRangeInput = document.querySelector(`#maxrange${index}`);
-            const costInput = document.querySelector(`#cost${index}`);
-
-            // Set placeholders to guide the user
-            currentRangeInput.placeholder = "Current Range (%)";
-            minRangeInput.placeholder = "Min Range (%)";
-            maxRangeInput.placeholder = "Max Range (%)";
-            costInput.placeholder = "Cost (Rs.)";
-
-            // Prefill values if available, otherwise leave blank
-            currentRangeInput.value = coalInfo.defaultCurrentRange || "";
-            minRangeInput.value = coalInfo.defaultMinRange || "";
-            maxRangeInput.value = coalInfo.defaultMaxRange || "";
-            costInput.value = coalInfo.defaultCost || "";
-        }
-
-        function addBlend() {
-            const MAX_COALS = 5;
-            const currentCoals = document.querySelectorAll('.blend').length;
-
-            if (currentCoals >= MAX_COALS) {
-                alert("You can only add up to 5 coal types.");
-                return;
-            }
-
-            const index = currentCoals;
-            const blendDiv = document.createElement("div");
-            blendDiv.className = "blend";
-            blendDiv.innerHTML = `
-                <label for="coal${index}">Coal:</label>
-                <select name="coal${index}" id="coal${index}" onchange="prefillValues(${index}, this.value)">
-                    <option value="">Select Coal Type</option>
-                </select>
-                <input type="number" id="currentrange${index}" placeholder="Current Range (%)" min="0" max="100">
-                <input type="number" id="minrange${index}" placeholder="Min Range (%)" min="0" max="100">
-                <input type="number" id="maxrange${index}" placeholder="Max Range (%)" min="0" max="100">
-                <input type="number" id="cost${index}" placeholder="Cost" min="0">
-                <input 
-    type="text" 
-    id="currency${index}" 
-    class="currency-select" 
-    pattern="INR|USD|DIR" 
-    title="Allowed currencies: INR, USD, DIR" 
-/>
-                <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
-                <button type="button" class="properties-btn" onclick="fetchCoalProperties(${index})">Properties</button>
-                <div id="properties${index}"></div>
-            `;
-
-            const currentRangeInput = blendDiv.querySelector(`#currentrange${index}`);
-            currentRangeInput.addEventListener("input", updateTotalRange);
-
-            const blendRow = document.querySelector(".blend-row");
-            blendRow.appendChild(blendDiv);
-
-            populateDropdown(blendDiv.querySelector(`#coal${index}`));
-            updateTotalRange();
-        }
-
-        function updateTotalRange() {
-            const totalRangeElement = document.getElementById("totalRange");
-            if (!totalRangeElement) {
-                console.error("Element with ID 'totalRange' not found in the DOM.");
-                return;
-            }
-
-            let totalCurrentRange = 0;
-            const ranges = document.querySelectorAll('input[id^="currentrange"]');
-            ranges.forEach(range => {
-                const rangeValue = parseFloat(range.value) || 0;
-                totalCurrentRange += rangeValue;
-            });
-            totalRangeElement.textContent = totalCurrentRange;
-        }
-
-        function removeBlend(button) {
-            button.parentElement.remove();
-            updateTotalRange();
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            fetch(`/get_coal_types`)
-                .then(response => response.json())
-                .then(data => {
-                    window.coalData = data.coal_data;
-                    addBlend();
-                })
-                .catch(error => console.error('Error fetching coal types:', error));
-        });
-
-        function fetchCoalProperties(index) {
-            const selectedCoal = document.querySelector(`#coal${index}`).value;
-
-            if (!selectedCoal) {
-                alert("Please select a coal type first.");
-                return;
-            }
-
-            const coalInfo = window.coalData.find(coal => coal.id === selectedCoal);
-            if (!coalInfo) {
-                alert("Properties not found.");
-                return;
-            }
-
-            let propertiesHTML = `
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th style="padding: 8px; border: 1px solid lightgray;">Percentage Properties</th>
-                            <th style="padding: 8px; border: 1px solid lightgray;">Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            for (const [key, value] of Object.entries(coalInfo.properties)) {
-                propertiesHTML += `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid lightgray;">${key}</td>
-                        <td style="padding: 8px; border: 1px solid lightgray;">${value}</td>
-                    </tr>
-                `;
-            }
-
-            propertiesHTML += `</tbody></table>`;
-
-            document.getElementById("coalPropertiesContent").innerHTML = propertiesHTML;
-            document.getElementById("coalPropertiesModal").style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById("coalPropertiesModal").style.display = "none";
-        }
-
-        window.onclick = function (event) {
-            const modal = document.getElementById("coalPropertiesModal");
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        };
-
-        function optimizeBlend() {
-            const blends = [];
-
-            let totalCurrentRange = 0;
-            const ranges = document.querySelectorAll('input[id^="currentrange"]');
-
-            ranges.forEach(range => {
-                const rangeValue = parseFloat(range.value) || 0;
-                totalCurrentRange += rangeValue;
-            });
-
-            if (totalCurrentRange !== 100) {
-                alert("Total percentage must be exactly 100 to proceed!");
-                return;
-            }
-
-            document.querySelectorAll(".blend").forEach((blendDiv, index) => {
-                const selectedId = document.querySelector(`#coal${index}`).value;
-                const min = parseFloat(document.querySelector(`#minrange${index}`).value) || 0;
-                const max = parseFloat(document.querySelector(`#maxrange${index}`).value) || 0;
-                const cost = parseFloat(document.querySelector(`#cost${index}`).value) || 0;
-                const current = parseFloat(document.querySelector(`#currentrange${index}`).value) || 0;
-
-                const coalInfo = window.coalData.find(coal => coal.id === selectedId);
-                if (!coalInfo) return;
-
-                blends.push({
-                    id: selectedId,
-                    coal: coalInfo.coalType,
-                    current,
-                    min,
-                    max,
-                    cost,
-                    properties: {
-                        SiO2: coalInfo.properties["SiO₂"] || 0,
-                        Al2O3: coalInfo.properties["Al₂O₃"] || 0,
-                        Fe2O3: coalInfo.properties["Fe₂O₃"] || 0,
-                        CaO: coalInfo.properties["CaO"] || 0,
-                        MgO: coalInfo.properties["MgO"] || 0,
-                        Na2O: coalInfo.properties["Na₂O"] || 0,
-                        K2O: coalInfo.properties["K₂O"] || 0,
-                        SO3: coalInfo.properties["SO₃"] || 0,
-                        TiO2: coalInfo.properties["TiO₂"] || 0,
-                        Gcv: coalInfo.properties["GCV"] || 0
-                    }
-                });
-            });
-
-            console.log("Blends data:", blends);
-
-            document.getElementById("coalForm").style.display = "none";
-            document.getElementById("optimization-result").style.display = "block";
-
-            fetch(`/optimize`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ blends })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    console.log("Optimization Result:", data);
-                    displayOptimizationResult(data, blends);
-                })
-                .catch(err => console.error("Error optimizing blend:", err));
-        }
-
-        function displayOptimizationResult(data, blends) {
-            const bestAftBlend = data.best_aft_blend;
-            const cheapestBlend = data.cheapest_blend;
-            const balancedBlend = data.balanced_blend;
-            const currentBlend = data.current_blend;
-
-            const tableHtml = `
-                <table>
-                    <tr>
-                        <th>Coal type</th>
-                        <th>Current Blend</th>
-                        <th>Best Blend</th>
-                        <th>Best Price Blend</th>
-                        <th>Balanced Blend</th>
-                        <th>UoM</th>
-                    </tr>
-                    ${blends.map((blend, i) => {
-                const bestAftPct = bestAftBlend.blend[i] || 0;
-                const cheapestPct = cheapestBlend.blend[i] || 0;
-                const balancedPct = balancedBlend.blend[i] || 0;
-                const currentPct = currentBlend.blend[i] || 0;
-                const currency = document.querySelector(`#currency${i}`)?.value || "INR"; // Fixed the invalid character issue by ensuring proper syntax for dynamic currency display
-
-                return `
-                            <tr>
-                                <td>${blend.coal}</td>
-                                <td>${currentPct}%</td>
-                                <td>${bestAftPct}%</td>
-                                <td>${cheapestPct}%</td>
-                                <td>${balancedPct}%</td>
-                                <td>%</td>
-                            </tr>
-                        `;
-            }).join('')}
-                    <tr>
-                        <td>AFT (°C)</td>
-                        <td>${currentBlend.predicted_aft.toFixed(2)}</td>
-                        <td>${bestAftBlend.predicted_aft.toFixed(2)}</td>
-                        <td>${cheapestBlend.predicted_aft.toFixed(2)}</td>
-                        <td>${balancedBlend.predicted_aft.toFixed(2)}</td>
-                        <td>°C</td>
-                    </tr>
-                    <tr>
-                        <td>GCV</td>
-                        <td>${currentBlend.gcv.toFixed(2)}</td>
-                        <td>${bestAftBlend.gcv.toFixed(2)}</td>
-                        <td>${cheapestBlend.gcv.toFixed(2)}</td>
-                        <td>${balancedBlend.gcv.toFixed(2)}</td>
-                        <td>kcal/kg</td>
-                    </tr>
-                    <tr>
-                        <td>Cost</td>
-                        <td>${currentBlend.cost.toFixed(2)}</td>
-                        <td>${bestAftBlend.cost.toFixed(2)}</td>
-                        <td>${cheapestBlend.cost.toFixed(2)}</td>
-                        <td>${balancedBlend.cost.toFixed(2)}</td>
-                        <td>${document.querySelector(`#currency0`)?.value || "INR"}</td>
-                    </tr>
-                </table>
-                <div style="margin-top: 20px; text-align: center;">
-                    <button onclick="window.location.reload()">Back</button>
-                </div>
-            `;
-
-            const individualTable = `
-                <h3>Individual Coal AFTs</h3>
-                <table class="individual-aft-table">
-                    <tr>
-                        <th>Coal Type</th>
-                        <th>Predicted AFT (°C)</th>
-                    </tr>
-                    ${data.individual_coal_afts.map(coal => `
-                        <tr>
-                            <td>${coal.coal}</td>
-                            <td>${coal.predicted_aft.toFixed(2)}</td>
-                        </tr>
-                    `).join('')}
-                </table>
-            `;
-
-            document.getElementById("optimization-result").innerHTML = `
-                <div style="width: 100%; margin-bottom: 30px;">
-                    ${tableHtml}
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
-                    <div style="flex: 1; min-width: 300px; padding: 20px;">
-                        <div id="ternary-plot" style="width: 100%; height: 400px;"></div>
-                    </div>
-                    <div style="flex: 1; min-width: 300px;">
-                        ${individualTable}
-                    </div>
-                </div>
-            `;
-
-            displayScaleBars(data);
-
-            const blendsWithAFT = [
-                { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
-                { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
-                { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
-            ];
-
-            updatePlot(blendsWithAFT);
-        }
-
-        // Refined the slagging and fouling calculations to align with the provided formulas.
-        function calculateSlaggingAndFouling(blend, otherBlends = []) {
-            if (!blend || (!blend.blended_oxides && otherBlends.length === 0)) {
-                console.error("Invalid blend data or missing blended_oxides.", blend);
-                return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
-            }
-
-            let blended_oxides = blend.blended_oxides;
-
-            if (!blended_oxides || blended_oxides.length === 0) {
-                blended_oxides = otherBlends.reduce((acc, otherBlend) => {
-                    if (otherBlend.blended_oxides && Array.isArray(otherBlend.blended_oxides)) {
-                        otherBlend.blended_oxides.forEach((value, index) => {
-                            acc[index] = (acc[index] || 0) + value;
-                        });
-                    }
-                    return acc;
-                }, []).map(value => value / otherBlends.length);
-            }
-
-            const [SiO2 = 0, Al2O3 = 0, Fe2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0, TiO2 = 0, SO3 = 0] = blended_oxides;
-
-            // Slagging Potential Calculation
-            const acidicOxides = SiO2 + Al2O3 + TiO2;
-            const basicOxides = CaO + MgO + Na2O + K2O;
-            const slaggingPotential = basicOxides / acidicOxides;
-
-            // Fouling Potential Calculation
-            const foulingPotential = (Na2O + K2O + SO3) / (SiO2 + 1);
-
-            // Normalize values for scale (0-10)
-            const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
-            const normalizedFouling = Math.min(foulingPotential * 10, 10);
-
-            const finalScore = normalizedSlagging + normalizedFouling;
-
-            return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
-        }
-
-        function displayScaleBars(data) {
-            console.log("displayScaleBars called with data:", data); // Debugging log
-
-            const { best_aft_blend, cheapest_blend, balanced_blend, current_blend } = data;
-
-            const tableElement = document.querySelector("#optimization-result table");
-            if (!tableElement) {
-                console.error("Table element not found. Cannot render scale bars.");
-                return;
-            }
-
-            const blends = [
-                { blend: best_aft_blend },
-                { blend: cheapest_blend },
-                { blend: balanced_blend },
-                { blend: current_blend }
-            ];
-
-            const row = tableElement.insertRow(-1);
-
-            const labelCell = row.insertCell(0);
-            labelCell.textContent = "Slagging & Fouling";
-            labelCell.style.fontWeight = "bold";
-            labelCell.style.textAlign = "center";
-
-            blends.forEach(({ blend }, index) => {
-                const cell = row.insertCell(-1);
-
-                if (!blend) {
-                    console.error(`Blend data missing for index ${index}`);
-                    return;
-                }
-
-                const { slaggingPotential, foulingPotential } = calculateSlaggingAndFouling(blend, [best_aft_blend, cheapest_blend, balanced_blend]);
-
-                const wrapper = document.createElement("div");
-                wrapper.style.display = "flex";
-                wrapper.style.flexDirection = "column";
-                wrapper.style.alignItems = "center";
-
-                const barWrapper = document.createElement("div");
-                barWrapper.style.width = "100%";
-                barWrapper.style.height = "32px";
-                barWrapper.style.border = "1px solid black";
-                barWrapper.style.borderRadius = "12px";
-                barWrapper.style.position = "relative";
-                barWrapper.style.display = "flex";
-                barWrapper.style.alignItems = "center";
-                barWrapper.style.overflow = "visible"; // ensure labels visible if any
-
-                const totalScore = slaggingPotential + foulingPotential;
-
-                const bar = document.createElement("div");
-                bar.style.height = "100%";
-                bar.style.width = `${(totalScore / 10) * 100}%`; // Scale the width based on the score
-                bar.style.borderRadius = "12px";
-                bar.style.backgroundColor = getScaleColor(totalScore);
-
-                const valueDisplay = document.createElement("span");
-                valueDisplay.textContent = totalScore.toFixed(2); // Display the score inside the bar
-                valueDisplay.style.position = "absolute";
-                valueDisplay.style.left = "50%";
-                valueDisplay.style.transform = "translateX(-50%)";
-                valueDisplay.style.color = "black";
-                valueDisplay.style.zIndex = "10";           // on top of bar
-                valueDisplay.style.backgroundColor = "rgba(255,255,255,0.7)"; // semi-transparent white bg behind text for contrast
-                valueDisplay.style.fontWeight = "bold";
-                valueDisplay.style.userSelect = "none";
-
-                barWrapper.appendChild(bar);
-                barWrapper.appendChild(valueDisplay);
-                wrapper.appendChild(barWrapper);
-
-                // --- Add horizontal scale with ticks and labels ---
-                const scaleContainer = document.createElement("div");
-                scaleContainer.style.position = "relative";
-                scaleContainer.style.width = "100%";
-                scaleContainer.style.height = "30px";
-                scaleContainer.style.marginTop = "8px";
-                scaleContainer.style.borderTop = "1px solid black";
-
-                // Initially hidden
-                scaleContainer.style.opacity = "0";
-                scaleContainer.style.pointerEvents = "none";
-                scaleContainer.style.transition = "opacity 0.3s ease";
-
-                const scaleValues = [0, 3, 6, 10];
-                scaleValues.forEach(value => {
-                    const posPercent = (value / 10) * 100; // max scale is 10
-
-                    // Tick mark
-                    const tick = document.createElement("div");
-                    tick.style.position = "absolute";
-                    tick.style.left = `${posPercent}%`;
-                    tick.style.top = "0";
-                    tick.style.width = "2px";
-                    tick.style.height = "10px";
-                    tick.style.backgroundColor = "black";
-                    tick.style.transform = "translateX(-50%)";
-                    scaleContainer.appendChild(tick);
-
-                    // Label
-                    const label = document.createElement("span");
-                    label.textContent = value;
-                    label.style.position = "absolute";
-                    label.style.left = `${posPercent}%`;
-                    label.style.top = "12px";
-                    label.style.fontSize = "12px";
-                    label.style.transform = "translateX(-50%)";
-                    scaleContainer.appendChild(label);
-                });
-
-                wrapper.appendChild(scaleContainer);
-
-                // Hover show/hide scale lines and labels
-                wrapper.addEventListener("mouseenter", () => {
-                    scaleContainer.style.opacity = "1";
-                    scaleContainer.style.pointerEvents = "auto";
-                });
-
-                wrapper.addEventListener("mouseleave", () => {
-                    scaleContainer.style.opacity = "0";
-                    scaleContainer.style.pointerEvents = "none";
-                });
-
-                cell.appendChild(wrapper);
-
-                console.log(`Rendered scale bar for blend index ${index} with totalScore: ${totalScore}`); // Debugging log
-            });
-        }
-
-        function getScaleColor(value) {
-            if (value < 4) {
-                return "#5de65d"; // Green
-            } else if (value < 7) {
-                return "#ffff76"; // Yellow
-            } else {
-                return "#e24242"; // Red
-            }
-        }
-
-        function updatePlot(blendsWithAFT) {
-            const ternaryPlotElement = document.getElementById('ternary-plot');
-            if (!ternaryPlotElement) {
-                console.error("Ternary plot element #ternary-plot not found.");
-                return;
-            }
-
-            const a = [];
-            const b = [];
-            const c = [];
-            const colors = [];
-            const labels = [];
-
-            blendsWithAFT.forEach(blend => {
-                let acidic = 0, basic = 0, other = 0;
-                let totalPercentage = 0;
-
-                blend.blend.forEach((pct, i) => {
-                    const coal = blend.coals[i];
-                    const props = coal.properties;
-                    const weight = pct;
-
-                    totalPercentage += weight;
-
-                    if (props) {
-                        acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
-                        basic += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
-                        other += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0));
-                    }
-                });
-
-                a.push(acidic / totalPercentage);
-                b.push(basic / totalPercentage);
-                c.push(other / totalPercentage);
-                colors.push(blend.predicted_aft);
-                labels.push(`${blend.label} - AFT: ${blend.predicted_aft.toFixed(2)}°C`);
-            });
-
-            const data = [{
-                type: 'scatterternary',
-                mode: 'markers',
-                a,
-                b,
-                c,
-                marker: {
-                    size: 14,
-                    color: colors,
-                    colorscale: 'Jet',
-                    colorbar: { title: "Fusion Temp (°C)" }
-                },
-                text: labels,
-                hoverinfo: 'text'
-            }];
-
-            const layout = {
-                margin: { l: 40, r: 40, t: 60, b: 50 },
-                ternary: {
-                    sum: 100,
-                    aaxis: { title: { text: "Thermal Stability", font: { size: 14 } }, showticklabels: true },
-                    baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } }, showticklabels: true },
-                    caxis: { title: { text: "Hardening Index", font: { size: 14 } }, showticklabels: true }
-                }
-            };
-
-            Plotly.newPlot(ternaryPlotElement, data, layout);
-        }
-
-        function createHorizontalScaleBar(containerId, gcvValue) {
-            const minValue = 0;
-            const maxValue = 10;
-            const interval = 3; // Interval for the scale
-
-            const container = document.getElementById(containerId);
-            if (!container) {
-                console.error(`Container with ID '${containerId}' not found.`);
-                return;
-            }
-
-            container.innerHTML = "";
-
-            const barWrapper = document.createElement("div");
-            barWrapper.style.width = "100%";
-            barWrapper.style.height = "80px"; // Increased height for better visibility
-            barWrapper.style.border = "2px solid black"; // Thicker border for better visibility
-            barWrapper.style.borderRadius = "12px";
-            barWrapper.style.position = "relative";
-            barWrapper.style.display = "flex";
-
-            const gcvPercentage = ((gcvValue - minValue) / (maxValue - minValue)) * 100;
-
-            const gcvBar = document.createElement("div");
-            gcvBar.style.height = "100%";
-            gcvBar.style.width = `${gcvPercentage}%`;
-            gcvBar.style.borderRadius = gcvPercentage >= 100 ? "12px" : "12px 0 0 12px";
-            gcvBar.style.backgroundColor = getGcvColor(gcvValue);
-
-            barWrapper.appendChild(gcvBar);
-
-            // Add tick marks (teeth) and labels at intervals of 3
-            for (let i = minValue; i <= maxValue; i++) {
-                const positionPercent = ((i - minValue) / (maxValue - minValue)) * 100;
-
-                // Create the tick mark
-                const tick = document.createElement("div");
-                tick.style.position = "absolute";
-                tick.style.left = `${positionPercent}%`;
-                tick.style.bottom = "0";
-                tick.style.height = (i % interval === 0 || i === maxValue) ? "30px" : "15px";
-                tick.style.width = "2px";
-                tick.style.backgroundColor = "black";
-                barWrapper.appendChild(tick);
-
-                // Create the label
-                if (i % interval === 0 || i === maxValue) {
-                    const label = document.createElement("div");
-                    label.style.position = "absolute";
-                    label.style.left = `${positionPercent}%`;
-                    label.style.bottom = "-25px"; // Position below the tick
-                    label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "16px";
-                    label.style.fontWeight = "bold";
-                    label.textContent = i;
-                    barWrapper.appendChild(label);
-                }
-            }
-
-        }
-
-        function getGcvColor(gcvValue) {
-            if (gcvValue < 4) return "#a6e3a6";
-            if (gcvValue < 7) return "yellow";
-            return "red";
-        }
-
-        function createBarGraph(containerId, value, minValue, maxValue, colorRanges) {
-            const container = document.getElementById(containerId);
-            container.style.width = "550px";
-            container.style.height = "32px";
-            container.style.border = "1px solid black";
-            container.style.borderRadius = "12px";
-            container.style.position = "relative";
-            container.style.marginBottom = "20px";
-            container.style.display = "flex";
-
-            const valueWidth = ((value - minValue) / (maxValue - minValue)) * 100;
-
-            const bar = document.createElement("div");
-            bar.style.height = "100%";
-            bar.style.width = `${valueWidth}%`;
-            bar.style.borderRadius = valueWidth >= 100 ? "12px" : "12px 0 0 12px";
-            bar.style.backgroundColor = getColor(value, colorRanges);
-
-            container.appendChild(bar);
-
-            for (let i = minValue; i <= maxValue; i++) {
-                const tick = document.createElement("div");
-                tick.style.position = "absolute";
-                tick.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                tick.style.top = "50%";
-                tick.style.transform = "translateY(-50%)";
-                tick.style.height = "10px";
-                tick.style.width = "1px";
-                tick.style.backgroundColor = "black";
-
-                const label = document.createElement("span");
-                label.style.position = "absolute";
-                label.style.marginTop = "5px";
-                label.style.left = `${((i - minValue) / (maxValue - minValue)) * 100}%`;
-                label.style.top = "100%";
-                label.style.transform = "translateX(-50%)";
-                label.style.fontSize = "12px";
-                label.textContent = i;
-
-                container.appendChild(tick);
-            }
-        }
-
-        function getColor(value, colorRanges) {
-            if (value >= colorRanges.red[0] && value <= colorRanges.red[1]) return "#e24242";
-            if (value >= colorRanges.yellow[0] && value <= colorRanges.yellow[1]) return "#ffff76";
-            if (value >= colorRanges.green[0] && value <= colorRanges.green[1]) return "#5de65d";
-            return "#ccc";
-        }
-
-        // Updated the horizontal scale graphs to reflect the calculated slagging and fouling values based on the provided formulas.
-        function updateHorizontalScaleGraphs(totalScore, checkboxScore, overallTotal) {
-            const minValue = 0;
-            const maxValue = 10;
-            const interval = 3; // Interval for the scale
-
-            // Graph container
-            const overallGraphContainer = document.createElement("div");
-            overallGraphContainer.style.width = "100%";
-            overallGraphContainer.style.height = "80px"; // Increased height for better visibility
-            overallGraphContainer.style.border = "2px solid black"; // Thicker border for better visibility
-            overallGraphContainer.style.borderRadius = "12px";
-            overallGraphContainer.style.position = "relative";
-            overallGraphContainer.style.marginBottom = "20px";
-            overallGraphContainer.style.display = "flex";
-
-            let sfWidth = (totalScore / maxValue) * 100;
-            sfWidth = sfWidth > 100 ? 100 : sfWidth;
-
-            let cbWidth = ((totalScore + checkboxScore) > maxValue)
-                ? Math.max(0, (maxValue - totalScore) / maxValue * 100)
-                : (checkboxScore / maxValue) * 100;
-
-            const totalCombined = totalScore + checkboxScore;
-
-            // Slagging + Fouling Score Bar
-            const sfBar = document.createElement("div");
-            sfBar.style.height = "100%";
-            sfBar.style.width = `${sfWidth}%`;
-            sfBar.style.borderRadius = totalCombined >= maxValue ? "12px" : "12px 0 0 12px";
-            sfBar.style.backgroundColor = getColor(totalScore);
-
-            // Checkbox Score Bar (overlay)
-            const cbBar = document.createElement("div");
-            cbBar.style.height = "100%";
-            cbBar.style.width = `${cbWidth}%`;
-            cbBar.style.borderRadius = totalCombined >= maxValue ? "0 12px 12px 0" : "0";
-            cbBar.style.backgroundColor = getCheckboxBaseColor(totalScore); // base color
-            cbBar.style.backgroundImage = getHatchingLines(getHatchColor(totalCombined)); // hatch color depends on total
-
-            // Append bars
-            overallGraphContainer.appendChild(sfBar);
-            overallGraphContainer.appendChild(cbBar);
-
-            // Tick marks and labels at intervals of 3
-            for (let i = minValue; i <= maxValue; i++) {
-                const tick = document.createElement("div");
-                tick.style.position = "absolute";
-                tick.style.left = `${(i / maxValue) * 100}%`;
-                tick.style.bottom = "0";
-                tick.style.height = i % interval === 0 ? "30px" : "15px"; // Longer ticks for intervals of 3
-                tick.style.width = "2px"; // Width of the tick
-                tick.style.backgroundColor = "black";
-
-                const label = document.createElement("span");
-                if (i % interval === 0) { // Add labels only for intervals of 3
-                    label.style.position = "absolute";
-                    label.style.marginTop = "5px";
-                    label.style.left = `${(i / maxValue) * 100}%`;
-                    label.style.bottom = "-40px"; // Adjusted position for better visibility
-                    label.style.transform = "translateX(-50%)";
-                    label.style.fontSize = "18px"; // Increased font size for better visibility
-                    label.style.fontWeight = "bold"; // Bold labels for emphasis
-                    label.textContent = i;
-                    overallGraphContainer.appendChild(label);
-                }
-
-                overallGraphContainer.appendChild(tick);
-            }
-
-            // Display score
-            const totalDisplay = document.createElement("div");
-            totalDisplay.style.marginBottom = "10px";
-            totalDisplay.style.marginTop = "10px";
-            totalDisplay.style.fontSize = "18px";
-            totalDisplay.style.fontWeight = "bold";
-            totalDisplay.textContent = `Overall Score: ${overallTotal.toFixed(1)} (Slagging + Fouling: ${totalScore.toFixed(1)}, O&M Score: ${checkboxScore.toFixed(1)})`;
-
-            const rightContainerDiv = document.getElementById("resultsContainer");
-            if (!rightContainerDiv) {
-                console.error("Container with ID 'resultsContainer' not found.");
-                return;
-            }
-
-            rightContainerDiv.appendChild(totalDisplay);
-            rightContainerDiv.appendChild(overallGraphContainer);
-        }
-
-        function getColor(score) {
-            if (score < 3) return "#a6e3a6";
-            if (score < 6.5) return "yellow";
-            return "red";
-        }
-
-        function getCheckboxBaseColor(score) {
-            if (score < 3) return "#a6e3a6";
-            if (score < 6.5) return "yellow";
-            return "red";
-        }
-
-        function getHatchingLines(color) {
-            return `repeating-linear-gradient(
-        45deg,
-        ${color},
-        ${color} 10px,
-        transparent 10px,
-        transparent 20px
-    )`;
-        }
-   document.getElementById("downloadPDF").addEventListener("click", function () {
-  const { jsPDF } = window.jspdf;
-  const element = document.body; // ✅ capture whole page including navbar
-
-  html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    onclone: (clonedDoc) => {
-      // Handle input & textarea values
-      const inputs = clonedDoc.querySelectorAll("input, textarea");
-      inputs.forEach(input => {
-        const text = clonedDoc.createElement("span");
-        text.textContent = input.value;
-
-        text.style.position = "absolute";
-        text.style.left = input.offsetLeft + "px";
-        text.style.top = input.offsetTop + "px";
-        text.style.width = input.offsetWidth + "px";
-        text.style.height = input.offsetHeight + "px";
-        text.style.lineHeight = input.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(input).font;
-        text.style.color = window.getComputedStyle(input).color;
-
-        clonedDoc.body.appendChild(text);
-        input.style.visibility = "hidden";
-      });
-
-      // Handle select dropdowns (coal names)
-      const selects = clonedDoc.querySelectorAll("select");
-      selects.forEach(select => {
-        const selectedText = select.options[select.selectedIndex]?.text || "";
-        const text = clonedDoc.createElement("span");
-        text.textContent = selectedText;
-
-        text.style.position = "absolute";
-        text.style.left = select.offsetLeft + "px";
-        text.style.top = select.offsetTop + "px";
-        text.style.width = select.offsetWidth + "px";
-        text.style.height = select.offsetHeight + "px";
-        text.style.lineHeight = select.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(select).font;
-        text.style.color = window.getComputedStyle(select).color;
-
-        clonedDoc.body.appendChild(text);
-        select.style.visibility = "hidden";
+<script>
+  // Robust multi-coal support: up to 10 coals
+  // Replaces fragile index-based DOM lookups with per-row queries
+  let blendCounter = 0;
+  const MAX_COALS = 10; // <-- increased to 10
+
+  function populateDropdown(selectElement) {
+    selectElement.innerHTML = '<option value="">Select Coal Type</option>';
+    if (window.coalData && Array.isArray(window.coalData)) {
+      window.coalData.forEach(coal => {
+        const opt = document.createElement('option');
+        opt.value = coal.id;
+        opt.textContent = coal.transportId ? `${coal.coalType} – ${coal.transportId}` : coal.coalType;
+        selectElement.appendChild(opt);
       });
     }
-  }).then(canvas => {
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
+  }
 
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+  function prefillValues(selectElement) {
+    // Operate on the select element passed; find the row and prefill its inputs
+    const coalId = selectElement.value;
+    const coalInfo = (window.coalData || []).find(c => c.id === coalId);
+    if (!coalInfo) return;
 
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const row = selectElement.closest('.blend');
+    if (!row) return;
 
-    let heightLeft = imgHeight;
-    let position = 0;
+    const currentRangeInput = row.querySelector('input[data-field="currentrange"]');
+    const minRangeInput = row.querySelector('input[data-field="minrange"]');
+    const maxRangeInput = row.querySelector('input[data-field="maxrange"]');
+    const costInput = row.querySelector('input[data-field="cost"]');
 
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    if (currentRangeInput) currentRangeInput.placeholder = "Current Range (%)";
+    if (minRangeInput) minRangeInput.placeholder = "Min Range (%)";
+    if (maxRangeInput) maxRangeInput.placeholder = "Max Range (%)";
+    if (costInput) costInput.placeholder = "Cost (Rs.)";
 
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+    if (currentRangeInput) currentRangeInput.value = coalInfo.defaultCurrentRange || "";
+    if (minRangeInput) minRangeInput.value = coalInfo.defaultMinRange || "";
+    if (maxRangeInput) maxRangeInput.value = coalInfo.defaultMaxRange || "";
+    if (costInput) costInput.value = coalInfo.defaultCost || "";
+    updateTotalRange();
+  }
+
+  function addBlend() {
+    const currentCoals = document.querySelectorAll('.blend').length;
+    if (currentCoals >= MAX_COALS) {
+      alert(`You can only add up to ${MAX_COALS} coal types.`);
+      return;
     }
 
-    pdf.save("Coal_Blending_Ratio.pdf");
+    const idSuffix = 'b' + (blendCounter++);
+
+    const blendDiv = document.createElement('div');
+    blendDiv.className = 'blend';
+    blendDiv.dataset.blendid = idSuffix;
+
+    blendDiv.innerHTML = `
+      <label for="coal-${idSuffix}">Coal:</label>
+      <select id="coal-${idSuffix}" name="coal-${idSuffix}" onchange="prefillValues(this)">
+        <option value="">Select Coal Type</option>
+      </select>
+
+      <input type="number" id="currentrange-${idSuffix}" data-field="currentrange" placeholder="Current Range (%)" min="0" max="100">
+      <input type="number" id="minrange-${idSuffix}" data-field="minrange" placeholder="Min Range (%)" min="0" max="100">
+      <input type="number" id="maxrange-${idSuffix}" data-field="maxrange" placeholder="Max Range (%)" min="0" max="100">
+      <input type="number" id="cost-${idSuffix}" data-field="cost" placeholder="Cost" min="0">
+      <input type="text" id="currency-${idSuffix}" data-field="currency" class="currency-select" pattern="INR|USD|DIR" title="Allowed currencies: INR, USD, DIR"/>
+
+      <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
+      <button type="button" class="properties-btn" onclick="fetchCoalProperties(this)">Properties</button>
+      <div id="properties-${idSuffix}"></div>
+    `;
+
+    // Attach event on currentrange input to update global total
+    const currentRangeInput = blendDiv.querySelector('input[data-field="currentrange"]');
+    if (currentRangeInput) {
+      currentRangeInput.addEventListener('input', updateTotalRange);
+    }
+
+    const blendRow = document.querySelector('.blend-row');
+    blendRow.appendChild(blendDiv);
+
+    // populate the dropdown we just created
+    populateDropdown(blendDiv.querySelector('select'));
+    updateTotalRange();
+  }
+
+  function updateTotalRange() {
+    const totalRangeElement = document.getElementById('totalRange');
+    if (!totalRangeElement) {
+      console.error("Element with ID 'totalRange' not found.");
+      return;
+    }
+
+    let totalCurrentRange = 0;
+    const ranges = document.querySelectorAll('input[data-field="currentrange"]');
+    ranges.forEach(input => {
+      const v = parseFloat(input.value);
+      if (!isNaN(v)) totalCurrentRange += v;
+    });
+
+    totalRangeElement.textContent = totalCurrentRange;
+  }
+
+  function removeBlend(button) {
+    const row = button.closest('.blend');
+    if (!row) return;
+    row.remove();
+    updateTotalRange();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch('/get_coal_types')
+      .then(response => response.json())
+      .then(data => {
+        window.coalData = data.coal_data || [];
+        addBlend(); // create initial row
+      })
+      .catch(error => {
+        console.error('Error fetching coal types:', error);
+        // still allow adding rows even if fetch failed
+        addBlend();
+      });
   });
-});
-    </script>
+
+  function fetchCoalProperties(button) {
+    // Accept button element; find the select in same row
+    const row = button.closest('.blend');
+    if (!row) return;
+    const select = row.querySelector('select');
+    const selectedCoal = select ? select.value : null;
+    if (!selectedCoal) {
+      alert('Please select a coal type first.');
+      return;
+    }
+    const coalInfo = (window.coalData || []).find(c => c.id === selectedCoal);
+    if (!coalInfo) {
+      alert('Properties not found.');
+      return;
+    }
+
+    let propertiesHTML = `
+      <table border="1" style="width: 100%; border-collapse: collapse;">
+        <thead><tr><th style="padding: 8px; border: 1px solid lightgray;">Percentage Properties</th><th style="padding: 8px; border: 1px solid lightgray;">Value</th></tr></thead>
+        <tbody>
+    `;
+    for (const [key, value] of Object.entries(coalInfo.properties || {})) {
+      propertiesHTML += `<tr><td style="padding:8px;border:1px solid lightgray;">${key}</td><td style="padding:8px;border:1px solid lightgray;">${value}</td></tr>`;
+    }
+    propertiesHTML += `</tbody></table>`;
+
+    document.getElementById('coalPropertiesContent').innerHTML = propertiesHTML;
+    document.getElementById('coalPropertiesModal').style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('coalPropertiesModal').style.display = 'none';
+  }
+
+  window.onclick = function (event) {
+    const modal = document.getElementById('coalPropertiesModal');
+    if (event.target === modal) modal.style.display = 'none';
+  };
+
+  function optimizeBlend() {
+    const blends = [];
+
+    // Validate total is 100
+    let totalCurrentRange = 0;
+    document.querySelectorAll('input[data-field="currentrange"]').forEach(inp => {
+      const v = parseFloat(inp.value);
+      if (!isNaN(v)) totalCurrentRange += v;
+    });
+
+    if (Math.round(totalCurrentRange) !== 100) { // allow minor float imprecision
+      alert('Total percentage must be exactly 100 to proceed!');
+      return;
+    }
+
+    // Build blends array by inspecting each .blend row
+    const blendRows = Array.from(document.querySelectorAll('.blend'));
+    blendRows.forEach(row => {
+      const selectedId = row.querySelector('select')?.value || '';
+      const min = parseFloat(row.querySelector('input[data-field="minrange"]')?.value) || 0;
+      const max = parseFloat(row.querySelector('input[data-field="maxrange"]')?.value) || 0;
+      const cost = parseFloat(row.querySelector('input[data-field="cost"]')?.value) || 0;
+      const current = parseFloat(row.querySelector('input[data-field="currentrange"]')?.value) || 0;
+      const currency = row.querySelector('input[data-field="currency"]')?.value || 'INR';
+
+      const coalInfo = (window.coalData || []).find(c => c.id === selectedId);
+      if (!coalInfo) return; // skip rows without a selected coal
+
+      blends.push({
+        id: selectedId,
+        coal: coalInfo.coalType,
+        current,
+        min,
+        max,
+        cost,
+        currency,
+        properties: {
+          SiO2: coalInfo.properties['SiO₂'] || coalInfo.properties['SiO2'] || 0,
+          Al2O3: coalInfo.properties['Al₂O₃'] || coalInfo.properties['Al2O3'] || 0,
+          Fe2O3: coalInfo.properties['Fe₂O₃'] || coalInfo.properties['Fe2O3'] || 0,
+          CaO: coalInfo.properties['CaO'] || 0,
+          MgO: coalInfo.properties['MgO'] || 0,
+          Na2O: coalInfo.properties['Na₂O'] || coalInfo.properties['Na2O'] || 0,
+          K2O: coalInfo.properties['K₂O'] || coalInfo.properties['K2O'] || 0,
+          SO3: coalInfo.properties['SO₃'] || coalInfo.properties['SO3'] || 0,
+          TiO2: coalInfo.properties['TiO₂'] || coalInfo.properties['TiO2'] || 0,
+          Gcv: coalInfo.properties['GCV'] || coalInfo.properties['Gcv'] || 0
+        }
+      });
+    });
+
+    if (blends.length === 0) {
+      alert('No valid blends found to optimize.');
+      return;
+    }
+
+    // Hide form & show result container
+    document.getElementById('coalForm').style.display = 'none';
+    document.getElementById('optimization-result').style.display = 'block';
+
+    fetch('/optimize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ blends })
+    })
+      .then(res => res.json())
+      .then(data => {
+        displayOptimizationResult(data, blends);
+      })
+      .catch(err => {
+        console.error('Error optimizing blend:', err);
+        alert('Optimization request failed — check console.');
+      });
+  }
+
+  function displayOptimizationResult(data, blends) {
+    // Data expected: best_aft_blend, cheapest_blend, balanced_blend, current_blend, individual_coal_afts
+    const bestAftBlend = data.best_aft_blend || { blend: [], predicted_aft: 0, gcv:0, cost:0 };
+    const cheapestBlend = data.cheapest_blend || { blend: [], predicted_aft:0, gcv:0, cost:0 };
+    const balancedBlend = data.balanced_blend || { blend: [], predicted_aft:0, gcv:0, cost:0 };
+    const currentBlend = data.current_blend || { blend: [], predicted_aft:0, gcv:0, cost:0 };
+
+    // Build table rows based on the blends array order (client-side blends)
+    const headerRow = `
+      <table>
+        <tr>
+          <th>Coal type</th>
+          <th>Current Blend</th>
+          <th>Best Blend</th>
+          <th>Best Price Blend</th>
+          <th>Balanced Blend</th>
+          <th>UoM</th>
+        </tr>
+        ${blends.map((blend, i) => {
+          const bestPct = (bestAftBlend.blend && bestAftBlend.blend[i]) ? bestAftBlend.blend[i] : 0;
+          const cheapestPct = (cheapestBlend.blend && cheapestBlend.blend[i]) ? cheapestBlend.blend[i] : 0;
+          const balancedPct = (balancedBlend.blend && balancedBlend.blend[i]) ? balancedBlend.blend[i] : 0;
+          const currentPct = (currentBlend.blend && currentBlend.blend[i]) ? currentBlend.blend[i] : blend.current;
+          return `
+            <tr>
+              <td>${blend.coal}</td>
+              <td>${currentPct}%</td>
+              <td>${bestPct}%</td>
+              <td>${cheapestPct}%</td>
+              <td>${balancedPct}%</td>
+              <td>%</td>
+            </tr>
+          `;
+        }).join('')}
+        <tr>
+          <td>AFT (°C)</td>
+          <td>${(currentBlend.predicted_aft || 0).toFixed(2)}</td>
+          <td>${(bestAftBlend.predicted_aft || 0).toFixed(2)}</td>
+          <td>${(cheapestBlend.predicted_aft || 0).toFixed(2)}</td>
+          <td>${(balancedBlend.predicted_aft || 0).toFixed(2)}</td>
+          <td>°C</td>
+        </tr>
+        <tr>
+          <td>GCV</td>
+          <td>${(currentBlend.gcv || 0).toFixed(2)}</td>
+          <td>${(bestAftBlend.gcv || 0).toFixed(2)}</td>
+          <td>${(cheapestBlend.gcv || 0).toFixed(2)}</td>
+          <td>${(balancedBlend.gcv || 0).toFixed(2)}</td>
+          <td>kcal/kg</td>
+        </tr>
+        <tr>
+          <td>Cost</td>
+          <td>${(currentBlend.cost || 0).toFixed(2)}</td>
+          <td>${(bestAftBlend.cost || 0).toFixed(2)}</td>
+          <td>${(cheapestBlend.cost || 0).toFixed(2)}</td>
+          <td>${(balancedBlend.cost || 0).toFixed(2)}</td>
+          <td>${(blends[0] && blends[0].currency) ? blends[0].currency : 'INR'}</td>
+        </tr>
+      </table>
+    `;
+
+    const individualTable = `
+      <h3>Individual Coal AFTs</h3>
+      <table class="individual-aft-table">
+        <tr><th>Coal Type</th><th>Predicted AFT (°C)</th></tr>
+        ${(Array.isArray(data.individual_coal_afts) ? data.individual_coal_afts : []).map(c => `
+          <tr><td>${c.coal}</td><td>${(c.predicted_aft || 0).toFixed(2)}</td></tr>
+        `).join('')}
+      </table>
+    `;
+
+    document.getElementById('optimization-result').innerHTML = `
+      <div style="width: 100%; margin-bottom: 30px;">${headerRow}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:15px;align-items:flex-start;">
+        <div style="flex:1;min-width:300px;padding:20px;">
+          <div id="ternary-plot" style="width:100%;height:400px;"></div>
+        </div>
+        <div style="flex:1;min-width:300px;">
+          ${individualTable}
+        </div>
+      </div>
+      <div style="margin-top:20px;text-align:center;"><button onclick="window.location.reload()">Back</button></div>
+    `;
+
+    displayScaleBars(data);
+    const blendsWithAFT = [
+      { label: "Best AFT", blend: bestAftBlend.blend, predicted_aft: bestAftBlend.predicted_aft, coals: blends },
+      { label: "Cheapest", blend: cheapestBlend.blend, predicted_aft: cheapestBlend.predicted_aft, coals: blends },
+      { label: "Balanced", blend: balancedBlend.blend, predicted_aft: balancedBlend.predicted_aft, coals: blends }
+    ];
+    updatePlot(blendsWithAFT);
+  }
+
+  // Slagging & fouling calculation (keeps current formulas but robust to variable input lengths)
+  function calculateSlaggingAndFouling(blend, otherBlends = []) {
+    if (!blend) return { slaggingPotential: 0, foulingPotential: 0, finalScore: 0 };
+
+    let blended_oxides = blend.blended_oxides;
+    if (!Array.isArray(blended_oxides) || blended_oxides.length === 0) {
+      // attempt to compute mean of other blends if available
+      if (Array.isArray(otherBlends) && otherBlends.length > 0) {
+        const n = otherBlends.length;
+        const sum = [];
+        otherBlends.forEach(ob => {
+          if (Array.isArray(ob.blended_oxides)) {
+            ob.blended_oxides.forEach((v, idx) => {
+              sum[idx] = (sum[idx] || 0) + (v || 0);
+            });
+          }
+        });
+        blended_oxides = sum.map(v => v / n);
+      } else {
+        blended_oxides = [];
+      }
+    }
+
+    const [SiO2 = 0, Al2O3 = 0, Fe2O3 = 0, CaO = 0, MgO = 0, Na2O = 0, K2O = 0, TiO2 = 0, SO3 = 0] = blended_oxides;
+
+    const acidicOxides = SiO2 + Al2O3 + TiO2;
+    const basicOxides = CaO + MgO + Na2O + K2O;
+    const slaggingPotential = (acidicOxides === 0) ? 0 : (basicOxides / acidicOxides);
+    const foulingPotential = (SiO2 + 1 === 0) ? 0 : ((Na2O + K2O + SO3) / (SiO2 + 1));
+
+    const normalizedSlagging = Math.min(slaggingPotential * 10, 10);
+    const normalizedFouling = Math.min(foulingPotential * 10, 10);
+    const finalScore = normalizedSlagging + normalizedFouling;
+
+    return { slaggingPotential: normalizedSlagging, foulingPotential: normalizedFouling, finalScore };
+  }
+
+  function displayScaleBars(data) {
+    const tableElement = document.querySelector('#optimization-result table');
+    if (!tableElement) return;
+
+    const blends = [
+      data.best_aft_blend,
+      data.cheapest_blend,
+      data.balanced_blend,
+      data.current_blend
+    ];
+
+    const row = tableElement.insertRow(-1);
+    const labelCell = row.insertCell(0);
+    labelCell.textContent = 'Slagging & Fouling';
+    labelCell.style.fontWeight = 'bold';
+    labelCell.style.textAlign = 'center';
+
+    // For each blend, compute slagging/fouling and render a bar
+    blends.forEach((blendObj, idx) => {
+      const cell = row.insertCell(-1);
+      if (!blendObj) {
+        cell.textContent = '-';
+        return;
+      }
+      const { slaggingPotential = 0, foulingPotential = 0 } = calculateSlaggingAndFouling(blendObj, [data.best_aft_blend, data.cheapest_blend, data.balanced_blend].filter(Boolean));
+      const totalScore = slaggingPotential + foulingPotential;
+
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.flexDirection = 'column';
+      wrapper.style.alignItems = 'center';
+
+      const barWrapper = document.createElement('div');
+      barWrapper.style.width = '100%';
+      barWrapper.style.height = '32px';
+      barWrapper.style.border = '1px solid black';
+      barWrapper.style.borderRadius = '12px';
+      barWrapper.style.position = 'relative';
+      barWrapper.style.display = 'flex';
+      barWrapper.style.alignItems = 'center';
+
+      const bar = document.createElement('div');
+      bar.style.height = '100%';
+      const percent = Math.min((totalScore / 10) * 100, 100);
+      bar.style.width = percent + '%';
+      bar.style.borderRadius = '12px';
+      bar.style.backgroundColor = getScaleColor(totalScore);
+
+      const valueDisplay = document.createElement('span');
+      valueDisplay.textContent = totalScore.toFixed(2);
+      valueDisplay.style.position = 'absolute';
+      valueDisplay.style.left = '50%';
+      valueDisplay.style.transform = 'translateX(-50%)';
+      valueDisplay.style.zIndex = '10';
+      valueDisplay.style.backgroundColor = 'rgba(255,255,255,0.7)';
+      valueDisplay.style.fontWeight = 'bold';
+      valueDisplay.style.userSelect = 'none';
+
+      barWrapper.appendChild(bar);
+      barWrapper.appendChild(valueDisplay);
+      wrapper.appendChild(barWrapper);
+
+      // Add hover scale
+      const scaleContainer = document.createElement('div');
+      scaleContainer.style.position = 'relative';
+      scaleContainer.style.width = '100%';
+      scaleContainer.style.height = '30px';
+      scaleContainer.style.marginTop = '8px';
+      scaleContainer.style.borderTop = '1px solid black';
+      scaleContainer.style.opacity = '0';
+      scaleContainer.style.pointerEvents = 'none';
+      scaleContainer.style.transition = 'opacity 0.3s ease';
+
+      [0,3,6,10].forEach(v => {
+        const pos = (v/10)*100;
+        const tick = document.createElement('div');
+        tick.style.position = 'absolute';
+        tick.style.left = pos + '%';
+        tick.style.top = '0';
+        tick.style.width = '2px';
+        tick.style.height = '10px';
+        tick.style.backgroundColor = 'black';
+        tick.style.transform = 'translateX(-50%)';
+        scaleContainer.appendChild(tick);
+        const label = document.createElement('span');
+        label.textContent = v;
+        label.style.position = 'absolute';
+        label.style.left = pos + '%';
+        label.style.top = '12px';
+        label.style.transform = 'translateX(-50%)';
+        label.style.fontSize = '12px';
+        scaleContainer.appendChild(label);
+      });
+
+      wrapper.appendChild(scaleContainer);
+      wrapper.addEventListener('mouseenter', () => { scaleContainer.style.opacity = '1'; scaleContainer.style.pointerEvents = 'auto'; });
+      wrapper.addEventListener('mouseleave', () => { scaleContainer.style.opacity = '0'; scaleContainer.style.pointerEvents = 'none'; });
+
+      cell.appendChild(wrapper);
+    });
+  }
+
+  function getScaleColor(value) {
+    if (value < 4) return '#5de65d';
+    if (value < 7) return '#ffff76';
+    return '#e24242';
+  }
+
+  function updatePlot(blendsWithAFT) {
+    const ternaryPlotElement = document.getElementById('ternary-plot');
+    if (!ternaryPlotElement) return;
+
+    const a = [], b = [], c = [], colors = [], labels = [];
+
+    blendsWithAFT.forEach(blend => {
+      let acidic = 0, basic = 0, other = 0;
+      let totalPercentage = 0;
+      if (!Array.isArray(blend.blend)) return;
+
+      blend.blend.forEach((pct, i) => {
+        const coal = blend.coals && blend.coals[i];
+        const props = coal && coal.properties;
+        const weight = Number(pct) || 0;
+        totalPercentage += weight;
+        if (props) {
+          acidic += weight * ((props.SiO2 || 0) + (props.Al2O3 || 0) + (props.TiO2 || 0));
+          basic += weight * ((props.CaO || 0) + (props.MgO || 0) + (props.Na2O || 0) + (props.K2O || 0));
+          other += weight * ((props.Fe2O3 || 0) + (props.SO3 || 0));
+        }
+      });
+
+      // Avoid division by zero
+      if (totalPercentage === 0) totalPercentage = 1;
+      a.push(acidic / totalPercentage);
+      b.push(basic / totalPercentage);
+      c.push(other / totalPercentage);
+      colors.push(blend.predicted_aft || 0);
+      labels.push(`${blend.label} - AFT: ${(blend.predicted_aft || 0).toFixed(2)}°C`);
+    });
+
+    const data = [{
+      type: 'scatterternary',
+      mode: 'markers',
+      a, b, c,
+      marker: { size: 14, color: colors, colorscale: 'Jet', colorbar: { title: "Fusion Temp (°C)" } },
+      text: labels,
+      hoverinfo: 'text'
+    }];
+
+    const layout = {
+      margin: { l: 40, r: 40, t: 60, b: 50 },
+      ternary: {
+        sum: 100,
+        aaxis: { title: { text: "Thermal Stability", font: { size: 14 } } },
+        baxis: { title: { text: "Fusion Accelerator", font: { size: 14 } } },
+        caxis: { title: { text: "Hardening Index", font: { size: 14 } } }
+      }
+    };
+
+    Plotly.newPlot(ternaryPlotElement, data, layout);
+  }
+</script>
+
 </body>
 
 </html>
