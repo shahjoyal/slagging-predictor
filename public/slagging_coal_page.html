@@ -547,41 +547,41 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
     </div>  
 
     <script >
-        function addBlend() {
-            const MAX_COALS = 5;
-            const currentCoals = document.querySelectorAll('.blend').length;
-        
-            if (currentCoals >= MAX_COALS) {
-                alert("You can only add up to 5 coal types.");
-                return;
-            }
-        
-            const index = currentCoals;
-            const blendDiv = document.createElement("div");
-            blendDiv.className = "blend";
-            blendDiv.innerHTML = `
-                <label for="coal${index}">Coal:</label>
-                <select name="coal${index}" id="coal${index}">
-                    <option value="">Select Coal Type</option>
-                </select>
-                <input type="number" id="currentrange${index}" placeholder="Current Range (%)">
-                <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
-                <button type="button" class="properties-btn" onclick="fetchCoalProperties(${index})">Properties</button>
-                <div id="properties${index}"></div>
-            `;
-        
-            const currentRangeInput = blendDiv.querySelector(`#currentrange${index}`);
-            currentRangeInput.addEventListener("input", updateTotalRange);
-        
-            const blendRow = document.querySelector(".blend-row");
-        
-            // Append the new blendDiv to the blendRow
-            blendRow.appendChild(blendDiv); // This will add it to the end
-        
-            populateDropdown(blendDiv.querySelector(`#coal${index}`));
-            updateTotalRange();
-        }
-        
+function addBlend() {
+    const MAX_COALS = 10; // <-- increased from 5 to 10
+    const currentCoals = document.querySelectorAll('.blend').length;
+
+    if (currentCoals >= MAX_COALS) {
+        alert("You can only add up to 10 coal types.");
+        return;
+    }
+
+    const index = currentCoals;
+    const blendDiv = document.createElement("div");
+    blendDiv.className = "blend";
+    blendDiv.innerHTML = `
+        <label for="coal${index}">Coal:</label>
+        <select name="coal${index}" id="coal${index}">
+            <option value="">Select Coal Type</option>
+        </select>
+        <input type="number" id="currentrange${index}" placeholder="Current Range (%)">
+        <button type="button" class="remove-blend-btn" onclick="removeBlend(this)">X</button>
+        <button type="button" class="properties-btn" onclick="fetchCoalProperties(${index})">Properties</button>
+        <div id="properties${index}"></div>
+    `;
+
+    const currentRangeInput = blendDiv.querySelector(`#currentrange${index}`);
+    currentRangeInput.addEventListener("input", updateTotalRange);
+
+    const blendRow = document.querySelector(".blend-row");
+
+    // Append the new blendDiv to the blendRow
+    blendRow.appendChild(blendDiv); // This will add it to the end
+
+    populateDropdown(blendDiv.querySelector(`#coal${index}`));
+    updateTotalRange();
+}
+
         function updateTotalRange() {
             totalCurrentRange = 0;
             const ranges = document.querySelectorAll('input[id^="currentrange"]');
