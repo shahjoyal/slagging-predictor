@@ -1613,15 +1613,16 @@ function addBlend() {
 //   });
 // });
 
-document.getElementById("downloadPDF").addEventListener("click", function () {
+ document.getElementById("downloadPDF").addEventListener("click", function () {
   const { jsPDF } = window.jspdf;
   const element = document.body; // capture whole page including navbar
 
   html2canvas(element, {
+    // Keep a reasonably high raster resolution, but we will scale to fit the PDF.
+    // You can tweak this (1.5-2.5) — higher => better clarity but bigger canvas.
     scale: 2,
     useCORS: true,
     onclone: (clonedDoc) => {
-      // Helper to get computed style from the cloned document's window if available
       const getCS = el => {
         try {
           return (clonedDoc.defaultView || window).getComputedStyle(el);
@@ -1630,7 +1631,6 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
         }
       };
 
-      // Replace form controls by visually identical spans so html2canvas renders their values
       const replaceElementWithSpan = (el, displayText) => {
         const cs = getCS(el);
         const rect = el.getBoundingClientRect();
@@ -1638,10 +1638,8 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
         const span = clonedDoc.createElement('span');
         span.textContent = displayText || '';
 
-        // Preserve box model and text styling to keep layout stable
         span.style.display = (cs.display === 'inline' ? 'inline-block' : cs.display) || 'inline-block';
         span.style.boxSizing = cs.boxSizing || 'border-box';
-        // width/height fallback to bounding rect if computed style gives 'auto'
         span.style.width = (cs.width && cs.width !== 'auto') ? cs.width : Math.round(rect.width) + 'px';
         span.style.height = (cs.height && cs.height !== 'auto') ? cs.height : Math.round(rect.height) + 'px';
         span.style.padding = cs.padding;
@@ -1657,22 +1655,16 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
         span.style.whiteSpace = 'nowrap';
         span.style.textOverflow = 'ellipsis';
 
-        // Preserve any classes (optional) if styles are in CSS
-        // span.className = el.className;
-
         el.replaceWith(span);
       };
 
-      // Handle inputs and textareas
       const inputs = clonedDoc.querySelectorAll('input, textarea');
       inputs.forEach(clonedEl => {
-        // If it's checkbox or radio - show a visible box with a tick when checked
         if (clonedEl.type === 'checkbox' || clonedEl.type === 'radio') {
           const cs = getCS(clonedEl);
           const rect = clonedEl.getBoundingClientRect();
           const box = clonedDoc.createElement('span');
 
-          // size from computed style or bounding rect
           const w = (cs.width && cs.width !== 'auto') ? cs.width : Math.round(rect.width) + 'px';
           const h = (cs.height && cs.height !== 'auto') ? cs.height : Math.round(rect.height) + 'px';
 
@@ -1680,32 +1672,28 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
           box.style.width = w;
           box.style.height = h;
           box.style.boxSizing = 'border-box';
-          // visual checkbox styling
           box.style.border = cs.border || '1px solid #666';
           box.style.borderRadius = cs.borderRadius || '3px';
           box.style.background = cs.background || 'transparent';
           box.style.verticalAlign = 'middle';
           box.style.textAlign = 'center';
-          box.style.lineHeight = h; // center the checkmark
+          box.style.lineHeight = h;
           box.style.fontSize = (parseFloat(cs.fontSize) || Math.round(rect.height * 0.6)) + 'px';
           box.style.color = cs.color || '#000';
 
-          // put a checkmark if checked
           if (clonedEl.checked) {
-            box.textContent = '✔'; // you can change to '✓' or custom symbol
+            box.textContent = '✔';
           } else {
             box.textContent = '';
           }
 
           clonedEl.replaceWith(box);
         } else {
-          // Regular text inputs and textareas: replace with span showing value
           const value = clonedEl.value || '';
           replaceElementWithSpan(clonedEl, value);
         }
       });
 
-      // Handle select dropdowns
       const selects = clonedDoc.querySelectorAll('select');
       selects.forEach(clonedEl => {
         const sel = clonedEl.options[clonedEl.selectedIndex];
@@ -1713,36 +1701,55 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
         replaceElementWithSpan(clonedEl, selectedText);
       });
 
-      // (Optional) hide any UI elements you do not want in PDF in clonedDoc
-      // Example: hide the download button inside the cloned document
+      // hide download button etc.
       const downloadBtn = clonedDoc.querySelector('#downloadPDF');
       if (downloadBtn) downloadBtn.style.display = 'none';
     }
   }).then(canvas => {
+    // Convert canvas to data URL (PNG)
     const imgData = canvas.toDataURL("image/png");
 
     // create a landscape A4 pdf
     const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
+    // PDF page dimensions in mm
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // Canvas pixel dimensions
+    const canvasWidthPx = canvas.width;
+    const canvasHeightPx = canvas.height;
 
-    let heightLeft = imgHeight;
-    let position = 0;
+    // Convert canvas px to mm using a DPI assumption:
+    // jsPDF uses 72 DPI internally for pt; a common conversion is:
+    // mmPerPx = 25.4 / (dpi)
+    // But simpler: compute scale based on ratios between page size (mm) and pixel sizes.
+    // We'll map canvas width to available page width in mm and compute resulting height in mm.
+    // First compute image aspect ratio
+    const aspect = canvasHeightPx / canvasWidthPx;
 
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    // We'll draw the image with width = pageWidth (max) then compute required height in mm
+    // To compute mm from px we can use: imgWidthMM = pageWidth (we set it)
+    // imgHeightMM = pageWidth * aspect
+    let imgWidthMM = pageWidth;
+    let imgHeightMM = pageWidth * aspect;
 
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+    // If the computed image height exceeds the page height, scale down proportionally
+    if (imgHeightMM > pageHeight) {
+      const scale = pageHeight / imgHeightMM;
+      imgHeightMM = imgHeightMM * scale;
+      imgWidthMM = imgWidthMM * scale;
     }
 
+    // center horizontally and vertically if there's leftover space
+    const x = (pageWidth - imgWidthMM) / 2;
+    const y = (pageHeight - imgHeightMM) / 2;
+
+    // Add the single, scaled image to the single page
+    // Use 'JPEG' if you want a smaller file size (quality param accepted). Keeping PNG here.
+    pdf.addImage(imgData, "PNG", x, y, imgWidthMM, imgHeightMM);
+
+    // Save
     pdf.save("Slagging_coal_page.pdf");
   }).catch(err => {
     console.error('Error generating PDF:', err);
