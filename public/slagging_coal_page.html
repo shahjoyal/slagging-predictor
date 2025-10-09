@@ -416,6 +416,79 @@
   opacity: 1;
 }
 
+/* Ensure checkbox cell has relative positioning for the custom checkmark */
+.checkbox-table td:first-child { position: relative; }
+
+/* 1) Left-align the description column (text immediately after checkbox) */
+.checkbox-table td:nth-child(2) {
+  text-align: left;            /* key: left align description */
+  padding: 12px 14px;         /* slightly larger padding for breathing room */
+  vertical-align: middle;
+  color: #0b1a2b;             /* dark readable color */
+  font-weight: 500;           /* medium weight for better hierarchy */
+  line-height: 1.35;
+  white-space: normal;        /* allow wrapping */
+}
+
+/* 2) Modern checkbox visuals (works even if default appearance removed) */
+.checkbox-table input[type="checkbox"]{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 2px solid rgba(2,0,138,0.18); /* subtle blue border */
+  background: #fff;
+  position: relative;
+  transition: all .12s ease;
+  box-sizing: border-box;
+}
+
+/* focus - accessible outline */
+.checkbox-table input[type="checkbox"]:focus{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(2,0,138,0.10);
+  border-color: rgba(1,28,187,0.35);
+}
+
+/* checked state: blue gradient background + no border */
+.checkbox-table input[type="checkbox"]:checked{
+  background: linear-gradient(180deg, #001cbb, #02008a);
+  border-color: transparent;
+}
+
+/* custom white checkmark using pseudo-element */
+.checkbox-table input[type="checkbox"]::after{
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transform-origin: center;
+  transition: transform .12s ease;
+  pointer-events: none;
+}
+
+/* reveal checkmark when checked */
+.checkbox-table input[type="checkbox"]:checked::after{
+  transform: rotate(45deg) scale(1);
+}
+
+/* small hover affordance */
+.checkbox-table input[type="checkbox"]:hover{
+  transform: translateY(-1px);
+}
+
+
+
         
 </style>
 
