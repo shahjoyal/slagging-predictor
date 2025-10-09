@@ -1091,6 +1091,143 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 
     Plotly.newPlot(ternaryPlotElement, data, layout);
   }
+
+document.getElementById("downloadPDF").addEventListener("click", function () {
+  const { jsPDF } = window.jspdf;
+  const element = document.body; // capture whole page including navbar
+
+  html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    onclone: (clonedDoc) => {
+      // Helper to get computed style from the cloned document's window if available
+      const getCS = el => {
+        try {
+          return (clonedDoc.defaultView || window).getComputedStyle(el);
+        } catch (e) {
+          return window.getComputedStyle(el);
+        }
+      };
+
+      // Replace form controls by visually identical spans so html2canvas renders their values
+      const replaceElementWithSpan = (el, displayText) => {
+        const cs = getCS(el);
+        const rect = el.getBoundingClientRect();
+
+        const span = clonedDoc.createElement('span');
+        span.textContent = displayText || '';
+
+        // Preserve box model and text styling to keep layout stable
+        span.style.display = (cs.display === 'inline' ? 'inline-block' : cs.display) || 'inline-block';
+        span.style.boxSizing = cs.boxSizing || 'border-box';
+        // width/height fallback to bounding rect if computed style gives 'auto'
+        span.style.width = (cs.width && cs.width !== 'auto') ? cs.width : Math.round(rect.width) + 'px';
+        span.style.height = (cs.height && cs.height !== 'auto') ? cs.height : Math.round(rect.height) + 'px';
+        span.style.padding = cs.padding;
+        span.style.margin = cs.margin;
+        span.style.border = cs.border;
+        span.style.font = cs.font || (cs.fontSize + ' ' + cs.fontFamily);
+        span.style.lineHeight = cs.lineHeight || span.style.height;
+        span.style.color = cs.color;
+        span.style.background = cs.background;
+        span.style.textAlign = cs.textAlign;
+        span.style.verticalAlign = cs.verticalAlign;
+        span.style.overflow = 'hidden';
+        span.style.whiteSpace = 'nowrap';
+        span.style.textOverflow = 'ellipsis';
+
+        // Preserve any classes (optional) if styles are in CSS
+        // span.className = el.className;
+
+        el.replaceWith(span);
+      };
+
+      // Handle inputs and textareas
+      const inputs = clonedDoc.querySelectorAll('input, textarea');
+      inputs.forEach(clonedEl => {
+        // If it's checkbox or radio - show a visible box with a tick when checked
+        if (clonedEl.type === 'checkbox' || clonedEl.type === 'radio') {
+          const cs = getCS(clonedEl);
+          const rect = clonedEl.getBoundingClientRect();
+          const box = clonedDoc.createElement('span');
+
+          // size from computed style or bounding rect
+          const w = (cs.width && cs.width !== 'auto') ? cs.width : Math.round(rect.width) + 'px';
+          const h = (cs.height && cs.height !== 'auto') ? cs.height : Math.round(rect.height) + 'px';
+
+          box.style.display = 'inline-block';
+          box.style.width = w;
+          box.style.height = h;
+          box.style.boxSizing = 'border-box';
+          // visual checkbox styling
+          box.style.border = cs.border || '1px solid #666';
+          box.style.borderRadius = cs.borderRadius || '3px';
+          box.style.background = cs.background || 'transparent';
+          box.style.verticalAlign = 'middle';
+          box.style.textAlign = 'center';
+          box.style.lineHeight = h; // center the checkmark
+          box.style.fontSize = (parseFloat(cs.fontSize) || Math.round(rect.height * 0.6)) + 'px';
+          box.style.color = cs.color || '#000';
+
+          // put a checkmark if checked
+          if (clonedEl.checked) {
+            box.textContent = '✔'; // you can change to '✓' or custom symbol
+          } else {
+            box.textContent = '';
+          }
+
+          clonedEl.replaceWith(box);
+        } else {
+          // Regular text inputs and textareas: replace with span showing value
+          const value = clonedEl.value || '';
+          replaceElementWithSpan(clonedEl, value);
+        }
+      });
+
+      // Handle select dropdowns
+      const selects = clonedDoc.querySelectorAll('select');
+      selects.forEach(clonedEl => {
+        const sel = clonedEl.options[clonedEl.selectedIndex];
+        const selectedText = sel ? sel.text : '';
+        replaceElementWithSpan(clonedEl, selectedText);
+      });
+
+      // (Optional) hide any UI elements you do not want in PDF in clonedDoc
+      // Example: hide the download button inside the cloned document
+      const downloadBtn = clonedDoc.querySelector('#downloadPDF');
+      if (downloadBtn) downloadBtn.style.display = 'none';
+    }
+  }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+
+    // create a landscape A4 pdf
+    const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("Slagging_coal_page.pdf");
+  }).catch(err => {
+    console.error('Error generating PDF:', err);
+  });
+});
+    
 </script>
 
 </body>
