@@ -505,6 +505,260 @@
 
 
     </style>
+
+    <style>
+/* ------------------ Premium UI override for model.html ------------------ */
+/* Paste this below the existing CSS in model.html */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root{
+  --bg-1: #f5f7fb;
+  --card-bg: rgba(255,255,255,0.96);
+  --muted: #6b7280;
+  --primary-1: #02126e;
+  --primary-2: #0027a7;
+  --accent: #ff7a59;
+  --glass-border: rgba(2,18,110,0.06);
+  --card-shadow: 0 12px 36px rgba(8,20,44,0.06);
+  --radius-lg: 12px;
+  --radius-md: 8px;
+}
+
+/* Base typography + page */
+html,body{ height:100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color: #0f2636;
+  font-size:14px;
+  background: linear-gradient(180deg, var(--bg-1) 0%, #fbfdff 60%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  margin:0;
+}
+
+/* NAVBAR - same position but elevated */
+.navbar{
+  position: fixed;
+  top:0; left:0; right:0;
+  height:72px;
+  padding:10px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,251,255,0.86));
+  box-shadow: 0 10px 30px rgba(9,20,46,0.06);
+  border-bottom: 1px solid rgba(2,18,110,0.04);
+  backdrop-filter: blur(4px) saturate(1.05);
+  z-index:1100;
+}
+
+/* Logo sizing (keeps layout but more balanced) */
+.navbar img{ height:46px; object-fit:contain; margin-right:12px; }
+
+/* Title */
+.navbar h1{
+  font-weight:700;
+  font-size:18px;
+  color:var(--primary-2);
+  margin:0 14px;
+  letter-spacing:0.2px;
+}
+
+/* Nav buttons (pill style) */
+.nav-buttons{ display:flex; gap:10px; align-items:center; }
+.nav-buttons button{
+  padding:8px 14px;
+  border-radius:999px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+  background: linear-gradient(180deg,var(--primary-1),var(--primary-2));
+  color:#fff;
+  box-shadow: 0 8px 20px rgba(2,18,110,0.07);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s;
+}
+.nav-buttons button:hover{ transform: translateY(-3px); box-shadow: 0 14px 40px rgba(2,18,110,0.09); }
+.nav-buttons .logout-btn{ background: linear-gradient(180deg,#ff4b4b,#e32d2d); box-shadow: 0 8px 22px rgba(227,45,45,0.08); }
+
+/* Main content area — preserve top margin but refine spacing */
+.content{
+  padding: 28px;
+  padding-top: 110px; /* keep content below navbar */
+  max-width:1200px;
+  margin: 0 auto;
+  width:100%;
+  box-sizing: border-box;
+}
+
+/* Blend rows: container card feel */
+.blend-row{
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding:16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--glass-border);
+  max-height: 56vh;
+  overflow-y: auto;
+}
+
+/* Single blend row */
+.blend{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  padding:10px;
+  border-radius:10px;
+  transition: background .12s ease, transform .08s ease;
+}
+.blend:hover{ transform: translateY(-3px); background: linear-gradient(180deg,#fff,#fbfdff); }
+
+/* Inputs & selects: larger, rounded, premium */
+.blend select, .blend input, .blend-entry select, .blend-entry input{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(15,32,54,0.06);
+  box-shadow: inset 0 3px 8px rgba(11,23,47,0.02);
+  background: #ffffff;
+  min-width:120px;
+  font-size:13px;
+  transition: box-shadow .12s, transform .08s;
+}
+.blend select:focus, .blend input:focus{
+  outline:none;
+  box-shadow: 0 8px 26px rgba(2,18,110,0.08);
+  transform: translateY(-2px);
+  border-color: rgba(2,18,110,0.12);
+}
+
+/* Action buttons */
+button, .add-blend-btn, .calculate-btn{
+  cursor:pointer;
+  border-radius:10px;
+  font-weight:700;
+  letter-spacing:0.2px;
+  padding:10px 14px;
+  border:none;
+}
+.add-blend-btn, .calculate-btn{
+  width:200px;
+  display:block;
+  margin:18px auto 0;
+  background: linear-gradient(180deg,var(--primary-1),var(--primary-2));
+  color:#fff;
+  box-shadow: 0 12px 30px rgba(2,18,110,0.08);
+}
+.remove-blend-btn{
+  background: linear-gradient(180deg,#ff6b6b,#e44a4a);
+  color:#fff;
+  padding:8px 10px;
+  border-radius:8px;
+  border:none;
+}
+.properties-btn{
+  background:transparent;
+  border:1px solid rgba(2,18,110,0.08);
+  padding:8px 10px;
+  border-radius:8px;
+  color:var(--primary-2);
+  font-weight:600;
+}
+
+/* Table: compact, elevated & readable */
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  background:transparent;
+  overflow:hidden;
+  border-radius:10px;
+  box-shadow: var(--card-shadow);
+}
+table th{
+  background: linear-gradient(180deg,#052062,#08398f);
+  color:#fff;
+  padding:12px;
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.6px;
+  text-align:center;
+}
+table td{
+  background: #fff;
+  padding:12px;
+  font-size:13px;
+  color:#243447;
+  text-align:center;
+  border-bottom:1px solid rgba(11,23,47,0.04);
+}
+table tr:nth-child(even) td{ background:#fbfdff; }
+table tr:hover td{ background:#f0f6ff; transform: translateY(-1px); }
+
+/* Individual-aft table */
+.individual-aft-table{
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow: 0 8px 22px rgba(9,20,46,0.04);
+}
+.individual-aft-table th{ background: linear-gradient(180deg,#0b4d9c,#0a3b86); color:#fff; padding:10px; }
+.individual-aft-table td{ padding:10px; }
+
+/* Modal refined */
+.modal{
+  display:none;
+  position:fixed; inset:0;
+  background: rgba(6,18,28,0.45);
+  backdrop-filter: blur(6px) saturate(1.02);
+  z-index:1400;
+  align-items:center; justify-content:center;
+}
+.modal-content{
+  width: min(720px, 92%);
+  background: linear-gradient(180deg,#fff,#fbfbff);
+  padding:18px;
+  border-radius:14px;
+  box-shadow: 0 30px 80px rgba(11,23,47,0.12);
+  border:1px solid rgba(11,23,47,0.04);
+}
+
+/* Icon download button */
+.icon-btn{
+  position:fixed;
+  top:92px;
+  right:26px;
+  z-index:1200;
+  background: #fff;
+  border-radius:10px;
+  padding:10px;
+  box-shadow: 0 8px 26px rgba(9,20,46,0.06);
+  border:1px solid rgba(11,23,47,0.04);
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.icon-btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 44px rgba(9,20,46,0.08); }
+
+/* Scale bar styles */
+.scale-bar-wrapper{ display:flex; gap:12px; align-items:center; margin:12px 0; }
+.scale-bar{ height:16px; border-radius:10px; position:relative; overflow:hidden; background: #f1f5f9; border:1px solid rgba(11,23,47,0.04); }
+.scale-bar::after{ content:''; position:absolute; left:0; top:0; bottom:0; width:40%; background: linear-gradient(90deg,#9be7a7,#ffeb99); }
+
+/* Small helpers */
+.blendedcoalProperties p{ background:#f7f9ff; border-radius:8px; padding:6px 10px; display:inline-block; margin:6px 8px 6px 0; }
+.checkbox-card{ border-radius:10px; padding:12px; box-shadow: var(--card-shadow); background:var(--card-bg); border:1px solid var(--glass-border); }
+
+/* Responsive tweaks (keeps layout stable) */
+@media (max-width:900px){
+  .nav-buttons button{ padding:8px 10px; font-size:13px; }
+  .navbar img{ height:40px; }
+  .content{ padding:16px; padding-top:120px; }
+  .icon-btn{ top:86px; right:12px; }
+  .blend{ flex-direction:column; align-items:stretch; gap:8px; }
+}
+
+
+</style>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
