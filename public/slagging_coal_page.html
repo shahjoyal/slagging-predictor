@@ -491,6 +491,165 @@
 
         
 </style>
+<style>
+    /* PREMIUM UI - paste after existing CSS to override */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root{
+  --bg-1: #f4f7fb;
+  --bg-2: #ffffff;
+  --nav-blue-1: #001cbb;
+  --nav-blue-2: #02008a;
+  --muted: #6b7280;
+  --card-shadow: 0 10px 30px rgba(11,23,47,0.06);
+  --card-border: rgba(2,0,138,0.06);
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --accent: #ff7a59; /* warm accent if needed */
+}
+
+/* Typography + page background */
+html,body{
+  height:100%;
+}
+body{
+  margin:0;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size:14px;
+  color: #0b1a2b;
+  background: linear-gradient(180deg, var(--bg-1) 0%, #fbfcff 60%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* NAVBAR - visually elevated but same position */
+.navbar{
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,251,255,0.85));
+  height:72px;
+  padding:12px 24px;
+  align-items:center;
+  box-shadow: 0 6px 18px rgba(11,23,47,0.06);
+  border-bottom: 1px solid rgba(11,23,47,0.04);
+  backdrop-filter: blur(4px);
+}
+
+/* logo & title */
+.navbar img{ height:48px; object-fit:contain; margin-right:12px; }
+.navbar h1{
+  font-size:18px; color:var(--nav-blue-2); font-weight:700;
+  margin:0;
+  letter-spacing:0.2px;
+}
+
+/* nav buttons (pill style) */
+.nav-buttons button{
+  padding:8px 14px;
+  border-radius:999px;
+  border: none;
+  margin-left:8px;
+  font-weight:600;
+  background: linear-gradient(180deg, var(--nav-blue-1), var(--nav-blue-2));
+  color:#fff;
+  box-shadow: 0 8px 20px rgba(2,0,138,0.07);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s;
+}
+.nav-buttons button:hover{ transform: translateY(-3px); box-shadow: 0 12px 30px rgba(2,0,138,0.09); }
+.nav-buttons .logout-btn{ background: linear-gradient(180deg,#ff4b4b,#e32d2d); box-shadow: 0 6px 18px rgba(227,45,45,0.08); }
+
+/* content containers (cards) - same widths/positioning preserved */
+.content{ margin-top:92px; padding:18px; display:flex; gap:18px; }
+.left-container, .right-container{
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,255,0.9));
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  padding:18px;
+  flex:1;
+  min-width:0; /* prevents overflow */
+}
+
+/* blend rows and controls */
+.blend-row{ display:flex; flex-direction:column; gap:12px; }
+.blend{ display:flex; gap:12px; align-items:center; width:100%; }
+.blend label{ min-width:42px; color:var(--muted); font-weight:600; }
+
+/* inputs & selects - premium fields */
+.blend select, .blend-entry select, .blend input, .blend-entry input{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(11,23,47,0.06);
+  box-shadow: inset 0 2px 6px rgba(11,23,47,0.02);
+  background: #fff;
+  font-size:14px;
+  transition: box-shadow .12s, transform .08s;
+  outline: none;
+}
+.blend select:focus, .blend input:focus, .blend-entry input:focus{
+  box-shadow: 0 6px 18px rgba(2,0,138,0.08);
+  transform: translateY(-2px);
+  border-color: rgba(2,0,138,0.12);
+}
+
+/* primary buttons */
+button, .add-blend-btn, .calculate-properties-btn, .blendProperties{
+  cursor:pointer;
+  border-radius:12px;
+  font-weight:700;
+  letter-spacing:0.2px;
+}
+.add-blend-btn{ width:180px; margin:20px auto; display:block; }
+.calculate-properties-btn{ width:220px; margin:8px auto 0; display:block; }
+
+/* tables - modern / compact */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:transparent;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:none;
+}
+table thead th{
+  background: linear-gradient(180deg, #071a52, #0b2a7a);
+  color:#fff; font-size:13px; font-weight:700; padding:10px 12px;
+  text-transform:uppercase; letter-spacing:0.6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+table tbody td{
+  background: #fff; padding:10px 12px; color:#243447; font-size:13px;
+  border-bottom: 1px solid rgba(11,23,47,0.04);
+}
+table tr:nth-child(even) td{ background:#fbfcff; }
+table tr:hover td{ transform:translateY(-1px); background: #f0f6ff; }
+
+/* modal - centered + blur backdrop */
+.modal{
+  display:none; position:fixed; inset:0; z-index:1200;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(6,18,28,0.4);
+  backdrop-filter: blur(6px) saturate(1.02);
+}
+.modal-content{
+  width: min(720px, 92%);
+  background: linear-gradient(180deg,#fff,#fbfbff);
+  padding:18px; border-radius:14px;
+  box-shadow: 0 30px 80px rgba(11,23,47,0.12);
+  border: 1px solid rgba(11,23,47,0.04);
+}
+
+/* small helpers */
+.icon-btn{ top:88px; right:22px; font-size:18px; background:transparent; }
+.checkbox-card{ border-radius:12px; padding:14px 16px; background:#fff; border:1px solid rgba(11,23,47,0.04); box-shadow:var(--card-shadow); }
+.blendedcoalProperties p{ background:#f7f9ff; border-radius:8px; padding:6px 10px; }
+
+/* responsive */
+@media (max-width:900px){
+  .content{ flex-direction:column; gap:12px; padding:12px; }
+  .nav-buttons button{ padding:8px 10px; font-size:13px; }
+  .navbar img{ height:40px; }
+}
+
+</style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
