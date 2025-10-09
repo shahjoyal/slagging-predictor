@@ -6,7 +6,7 @@
     <title>Slagging For</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
     <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>   
-    <style>
+    <!-- <style>
         body {
             margin: 0;
             padding: 0;
@@ -417,6 +417,514 @@
 }
 
         
+</style> -->
+
+<style>
+/* Cleaned style — only minimal, safe visual improvements requested */
+
+/* Import modern font but keep original sizing intent */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-size: large;                /* preserved */
+    font-family: "Inter", Arial, sans-serif;  /* improved font only */
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+}
+
+/* Navbar Styling (kept identical structure, color intent preserved) */
+.navbar {
+    width: 100%;
+    background-color: #f7f8fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 65px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar img {
+    height: 95px;
+    margin-right: 10px;
+    margin-left: 0px;
+    object-fit: contain;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 10px; /* Use 'gap' for spacing between flex items */
+    margin-right: 20px;
+}
+
+.navbar h1 {
+    margin-left: 0px;
+    font-size: 25px; /* Adjust font size as needed */
+    color: #02008a;
+    font-weight: 600;
+}
+
+/* navbar buttons — improved visuals but same placement/margins */
+.navbar button {
+    padding: 10px 15px;
+    background: linear-gradient(180deg,#001cbb,#02008a);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;            /* preserved */
+    margin-right: 20px;
+    font-weight: bold;
+    box-shadow: 0 6px 18px rgba(2,8,138,0.08);
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.navbar button:hover {
+    background: linear-gradient(180deg,#0026e0,#001a8a);
+    transform: translateY(-2px);
+}
+
+/* Layout wrapper — unchanged */
+.content {
+    margin-top: 90px; /* Space below navbar */
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: auto;
+}
+
+/* Keep container widths/padding exactly as before */
+.left-container, .right-container {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    border-radius: 4px;
+    flex-direction: column;
+    position: relative;
+    padding: 1rem;
+    background: #fff;
+}
+
+/* Blend rows / input styling left mostly intact (only subtle smoothing) */
+.blend-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.blend {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    width: 100%;
+}
+
+.blend select, .blend-entry select, .blend input, .blend-entry input {
+    flex: 2;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* Buttons — preserved sizes/margins but improved visuals and hover */
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(180deg,#001cbb,#02008a);
+    color: white;
+    border-radius: 5px; /* preserved */
+    box-shadow: 0 6px 18px rgba(2,8,138,0.08);
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    font-weight: 600;
+}
+
+.nav-buttons .logout-btn{
+    background: red;
+}
+
+.remove-blend-btn{
+  background: red;
+}
+
+button:hover {
+    background: linear-gradient(180deg,#0026e0,#001a8a);
+    transform: translateY(-2px);
+}
+
+/* preserve hidden-weighted area */
+#weightedAverageProperties {
+    display: none;
+    margin-top: 20px;
+}
+
+/* Tables — preserved */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+/* Table Header */
+table th {
+    background: #0153ac;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    font-family: "Inter", Arial, sans-serif;
+    font-weight: 600;
+}
+
+/* Table Rows */
+table td {
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+/* Alternate Row Background */
+table tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+/* Hover Effect */
+table tr:hover {
+    background: #d4e6ff;
+}
+
+/* Light blue background for specific header */
+th[colspan="3"] {
+    background-color: rgb(24, 0, 158);
+}
+
+/* Modal / blended coal properties preserved */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.close {
+    font-size: 30px;
+    cursor: pointer;
+    font-weight: bolder;
+}
+
+.blendedcoalProperties {
+    overflow-x: auto;
+    margin-top: 10px;
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.blendedcoalProperties p {
+    display: inline-block;
+    margin-right: 20px;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+/* scrollbars preserved */
+.blendedcoalProperties::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+.blendedcoalProperties::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 5px;
+}
+.blendedcoalProperties::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+/* Remove buttons (kept same sizes, nicer visuals) */
+.blend .remove-blend-btn, .blend-entry .remove-blend-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s, transform .1s;
+    box-shadow: 0 6px 14px rgba(231,76,60,0.08);
+}
+.blend .remove-blend-btn:hover, .blend-entry .remove-blend-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* ========== Stack Add & Calculate buttons safely ==========
+   Keep their original width percentages and margins but make them block-centered
+   so they stack vertically without changing other layout widths.
+*/
+.add-blend-btn {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    width: 20%;              /* preserved */
+    background: linear-gradient(180deg,#001cbb,#02008a);
+    margin: 20px auto 10px;  /* center and stack (was margin-left:40%) */
+    color: white;
+    border-radius: 5px;      /* preserved */
+    display: block;          /* stack */
+    box-shadow: 0 6px 18px rgba(2,8,138,0.08);
+}
+
+.calculate-properties-btn {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(180deg,#001cbb,#02008a);
+    width: 30%;              /* preserved */
+    margin: 10px auto 20px;  /* center and stack (was margin-left:35%) */
+    color: white;
+    border-radius: 5px;
+    display: block;          /* stack */
+    box-shadow: 0 6px 18px rgba(2,8,138,0.08);
+}
+
+/* keep blendProperties as originally placed unless used elsewhere */
+.blendProperties {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    background-color: #02008a;
+    width: 45%;
+    margin-left: 27%;
+    margin-top: 20px;
+    color: white;
+    border-radius: 5px;
+}
+
+/* total range container preserved */
+#totalRangeContainer {
+    text-align: center;
+}
+
+#totalRange {
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* right-container spacing preserved */
+.right-container > table {
+    margin-bottom: 30px;
+}
+
+/* Checkbox Card (preserved look, only left-align description + modern checkbox) */
+.checkbox-card {
+    width: 94%;
+    background-color: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 15px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkbox-card h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* Collapsible Checkbox Section (preserved) */
+.checkbox-container {
+    width: 95%;
+    background-color: #ffffff;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* Initially hidden */
+    transition: all 0.3s ease;
+}
+
+.checkbox-table td {
+    padding: 8px;
+}
+
+/* ------- Left-align after checkbox + conservative modern checkbox visuals ------- */
+.checkbox-table td:first-child { position: relative; }
+
+/* Left align the description immediately after checkbox (requested) */
+.checkbox-table td:nth-child(2) {
+  text-align: left;
+  padding: 12px 14px;
+  vertical-align: middle;
+  color: #0b1a2b;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+/* Modern checkbox (keeps size/spacing similar to before but nicer look) */
+.checkbox-table input[type="checkbox"]{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 2px solid rgba(2,0,138,0.18);
+  background: #fff;
+  position: relative;
+  transition: all .12s ease;
+  box-sizing: border-box;
+}
+.checkbox-table input[type="checkbox"]:focus{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(2,0,138,0.10);
+  border-color: rgba(1,28,187,0.35);
+}
+.checkbox-table input[type="checkbox"]:checked{
+  background: linear-gradient(180deg, #001cbb, #02008a);
+  border-color: transparent;
+}
+.checkbox-table input[type="checkbox"]::after{
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transform-origin: center;
+  transition: transform .12s ease;
+  pointer-events: none;
+}
+.checkbox-table input[type="checkbox"]:checked::after{
+  transform: rotate(45deg) scale(1);
+}
+.checkbox-table input[type="checkbox"]:hover{
+  transform: translateY(-1px);
+}
+
+/* Plot and ternary sections preserved */
+#plot-section {
+    width: 100%;
+    display: flex;
+    padding-left: 25px;
+    align-items: center;
+    flex-direction: column;
+}
+#ternary-plot {
+    width: 100%;
+    max-height: 500px;
+    padding-top: 10px;
+}
+
+/* Logout button preserved */
+.navbar .logout-btn {
+    padding: 10px 16px;
+    background-color: red !important;
+    color: #fff !important;
+    border: none;
+    cursor: pointer;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.navbar .logout-btn:hover {
+    background-color: darkred !important;
+}
+
+/* icon button + tooltip preserved */
+.icon-btn {
+    position: absolute;
+    top: 90px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #1f2937;
+    transition: color 0.2s ease;
+    z-index: 1000;
+}
+.icon-btn:hover { color: #000; }
+.icon-btn::after {
+    content: attr(title);
+    position: absolute;
+    top: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 4px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+.icon-btn:hover::after {
+    opacity: 1;
+}
+
+/* Responsive small tweaks only — keep widths same */
+@media (max-width: 900px) {
+    .content { flex-direction: column; }
+    .navbar img { height: 72px; }
+    .add-blend-btn, .calculate-properties-btn { width: 90%; margin-left: auto; margin-right: auto; display: block; }
+    table th, table td { font-size: 13px; padding: 8px; }
+    .modal-content { width: 90%; }
+}
 </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1463,58 +1971,192 @@ function addBlend() {
                 modal.style.display = "none";
             }
         };
-        document.getElementById("downloadPDF").addEventListener("click", function () {
+//         document.getElementById("downloadPDF").addEventListener("click", function () {
+//   const { jsPDF } = window.jspdf;
+//   const element = document.body; // ✅ capture whole page including navbar
+
+//   html2canvas(element, {
+//     scale: 2,
+//     useCORS: true,
+//     onclone: (clonedDoc) => {
+//       // Handle input & textarea values
+//       const inputs = clonedDoc.querySelectorAll("input, textarea");
+//       inputs.forEach(input => {
+//         const text = clonedDoc.createElement("span");
+//         text.textContent = input.value;
+
+//         text.style.position = "absolute";
+//         text.style.left = input.offsetLeft + "px";
+//         text.style.top = input.offsetTop + "px";
+//         text.style.width = input.offsetWidth + "px";
+//         text.style.height = input.offsetHeight + "px";
+//         text.style.lineHeight = input.offsetHeight + "px";
+//         text.style.textAlign = "center";
+//         text.style.font = window.getComputedStyle(input).font;
+//         text.style.color = window.getComputedStyle(input).color;
+
+//         clonedDoc.body.appendChild(text);
+//         input.style.visibility = "hidden";
+//       });
+
+//       // Handle select dropdowns (coal names)
+//       const selects = clonedDoc.querySelectorAll("select");
+//       selects.forEach(select => {
+//         const selectedText = select.options[select.selectedIndex]?.text || "";
+//         const text = clonedDoc.createElement("span");
+//         text.textContent = selectedText;
+
+//         text.style.position = "absolute";
+//         text.style.left = select.offsetLeft + "px";
+//         text.style.top = select.offsetTop + "px";
+//         text.style.width = select.offsetWidth + "px";
+//         text.style.height = select.offsetHeight + "px";
+//         text.style.lineHeight = select.offsetHeight + "px";
+//         text.style.textAlign = "center";
+//         text.style.font = window.getComputedStyle(select).font;
+//         text.style.color = window.getComputedStyle(select).color;
+
+//         clonedDoc.body.appendChild(text);
+//         select.style.visibility = "hidden";
+//       });
+//     }
+//   }).then(canvas => {
+//     const imgData = canvas.toDataURL("image/png");
+//     const pdf = new jsPDF("p", "mm", "a4");
+
+//     const pageWidth = pdf.internal.pageSize.getWidth();
+//     const pageHeight = pdf.internal.pageSize.getHeight();
+
+//     const imgWidth = pageWidth;
+//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+//     let heightLeft = imgHeight;
+//     let position = 0;
+
+//     pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+//     heightLeft -= pageHeight;
+
+//     while (heightLeft > 0) {
+//       position = heightLeft - imgHeight;
+//       pdf.addPage();
+//       pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+//       heightLeft -= pageHeight;
+//     }
+
+//     pdf.save("Coal_Blending_Ratio.pdf");
+//   });
+// });
+
+document.getElementById("downloadPDF").addEventListener("click", function () {
   const { jsPDF } = window.jspdf;
-  const element = document.body; // ✅ capture whole page including navbar
+  const element = document.body; // capture whole page including navbar
 
   html2canvas(element, {
     scale: 2,
     useCORS: true,
     onclone: (clonedDoc) => {
-      // Handle input & textarea values
-      const inputs = clonedDoc.querySelectorAll("input, textarea");
-      inputs.forEach(input => {
-        const text = clonedDoc.createElement("span");
-        text.textContent = input.value;
+      // Helper to get computed style from the cloned document's window if available
+      const getCS = el => {
+        try {
+          return (clonedDoc.defaultView || window).getComputedStyle(el);
+        } catch (e) {
+          return window.getComputedStyle(el);
+        }
+      };
 
-        text.style.position = "absolute";
-        text.style.left = input.offsetLeft + "px";
-        text.style.top = input.offsetTop + "px";
-        text.style.width = input.offsetWidth + "px";
-        text.style.height = input.offsetHeight + "px";
-        text.style.lineHeight = input.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(input).font;
-        text.style.color = window.getComputedStyle(input).color;
+      // Replace form controls by visually identical spans so html2canvas renders their values
+      const replaceElementWithSpan = (el, displayText) => {
+        const cs = getCS(el);
+        const rect = el.getBoundingClientRect();
 
-        clonedDoc.body.appendChild(text);
-        input.style.visibility = "hidden";
+        const span = clonedDoc.createElement('span');
+        span.textContent = displayText || '';
+
+        // Preserve box model and text styling to keep layout stable
+        span.style.display = (cs.display === 'inline' ? 'inline-block' : cs.display) || 'inline-block';
+        span.style.boxSizing = cs.boxSizing || 'border-box';
+        // width/height fallback to bounding rect if computed style gives 'auto'
+        span.style.width = (cs.width && cs.width !== 'auto') ? cs.width : Math.round(rect.width) + 'px';
+        span.style.height = (cs.height && cs.height !== 'auto') ? cs.height : Math.round(rect.height) + 'px';
+        span.style.padding = cs.padding;
+        span.style.margin = cs.margin;
+        span.style.border = cs.border;
+        span.style.font = cs.font || (cs.fontSize + ' ' + cs.fontFamily);
+        span.style.lineHeight = cs.lineHeight || span.style.height;
+        span.style.color = cs.color;
+        span.style.background = cs.background;
+        span.style.textAlign = cs.textAlign;
+        span.style.verticalAlign = cs.verticalAlign;
+        span.style.overflow = 'hidden';
+        span.style.whiteSpace = 'nowrap';
+        span.style.textOverflow = 'ellipsis';
+
+        // Preserve any classes (optional) if styles are in CSS
+        // span.className = el.className;
+
+        el.replaceWith(span);
+      };
+
+      // Handle inputs and textareas
+      const inputs = clonedDoc.querySelectorAll('input, textarea');
+      inputs.forEach(clonedEl => {
+        // If it's checkbox or radio - show a visible box with a tick when checked
+        if (clonedEl.type === 'checkbox' || clonedEl.type === 'radio') {
+          const cs = getCS(clonedEl);
+          const rect = clonedEl.getBoundingClientRect();
+          const box = clonedDoc.createElement('span');
+
+          // size from computed style or bounding rect
+          const w = (cs.width && cs.width !== 'auto') ? cs.width : Math.round(rect.width) + 'px';
+          const h = (cs.height && cs.height !== 'auto') ? cs.height : Math.round(rect.height) + 'px';
+
+          box.style.display = 'inline-block';
+          box.style.width = w;
+          box.style.height = h;
+          box.style.boxSizing = 'border-box';
+          // visual checkbox styling
+          box.style.border = cs.border || '1px solid #666';
+          box.style.borderRadius = cs.borderRadius || '3px';
+          box.style.background = cs.background || 'transparent';
+          box.style.verticalAlign = 'middle';
+          box.style.textAlign = 'center';
+          box.style.lineHeight = h; // center the checkmark
+          box.style.fontSize = (parseFloat(cs.fontSize) || Math.round(rect.height * 0.6)) + 'px';
+          box.style.color = cs.color || '#000';
+
+          // put a checkmark if checked
+          if (clonedEl.checked) {
+            box.textContent = '✔'; // you can change to '✓' or custom symbol
+          } else {
+            box.textContent = '';
+          }
+
+          clonedEl.replaceWith(box);
+        } else {
+          // Regular text inputs and textareas: replace with span showing value
+          const value = clonedEl.value || '';
+          replaceElementWithSpan(clonedEl, value);
+        }
       });
 
-      // Handle select dropdowns (coal names)
-      const selects = clonedDoc.querySelectorAll("select");
-      selects.forEach(select => {
-        const selectedText = select.options[select.selectedIndex]?.text || "";
-        const text = clonedDoc.createElement("span");
-        text.textContent = selectedText;
-
-        text.style.position = "absolute";
-        text.style.left = select.offsetLeft + "px";
-        text.style.top = select.offsetTop + "px";
-        text.style.width = select.offsetWidth + "px";
-        text.style.height = select.offsetHeight + "px";
-        text.style.lineHeight = select.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(select).font;
-        text.style.color = window.getComputedStyle(select).color;
-
-        clonedDoc.body.appendChild(text);
-        select.style.visibility = "hidden";
+      // Handle select dropdowns
+      const selects = clonedDoc.querySelectorAll('select');
+      selects.forEach(clonedEl => {
+        const sel = clonedEl.options[clonedEl.selectedIndex];
+        const selectedText = sel ? sel.text : '';
+        replaceElementWithSpan(clonedEl, selectedText);
       });
+
+      // (Optional) hide any UI elements you do not want in PDF in clonedDoc
+      // Example: hide the download button inside the cloned document
+      const downloadBtn = clonedDoc.querySelector('#downloadPDF');
+      if (downloadBtn) downloadBtn.style.display = 'none';
     }
   }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
+
+    // create a landscape A4 pdf
+    const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
@@ -1535,7 +2177,9 @@ function addBlend() {
       heightLeft -= pageHeight;
     }
 
-    pdf.save("Coal_Blending_Ratio.pdf");
+    pdf.save("Slagging_coal_page.pdf");
+  }).catch(err => {
+    console.error('Error generating PDF:', err);
   });
 });
     </script>
