@@ -6,7 +6,7 @@
     <title>Slagging For</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
     <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>   
-    <style>
+<style>
         body {
             margin: 0;
             padding: 0;
@@ -415,8 +415,12 @@
 .icon-btn:hover::after {
   opacity: 1;
 }
+/* ---------------------------
+  Add-on: Left-align after checkbox + modern checkbox visuals
+  Append this to the end of your existing <style> block
+   --------------------------- */
 
-/* Ensure checkbox cell has relative positioning for the custom checkmark done as per requirement*/
+/* Ensure checkbox cell has relative positioning for the custom checkmark */
 .checkbox-table td:first-child { position: relative; }
 
 /* 1) Left-align the description column (text immediately after checkbox) */
@@ -623,12 +627,23 @@ table tr:nth-child(even) td{ background:#fbfcff; }
 table tr:hover td{ transform:translateY(-1px); background: #f0f6ff; }
 
 /* modal - centered + blur backdrop */
-.modal{
-  display:none; position:fixed; inset:0; z-index:1200;
-  display:flex; align-items:center; justify-content:center;
+/* REPLACE your existing .modal block with this */
+.modal {
+  display: none;               /* hidden by default */
+  position: fixed;
+  inset: 0;                    /* top:0; left:0; right:0; bottom:0 */
+  z-index: 1200;
+  align-items: center;
+  justify-content: center;
   background: rgba(6,18,28,0.4);
   backdrop-filter: blur(6px) saturate(1.02);
 }
+
+/* show the modal only when JS adds the .show class */
+.modal.show {
+  display: flex;
+}
+
 .modal-content{
   width: min(720px, 92%);
   background: linear-gradient(180deg,#fff,#fbfbff);
