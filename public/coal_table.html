@@ -347,6 +347,7 @@
 
     // for selected-rows PDF header logo
     let pdfLogoDataUrl = null;
+    let pdfLogoAspect = 0; // height / width
 
     function downloadExcel() {
         window.location.href = "/download-template";
@@ -462,7 +463,7 @@
         .catch(error => console.error("Error deleting data:", error));
     }
 
-    // Load logo into base64 for PDF header
+    // Load logo into base64 for PDF header (correct aspect ratio)
     function loadPdfLogo() {
         const img = new Image();
         img.src = "/images/abhitech-logo.png";
@@ -470,21 +471,51 @@
 
         img.onload = function () {
             const canvas = document.createElement("canvas");
-            const targetWidth = 200;
-            const ratio = img.width ? targetWidth / img.width : 1;
-            canvas.width = targetWidth;
-            canvas.height = img.height * ratio;
+            canvas.width = img.width;
+            canvas.height = img.height;
 
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
             pdfLogoDataUrl = canvas.toDataURL("image/png");
+            if (img.width) {
+                pdfLogoAspect = img.height / img.width;
+            }
         };
 
         img.onerror = function () {
             console.warn("Could not load logo for PDF header");
             pdfLogoDataUrl = null;
         };
+    }
+
+    // Clean up text for PDF (fix oxide names)
+    function normalizeText(text) {
+        if (text === undefined || text === null) return "";
+        let t = String(text);
+
+        // replace subscript digits with normal digits
+        const subMap = {
+            '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
+            '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'
+        };
+        t = t.replace(/[₀-₉]/g, ch => subMap[ch] || '');
+
+        // fix some odd characters we've seen
+        t = t
+            .replace(/ƒ/g, 'f')
+            .replace(/‚/g, ',')
+            .replace(/„/g, '"')
+            .replace(/…/g, '...')
+            .replace(/−/g, '-');
+
+        // collapse multiple whitespace
+        t = t.replace(/\s+/g, ' ').trim();
+
+        // join split single-letter tokens: "S i O" -> "SiO"
+        t = t.replace(/(\b[A-Za-z])\s(?=[A-Za-z]\b)/g, '$1');
+
+        return t;
     }
 
     // Dropdown behaviour for "Download Selected"
@@ -508,7 +539,7 @@
         });
     }
 
-    // ✅ UPDATED: Download selected rows as Excel or PDF (with dynamic header spacing)
+    // Download selected rows as Excel or PDF (with dynamic header spacing and text normalization)
     async function downloadSelected(format) {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
@@ -565,8 +596,8 @@
 
                 let logoRightX = 5;
                 if (pdfLogoDataUrl) {
-                    const logoW = 18;
-                    const logoH = 9;
+                    const logoW = 22; // a bit wider, nicer aspect
+                    const logoH = pdfLogoAspect ? logoW * pdfLogoAspect : 8;
                     doc.addImage(pdfLogoDataUrl, "PNG", 3, 3, logoW, logoH);
                     logoRightX = 3 + logoW;
                 }
@@ -586,15 +617,16 @@
 
             let y = marginY;
 
-            /* ------ DYNAMIC HEADER ROW HEIGHT ------ */
+            /* ------ DYNAMIC HEADER ROW HEIGHT + CLEAN TEXT ------ */
             function drawHeaderRow() {
                 doc.setFont(undefined, "bold");
 
                 let maxHeaderLines = 1;
 
                 keys.forEach((h, index) => {
+                    const headerText = normalizeText(h);
                     const x = marginX + index * colWidth;
-                    const headerLines = doc.splitTextToSize(String(h), colWidth - 2);
+                    const headerLines = doc.splitTextToSize(headerText, colWidth - 2);
 
                     if (headerLines.length > maxHeaderLines) {
                         maxHeaderLines = headerLines.length;
@@ -623,10 +655,10 @@
             drawPdfHeader();
             drawHeaderRow();
 
-            /* ------ BODY ROWS ------ */
+            /* ------ BODY ROWS (with clean text) ------ */
             rows.forEach((row) => {
                 const cellData = keys.map((k, index) => {
-                    const value = row[k] !== undefined && row[k] !== null ? String(row[k]) : "";
+                    const value = normalizeText(row[k]);
                     const x = marginX + index * colWidth;
                     const lines = doc.splitTextToSize(value, colWidth - 2);
                     return { x, lines };
