@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Coal Data Table</title>
 
-    <!-- SheetJS for Excel -->
+    <!-- SheetJS for Excel sheet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <!-- jsPDF and html2canvas for PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -75,19 +75,11 @@
         }
         .navbar .logout-btn:hover { background-color: darkred !important; }
 
-        h1.page-title {
-            margin-top: 90px;
-            text-align: center;
-        }
+        /* Heading below navbar */
+        h1.page-title { margin-top: 90px; text-align: center; }
 
         /* CENTERED TOOLBAR UNDER HEADING */
-        .toolbar-wrapper {
-            margin-top: 10px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
+        .toolbar-wrapper { width: 100%; display: flex; justify-content: center; margin-top: 10px; }
         .toolbar {
             display: flex;
             justify-content: center;
@@ -95,6 +87,7 @@
             flex-wrap: wrap;
             gap: 12px;
             max-width: 900px;
+            padding: 0 16px;
         }
 
         /* Base Button Styling */
@@ -105,158 +98,103 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0,0,0,0.12);
             white-space: nowrap;
         }
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
-        }
+        button:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,0,0,0.18); }
 
         /* Download Template */
-        .btn-template {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-        }
+        .btn-template { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
 
-        /* Upload new data */
+        /* Upload new data (label styled as button) */
         .btn-upload {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-
             padding: 10px 16px;
             border-radius: 8px;
             border: none;
-
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
-
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: #ffffff;
             box-shadow: 0 3px 8px rgba(0,0,0,0.12);
             transition: all 0.2s ease;
             text-decoration: none;
         }
-        .btn-upload:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        }
+        .btn-upload:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-1px); }
 
-        #fileInput {
-            display: none;
-        }
+        #fileInput { display: none; }
 
-        /* Delete Selected */
-        #delete-selected-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-        }
-        #delete-selected-btn:hover {
-            background: #b91c1c;
-        }
+        /* Delete Selected button */
+        #delete-selected-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        #delete-selected-btn:hover { background: #b91c1c; }
 
-        /* Download Selected dropdown trigger */
-        .download-dropdown .menu-btn {
-            background: linear-gradient(135deg,#0ea5e9,#0284c7);
-            color: white;
-        }
-
-        /* Page PDF button */
-        #downloadPDF {
-            background: #02008a;
-            border-radius: 50%;
-            padding: 10px 12px;
-            color: #fff;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-        }
-
-        /* Dropdown container */
-        .download-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        /* Dropdown menu */
+        /* Download Selected dropdown */
+        .download-dropdown { position: relative; display: inline-block; }
+        .download-dropdown .menu-btn { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; }
         .download-dropdown .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            display: none;
-            background: white;
-            min-width: 170px;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.16);
-            z-index: 2000;
-            padding: 6px;
+            position: absolute; top: calc(100% + 6px); left: 0; display: none; background: white;
+            min-width: 170px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.16); z-index: 2000; padding: 6px;
         }
-
         .download-dropdown .dropdown-menu button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 8px 10px;
-            background: transparent;
-            border-radius: 6px;
-            margin: 0;
-            box-shadow: none;
+            display: block; width: 100%; text-align: left; padding: 8px 10px; background: transparent;
+            border-radius: 6px; margin: 0; box-shadow: none; font-size: 14px; font-weight: 600;
         }
+        .download-dropdown .dropdown-menu button:hover { background: #f3f4f6; transform: none; }
 
-        .download-dropdown .dropdown-menu button:hover {
-            background: #f3f4f6;
-            transform: none;
+        /* Download PDF icon button */
+        #downloadPDF.icon-btn {
+            background: #02008a; color: #fff; border-radius: 50%; padding: 10px 12px; font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12); position: relative;
         }
+        .icon-btn::after {
+            content: attr(title); position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; font-size: 12px; padding: 5px 8px; border-radius: 6px;
+            opacity: 0; white-space: nowrap; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .icon-btn:hover::after { opacity: 1; }
 
-        /* ===================== TABLE STYLES (LIKE REFERENCE) ===================== */
-
+        /* Table wrapper
+           - horizontal scroll with visible scrollbar when needed
+           - vertical scroll kept */
         .table-wrapper {
             margin-top: 20px;
             padding: 0 16px 16px;
-            overflow: auto;              /* scroll as needed, but widths are friendly */
+            overflow-x: auto;      /* ⬅ horizontal scrollbar when needed */
+            overflow-y: auto;      /* vertical scroll */
+            max-height: calc(100vh - 220px);
+            box-sizing: border-box;
         }
 
+        /* Dynamic column widths based on content */
         table {
-            width: 100%;
             border-collapse: collapse;
-            min-width: 800px;            /* same as your reference */
+            table-layout: auto;       /* let browser size columns based on content */
+            width: max-content;       /* table can grow wider than container */
+            min-width: 100%;          /* at least fill container width */
         }
 
         th, td {
             border: 1px solid black;
             padding: 8px;
             text-align: center;
-            white-space: normal;         /* allow wrapping to avoid horizontal scroll */
+            white-space: nowrap;      /* keep headers / values on one line */
         }
 
-        th {
-            background-color: #f4f4f4;
-        }
+        th { background-color: #f4f4f4; }
 
-        /* Sticky first column */
         th:first-child, td:first-child {
             position: sticky;
             left: 0;
+            border: 1px solid black;
             background-color: white;
             z-index: 2;
         }
     </style>
-
-    <script>
-        // Simple auth check
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            alert('You must login first!');
-            window.location.href = '/login.html';
-        }
-
-        function logoutUser() {
-            localStorage.setItem('isLoggedIn', 'false');
-            window.location.href = 'login.html';
-        }
-    </script>
 </head>
 <body>
     <div class="navbar">
@@ -283,16 +221,14 @@
             <button id="delete-selected-btn">Delete Selected</button>
 
             <div class="download-dropdown">
-                <button id="download-selected-btn" class="menu-btn">
-                    Download Selected ▾
-                </button>
+                <button id="download-selected-btn" class="menu-btn">Download Selected ▾</button>
                 <div id="download-menu" class="dropdown-menu" aria-hidden="true">
                     <button type="button" onclick="downloadSelected('excel')">Download as Excel</button>
                     <button type="button" onclick="downloadSelected('pdf')">Download as PDF</button>
                 </div>
             </div>
 
-            <button id="downloadPDF" title="Download full page as PDF">⬇️</button>
+            <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
         </div>
     </div>
 
@@ -311,26 +247,25 @@
         let pdfLogoDataUrl = null;
         let pdfLogoAspect = 0; // height / width
 
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert('You must login first!');
+            window.location.href = '/login.html';
+        }
+
+        function logoutUser() {
+            localStorage.setItem('isLoggedIn', 'false');
+            window.location.href = 'login.html';
+        }
+
         function downloadExcel() { window.location.href = "/download-template"; }
 
         document.addEventListener("DOMContentLoaded", () => {
             fetchData();
             loadPdfLogo();
 
-            const fileInput = document.getElementById("fileInput");
-            if (fileInput) {
-                fileInput.addEventListener("change", handleFileUpload);
-            }
-
-            const deleteBtn = document.getElementById("delete-selected-btn");
-            if (deleteBtn) {
-                deleteBtn.addEventListener("click", handleDeleteSelected);
-            }
-
-            const downloadPagePdfBtn = document.getElementById("downloadPDF");
-            if (downloadPagePdfBtn) {
-                downloadPagePdfBtn.addEventListener("click", handleDownloadPDF);
-            }
+            document.getElementById("fileInput").addEventListener("change", handleFileUpload);
+            document.getElementById("delete-selected-btn").addEventListener("click", handleDeleteSelected);
+            document.getElementById("downloadPDF").addEventListener("click", handleDownloadPDF);
 
             setupDownloadDropdown();
         });
@@ -362,12 +297,6 @@
         function displayTable(data) {
             const tableHeader = document.getElementById("table-header");
             const tableBody = document.getElementById("table-body");
-
-            if (!tableHeader || !tableBody) {
-                console.error("Table header/body elements not found.");
-                return;
-            }
-
             tableHeader.innerHTML = "";
             tableBody.innerHTML = "";
 
@@ -506,7 +435,7 @@
             if (format === "excel") {
                 const jsonData = rows.map(r => {
                     const obj = {};
-                    keys.forEach(k => obj[k] = r[k] !== undefined ? r[k] : "";
+                    keys.forEach(k => obj[k] = r[k] !== undefined ? r[k] : "");
                     return obj;
                 });
                 const ws = XLSX.utils.json_to_sheet(jsonData);
@@ -519,6 +448,7 @@
             if (format === "pdf") {
                 const doc = new jsPDF("l", "mm", "a4");
                 const pageWidth = doc.internal.pageSize.getWidth();
+
                 const headerBarHeight = 20;
                 const marginY = headerBarHeight + 8;
 
@@ -561,8 +491,7 @@
 
                 drawPdfHeader();
 
-                const keysNormalized = keys.map(k => normalizeText(k));
-                const head = [keysNormalized];
+                const head = [keys.map(k => normalizeText(k))];
                 const body = rows.map(r => keys.map(k => normalizeText(r[k])));
 
                 doc.autoTable({
