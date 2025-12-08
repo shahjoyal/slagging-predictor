@@ -10,6 +10,8 @@
     <!-- jsPDF and html2canvas for PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF AutoTable for proper table in PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         body {
@@ -156,38 +158,33 @@
         }
         .icon-btn:hover::after { opacity: 1; }
 
-        /* Table wrapper under toolbar
-           - NO horizontal scrolling (we wrap content)
-           - vertical scrolling kept */
+        /* Table wrapper
+           - allow horizontal scroll when needed
+           - vertical scroll kept */
         .table-wrapper {
             margin-top: 20px;
             padding: 0 16px 16px;
-            overflow-x: hidden;   /* hide horizontal scrolling; table will wrap */
-            overflow-y: auto;     /* vertical scroll allowed */
+            overflow-x: auto;      /* horizontal scroll allowed when needed */
+            overflow-y: auto;      /* vertical scroll allowed */
             max-height: calc(100vh - 220px); /* keeps header/toolbars visible; adjust if needed */
         }
 
-        /* Use fixed layout so columns wrap instead of forcing horizontal scroll */
+        /* Dynamic column widths based on content */
         table {
-            width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;   /* crucial to prevent horizontal scroll */
+            table-layout: auto;       /* let browser size columns based on content */
+            width: max-content;       /* table grows as needed */
+            min-width: 100%;          /* at least fill container width */
         }
 
         th, td {
             border: 1px solid black;
             padding: 8px;
-            min-width: 80px;        /* reduce min width so wrapping kicks in earlier */
-            max-width: 220px;       /* prevents cells from growing too wide */
             text-align: center;
-            word-wrap: break-word;  /* allow long content to wrap */
-            white-space: normal;
-            overflow-wrap: anywhere;
+            white-space: nowrap;      /* keep names in one line */
         }
 
-        th {
-            background-color: #f4f4f4;
-        }
+        th { background-color: #f4f4f4; }
 
         th:first-child, td:first-child {
             position: sticky;
@@ -250,7 +247,7 @@
         let pdfLogoDataUrl = null;
         let pdfLogoAspect = 0; // height / width
 
-        // Basic auth guard (keeps from showing page if not logged in)
+        // Auth guard
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             alert('You must login first!');
             window.location.href = '/login.html';
@@ -386,17 +383,17 @@
             if (text === undefined || text === null) return "";
             let t = String(text);
 
-            // replace subscript digits with normal digits
             const subMap = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
             t = t.replace(/[₀-₉]/g, ch => subMap[ch] || '');
 
-            // fix some odd characters we've seen
-            t = t.replace(/ƒ/g, 'f').replace(/‚/g, ',').replace(/„/g, '"').replace(/…/g, '...').replace(/−/g, '-');
+            t = t
+                .replace(/ƒ/g, 'f')
+                .replace(/‚/g, ',')
+                .replace(/„/g, '"')
+                .replace(/…/g, '...')
+                .replace(/−/g, '-');
 
-            // collapse multiple whitespace
             t = t.replace(/\s+/g, ' ').trim();
-
-            // join split single-letter tokens: "S i O" -> "SiO"
             t = t.replace(/(\b[A-Za-z])\s(?=[A-Za-z]\b)/g, '$1');
 
             return t;
@@ -423,7 +420,7 @@
             });
         }
 
-        // Download selected rows as Excel or PDF (with dynamic header spacing, borders and text normalization)
+        // Download selected rows as Excel or PDF (now using AutoTable for proper grid)
         async function downloadSelected(format) {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
             if (checkboxes.length === 0) {
@@ -454,25 +451,15 @@
                 return;
             }
 
-            /* ---------------------- PDF DOWNLOAD ---------------------- */
+            /* ---------------------- PDF DOWNLOAD (AutoTable) ---------------------- */
             if (format === "pdf") {
                 const doc = new jsPDF("l", "mm", "a4");
                 const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
 
-                const headerBarHeight = 20;          // slightly taller bar
-                const marginX = 10;
-                const marginY = headerBarHeight + 8; // more space before table
-                const lineHeight = 4;
-                const usableWidth = pageWidth - 2 * marginX;
-                const colWidth = usableWidth / keys.length;
+                const headerBarHeight = 20;
+                const marginY = headerBarHeight + 8;
 
-                doc.setFontSize(8);
-                doc.setFont(undefined, "normal");
-                doc.setDrawColor(0);
-                doc.setLineWidth(0.25);
-
-                /* ------ BLUE HEADER + LOGO (SHRUNK, NOT STRETCHED) ------ */
+                // Header bar + logo
                 function drawPdfHeader() {
                     doc.setFillColor(2, 0, 138);
                     doc.rect(0, 0, pageWidth, headerBarHeight, "F");
@@ -480,13 +467,13 @@
                     let logoRightX = 5;
 
                     if (pdfLogoDataUrl) {
-                        const maxLogoHeight = headerBarHeight - 2; // vertical padding
-                        let logoH = Math.min(maxLogoHeight, 14);    // cap absolute size
+                        const maxLogoHeight = headerBarHeight - 2;
+                        let logoH = Math.min(maxLogoHeight, 14);
                         let logoW = logoH;
                         if (pdfLogoAspect && pdfLogoAspect > 0) logoW = logoH / pdfLogoAspect;
 
                         const yPos = (headerBarHeight - logoH) / 2;
-                        const xPos = 6; // small left margin
+                        const xPos = 6;
 
                         doc.addImage(pdfLogoDataUrl, "PNG", xPos, yPos, logoW, logoH);
                         logoRightX = xPos + logoW;
@@ -498,110 +485,48 @@
                     doc.text("Combustion Analyzer", logoRightX + 6, headerBarHeight / 2 + 3);
 
                     doc.setFontSize(10);
-                    doc.text("Slagging Data Table - Selected Rows", pageWidth / 2, headerBarHeight / 2 + 3, { align: "center" });
+                    doc.text(
+                        "Slagging Data Table - Selected Rows",
+                        pageWidth / 2,
+                        headerBarHeight / 2 + 3,
+                        { align: "center" }
+                    );
 
                     doc.setTextColor(0, 0, 0);
                     doc.setFontSize(8);
                     doc.setFont(undefined, "normal");
                 }
 
-                let y = marginY;
-
-                /* ------ DYNAMIC HEADER ROW HEIGHT + CLEAN TEXT + BORDER DRAWING ------ */
-                function drawHeaderRow() {
-                    doc.setFont(undefined, "bold");
-
-                    let maxHeaderLines = 1;
-                    let headersPerColumn = []; // store lines per column
-
-                    keys.forEach((h, index) => {
-                        const headerText = normalizeText(h);
-                        const x = marginX + index * colWidth;
-                        const headerLines = doc.splitTextToSize(headerText, colWidth - 2);
-                        headersPerColumn[index] = headerLines;
-                        if (headerLines.length > maxHeaderLines) maxHeaderLines = headerLines.length;
-                    });
-
-                    const headerTop = y;
-                    const headerHeight = maxHeaderLines * lineHeight + 3;
-
-                    // draw header text
-                    keys.forEach((h, index) => {
-                        const x = marginX + index * colWidth;
-                        const headerLines = headersPerColumn[index];
-                        let lineY = headerTop;
-                        headerLines.forEach(line => {
-                            doc.text(line, x, lineY);
-                            lineY += lineHeight;
-                        });
-                    });
-
-                    // draw borders for header cells
-                    for (let i = 0; i < keys.length; i++) {
-                        const rectX = marginX + i * colWidth - 0.6;
-                        const rectY = headerTop - 2;
-                        const rectW = colWidth + 1.2;
-                        const rectH = headerHeight + 4;
-                        doc.rect(rectX, rectY, rectW, rectH); // stroke
-                    }
-
-                    doc.setFont(undefined, "normal");
-                    // move y below header
-                    y += headerHeight + 6; // extra space to separate header and first row
-                }
-
-                function addNewPage() {
-                    doc.addPage();
-                    drawPdfHeader();
-                    y = marginY;
-                    drawHeaderRow();
-                }
-
                 drawPdfHeader();
-                drawHeaderRow();
 
-                /* ------ BODY ROWS (with clean text + borders) ------ */
-                rows.forEach((row) => {
-                    const cellData = keys.map((k, index) => {
-                        const value = normalizeText(row[k]);
-                        const x = marginX + index * colWidth;
-                        const lines = doc.splitTextToSize(value, colWidth - 2);
-                        return { x, lines };
-                    });
+                // Prepare AutoTable data
+                const head = [keys.map(k => normalizeText(k))];
+                const body = rows.map(r => keys.map(k => normalizeText(r[k])));
 
-                    const maxLines = Math.max(...cellData.map(c => c.lines.length || 1));
-                    const rowHeight = maxLines * lineHeight + 4;
-
-                    if (y + rowHeight > pageHeight - 10) {
-                        addNewPage();
-                    }
-
-                    // draw cell borders first
-                    for (let i = 0; i < keys.length; i++) {
-                        const rectX = marginX + i * colWidth - 0.6;
-                        const rectY = y - 3;
-                        const rectW = colWidth + 1.2;
-                        const rectH = rowHeight + 2;
-                        doc.rect(rectX, rectY, rectW, rectH);
-                    }
-
-                    // then draw text inside each cell
-                    cellData.forEach(cell => {
-                        let lineY = y;
-                        cell.lines.forEach(line => {
-                            doc.text(line, cell.x, lineY);
-                            lineY += lineHeight;
-                        });
-                    });
-
-                    y += rowHeight;
+                doc.autoTable({
+                    head,
+                    body,
+                    startY: marginY,
+                    theme: "grid",   // full grid with borders
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 1.5,
+                        halign: "center",
+                        valign: "middle"
+                    },
+                    headStyles: {
+                        fillColor: [244, 244, 244],
+                        textColor: 0,
+                        fontStyle: "bold"
+                    },
+                    margin: { left: 10, right: 10 },
+                    tableWidth: "auto"
                 });
 
                 doc.save("selected_rows.pdf");
                 return;
             }
 
-            /* ---------------------- FALLBACK ---------------------- */
             alert("Unsupported download format: " + format);
         }
 
