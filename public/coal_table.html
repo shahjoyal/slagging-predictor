@@ -318,7 +318,7 @@
 
         <button id="delete-selected-btn">Delete Selected</button>
 
-        <!-- NEW: Download Selected dropdown -->
+        <!-- Download Selected dropdown -->
         <div class="download-dropdown">
             <button id="download-selected-btn" class="menu-btn">
                 Download Selected ▾
@@ -345,12 +345,16 @@
 <script>
     const { jsPDF } = window.jspdf;
 
+    // for selected-rows PDF header logo
+    let pdfLogoDataUrl = null;
+
     function downloadExcel() {
         window.location.href = "/download-template";
     }
 
     document.addEventListener("DOMContentLoaded", () => {
         fetchData();
+        loadPdfLogo();
 
         document.getElementById("fileInput").addEventListener("change", handleFileUpload);
         document.getElementById("delete-selected-btn").addEventListener("click", handleDeleteSelected);
@@ -458,6 +462,31 @@
         .catch(error => console.error("Error deleting data:", error));
     }
 
+    // Load logo into base64 for PDF header
+    function loadPdfLogo() {
+        const img = new Image();
+        img.src = "/images/abhitech-logo.png";
+        img.crossOrigin = "anonymous";
+
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            const targetWidth = 200;
+            const ratio = img.width ? targetWidth / img.width : 1;
+            canvas.width = targetWidth;
+            canvas.height = img.height * ratio;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            pdfLogoDataUrl = canvas.toDataURL("image/png");
+        };
+
+        img.onerror = function () {
+            console.warn("Could not load logo for PDF header");
+            pdfLogoDataUrl = null;
+        };
+    }
+
     // Dropdown behaviour for "Download Selected"
     function setupDownloadDropdown() {
         const downloadBtn = document.getElementById("download-selected-btn");
@@ -479,7 +508,7 @@
         });
     }
 
-    // Download selected rows as Excel or PDF
+    // Download selected rows as Excel or PDF (with nice header)
     async function downloadSelected(format) {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
@@ -516,13 +545,40 @@
             const pageHeight = doc.internal.pageSize.getHeight();
 
             const marginX = 10;
-            const marginY = 15;
+            const marginY = 22;      // below header bar
             const lineHeight = 4;
             const usableWidth = pageWidth - 2 * marginX;
             const colWidth = usableWidth / keys.length;
 
             doc.setFontSize(8);
             doc.setFont(undefined, "normal");
+
+            // HEADER with blue bar + logo + titles
+            function drawPdfHeader() {
+                // blue bar
+                doc.setFillColor(2, 0, 138);
+                doc.rect(0, 0, pageWidth, 15, "F");
+
+                let logoRightX = 5;
+                if (pdfLogoDataUrl) {
+                    const logoW = 18;
+                    const logoH = 9;
+                    doc.addImage(pdfLogoDataUrl, "PNG", 3, 3, logoW, logoH);
+                    logoRightX = 3 + logoW;
+                }
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(12);
+                doc.setFont(undefined, "bold");
+                doc.text("Combustion Analyzer", logoRightX + 4, 10);
+
+                doc.setFontSize(10);
+                doc.text("Slagging Data Table - Selected Rows", pageWidth / 2, 10, { align: "center" });
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(8);
+                doc.setFont(undefined, "normal");
+            }
 
             let y = marginY;
 
@@ -543,10 +599,12 @@
 
             function addNewPage() {
                 doc.addPage();
+                drawPdfHeader();
                 y = marginY;
                 drawHeaderRow();
             }
 
+            drawPdfHeader();
             drawHeaderRow();
 
             rows.forEach((row) => {
@@ -581,6 +639,7 @@
         }
     }
 
+    // Full page PDF (with real navbar & logo via html2canvas)
     function handleDownloadPDF() {
         const element = document.body;
 
@@ -612,7 +671,7 @@
                     input.style.visibility = "hidden";
                 });
 
-                // Render selects as text
+                // Render selects as text (if any)
                 const selects = clonedDoc.querySelectorAll("select");
                 selects.forEach(select => {
                     const selectedText = select.options[select.selectedIndex]?.text || "";
