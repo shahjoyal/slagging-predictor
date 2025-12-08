@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coal Data Table</title>
+
+    <!-- Excel export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+    <!-- jsPDF + html2canvas for PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -13,10 +20,10 @@
             font-family: Arial, sans-serif;
         }
 
-         /* Navbar Styling */
-         .navbar {
+        /* Navbar Styling */
+        .navbar {
             display: flex;
-            justify-content: space-between; /* or space-evenly */
+            justify-content: space-between;
             width: 100%;
             background-color: #f7f8fa;
             align-items: center;
@@ -35,12 +42,13 @@
             margin-right: 10px;
             margin-left: 0px;
         }
+
         .nav-buttons {
-        display: flex;
-            gap: 10px; /* Use 'gap' for spacing between flex items */
+            display: flex;
+            gap: 10px;
             margin-right: 20px;
-            
         }
+
         .navbar button {
             padding: 10px 15px;
             background-color: #02008a;
@@ -51,223 +59,281 @@
             margin-right: 20px;
             font-weight: bold;
         }
-        
+
         .navbar button:hover {
             background-color: #001cbb;
         }
 
         .navbar h1 {
             margin-left: 0px;
-            font-size: 20px; /* Adjust font size as needed */
+            font-size: 20px;
             color: black;
-            
         }
 
-        
-        .container {
-            margin: 20px;
-            overflow-x: auto;
+        .navbar .logout-btn {
+            padding: 10px 16px;
+            background-color: red !important;
+            color: #fff !important;
+            border: none;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
-        table {
-            width: 90%;
-            border-collapse: collapse;
+        .navbar .logout-btn:hover {
+            background-color: darkred !important;
+        }
+
+        /* Heading below navbar */
+        h1.page-title {
+            margin-top: 90px;
+            text-align: center;
+        }
+
+        /* CENTERED TOOLBAR UNDER HEADING */
+        .toolbar-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 900px;
+            padding: 0 16px;
+        }
+
+        /* Base Button Styling */
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            white-space: nowrap;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
+        }
+
+        /* Download Template */
+        .btn-template {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+
+        /* Upload new data (label styled as button) */
+        .btn-upload {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #ffffff;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-upload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        /* Hide actual file input */
+        #fileInput {
+            display: none;
+        }
+
+        /* Delete Selected button */
+        #delete-selected-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+        #delete-selected-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Download Selected dropdown */
+        .download-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .download-dropdown .menu-btn {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: #fff;
+        }
+        .download-dropdown .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            display: none;
+            background: white;
+            min-width: 170px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+            z-index: 2000;
+            padding: 6px;
+        }
+        .download-dropdown .dropdown-menu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            background: transparent;
+            border-radius: 6px;
+            margin: 0;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .download-dropdown .dropdown-menu button:hover {
+            background: #f3f4f6;
+            transform: none;
+        }
+
+        /* Download PDF icon button */
+        #downloadPDF.icon-btn {
+            background: #02008a;
+            color: #fff;
+            border-radius: 50%;
+            padding: 10px 12px;
+            font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            position: relative;
+        }
+
+        /* Tooltip for PDF icon */
+        .icon-btn::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            opacity: 0;
+            white-space: nowrap;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .icon-btn:hover::after {
+            opacity: 1;
+        }
+
+        /* Table wrapper under toolbar */
+        .table-wrapper {
             margin-top: 20px;
-            margin-right: 15px;
-            margin: 10px;
-            
+            padding: 0 16px 16px;
+            overflow: auto;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
         th, td {
             border: 1px solid black;
             padding: 8px;
             min-width: 100px;
             text-align: center;
         }
+
         th {
             background-color: #f4f4f4;
             min-height: 20px;
-
         }
 
         th:first-child, td:first-child {
             position: sticky;
             left: 0;
-            border: 1px solid black;   
-            background-color: white; /* Ensure it doesn't become transparent */
+            border: 1px solid black;
+            background-color: white;
             z-index: 2;
         }
-.container {
-  margin-top: 100px;  /* pushes content below navbar */
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-/* Base Button Styling */
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
-
-button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-
-/* Download Template */
-.btn {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: #fff;
-}
-
-
-/* Upload new data */
-/* Upload New Data button (same style as others) */
-.btn-upload {
-  display: inline-block;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: #fff;
-  cursor: pointer;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  transition: all 0.3s ease;
-}
-
-/* Hide actual input */
-#fileInput {
-  display: none;
-}
-
-
-/* Delete button */
-#delete-selected-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: #fff;
-}
-
-
-/* Download PDF - match navbar button */
-#downloadPDF {
-  background: #02008a;
-  color: #fff;
-}
-
-
-/* Specific colors */
-.btn { background: #16a34a; color: #fff; }
-.btn:hover { background: #15803d; }
-
-.btn-upload { background: #2563eb; color: #fff; }
-.btn-upload:hover { background: #1e40af; }
-
-.navbar button { background: #02008a; color: #fff; }
-.navbar button:hover { background: #001cbb; }
-
-#delete-selected-btn { background: #dc2626; }
-#delete-selected-btn:hover { background: #b91c1c; }
-.navbar .logout-btn {
-  padding: 10px 16px;
-  background-color: red !important;
-  color: #fff !important;
-  border: none;
-  cursor: pointer;
-  border-radius: 25px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.navbar .logout-btn:hover {
-  background-color: darkred !important;
-}
-        .icon-btn {
-  background: #02008a;  /* same as navbar */
-  color: #fff;
-  border: none;
-  padding: 12px;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
-
-
-/* Tooltip */
-.icon-btn::after {
-  content: attr(title);
-  position: absolute;
-  bottom: -35px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #000;
-  color: #fff;
-  font-size: 12px;
-  padding: 5px 8px;
-  border-radius: 6px;
-  opacity: 0;
-  white-space: nowrap;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.icon-btn:hover::after {
-  opacity: 1;
-}
-        
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
-if(localStorage.getItem('isLoggedIn') !== 'true') {
-    alert('You must login first!');
-    window.location.href = '/login.html'; 
-} else {
-    document.body.style.display = 'block';
-}
-      function logoutUser() {
-  localStorage.setItem('isLoggedIn', 'false'); 
-  window.location.href = 'login.html'; 
-}      
-</script>
+        // Auth check
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert('You must login first!');
+            window.location.href = '/login.html';
+        } else {
+            document.body.style.display = 'block';
+        }
+
+        function logoutUser() {
+            localStorage.setItem('isLoggedIn', 'false');
+            window.location.href = 'login.html';
+        }
+    </script>
 </head>
 <body>
 
 <div class="navbar">
     <img src="/images/abhitech-logo.png" alt="Company Logo">
-    <h1>Combustion Analyzer</h1> 
-     <div class="nav-buttons">
-            <button onclick="window.location.href='model.html'">Model</button>
-            <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
-         <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
-         <button class="logout-btn" onclick="logoutUser()">Logout</button>
-         
-           
+    <h1>Combustion Analyzer</h1>
+    <div class="nav-buttons">
+        <button onclick="window.location.href='model.html'">Model</button>
+        <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
+        <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
+        <button class="logout-btn" onclick="logoutUser()">Logout</button>
     </div>
 </div>
 
-<h1>Slagging Data Table</h1>
+<h1 class="page-title">Slagging Data Table</h1>
 
-<div class="container">
-    <button class="btn" onclick="downloadExcel()">Download Template</button>
-    <label for="fileInput" class="btn-upload">📤 Upload New Data</label>
-<input type="file" id="fileInput" accept=".xlsx, .xls" style="display:none;">
-    <button id="delete-selected-btn" style="background-color: #02008a; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px;">Delete Selected</button>
-    <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
+<!-- CENTERED TOOLBAR -->
+<div class="toolbar-wrapper">
+    <div class="toolbar">
+        <button class="btn-template" onclick="downloadExcel()">Download Template</button>
+
+        <label for="fileInput" class="btn-upload">
+            📤 Upload New Data
+        </label>
+        <input type="file" id="fileInput" accept=".xlsx, .xls">
+
+        <button id="delete-selected-btn">Delete Selected</button>
+
+        <!-- NEW: Download Selected dropdown -->
+        <div class="download-dropdown">
+            <button id="download-selected-btn" class="menu-btn">
+                Download Selected ▾
+            </button>
+            <div id="download-menu" class="dropdown-menu" aria-hidden="true">
+                <button type="button" onclick="downloadSelected('excel')">Download as Excel</button>
+                <button type="button" onclick="downloadSelected('pdf')">Download as PDF</button>
+            </div>
+        </div>
+
+        <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
+    </div>
 </div>
 
-<div class="table-container">
+<div class="table-wrapper">
     <table id="data-table">
         <thead>
             <tr id="table-header"></tr>
@@ -277,27 +343,36 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
 </div>
 
 <script>
+    const { jsPDF } = window.jspdf;
+
     function downloadExcel() {
         window.location.href = "/download-template";
     }
 
-    document.addEventListener("DOMContentLoaded", fetchData);
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchData();
+
+        document.getElementById("fileInput").addEventListener("change", handleFileUpload);
+        document.getElementById("delete-selected-btn").addEventListener("click", handleDeleteSelected);
+        document.getElementById("downloadPDF").addEventListener("click", handleDownloadPDF);
+
+        setupDownloadDropdown();
+    });
 
     function fetchData() {
         fetch("/fetch-data")
             .then(response => response.json())
-            
             .then(data => displayTable(data))
             .catch(error => console.error("Error fetching data:", error));
     }
-    
-    document.getElementById("fileInput").addEventListener("change", function(event) {
+
+    function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
-    
+
         const formData = new FormData();
         formData.append("file", file);
-    
+
         fetch("/upload-excel", {
             method: "POST",
             body: formData
@@ -309,43 +384,47 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
             displayTable(data);
         })
         .catch(error => console.error("Error uploading file:", error));
-    });
-    
+    }
+
     function displayTable(data) {
         const tableHeader = document.getElementById("table-header");
         const tableBody = document.getElementById("table-body");
         tableHeader.innerHTML = "";
         tableBody.innerHTML = "";
 
-        if (data.length === 0) return;
+        if (!data || data.length === 0) return;
 
         const headers = Object.keys(data[0]).filter(header => header !== '_id');
-        headers.push("Select"); // Add Select header
+        headers.push("Select");
 
-        // Create table headers
+        // Header row
         headers.forEach((header) => {
             let th = document.createElement("th");
             th.textContent = header;
-            if (header === headers[0]) th.style.position = "sticky"; // Fix first column
             tableHeader.appendChild(th);
         });
 
-        // Create table rows
+        // Body rows
         data.forEach(row => {
             let tr = document.createElement("tr");
 
             headers.slice(0, -1).forEach((header) => {
                 let td = document.createElement("td");
-                td.textContent = row[header];
-                if (header === headers[0]) td.style.position = "sticky"; // Fix first column
+                td.textContent = row[header] !== undefined ? row[header] : "";
                 tr.appendChild(td);
             });
 
-            // Add Checkbox
+            // Checkbox for Select
             let checkboxTd = document.createElement("td");
             let checkbox = document.createElement("input");
             checkbox.type = "checkbox";
-            checkbox.setAttribute("data-id", row._id); // Store _id
+            checkbox.setAttribute("data-id", row._id);
+            // store row data for downloadSelected
+            try {
+                checkbox.dataset.row = JSON.stringify(row);
+            } catch (e) {
+                checkbox.dataset.row = "{}";
+            }
             checkboxTd.appendChild(checkbox);
             tr.appendChild(checkboxTd);
 
@@ -353,7 +432,7 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
         });
     }
 
-    document.getElementById("delete-selected-btn").addEventListener("click", function() {
+    function handleDeleteSelected() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
             alert("Please select at least one row to delete.");
@@ -374,104 +453,212 @@ if(localStorage.getItem('isLoggedIn') !== 'true') {
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            fetchData(); // Refresh Table
+            fetchData();
         })
         .catch(error => console.error("Error deleting data:", error));
-    });
+    }
 
-    // Delete Data Function (for single delete, if needed)
-    function deleteData(id) {
-        if (!id) {
-            console.error("Invalid ID for deletion.");
+    // Dropdown behaviour for "Download Selected"
+    function setupDownloadDropdown() {
+        const downloadBtn = document.getElementById("download-selected-btn");
+        const downloadMenu = document.getElementById("download-menu");
+        if (!downloadBtn || !downloadMenu) return;
+
+        downloadBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const visible = downloadMenu.style.display === "block";
+            downloadMenu.style.display = visible ? "none" : "block";
+            downloadMenu.setAttribute("aria-hidden", visible ? "true" : "false");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!downloadMenu.contains(e.target) && e.target !== downloadBtn) {
+                downloadMenu.style.display = "none";
+                downloadMenu.setAttribute("aria-hidden", "true");
+            }
+        });
+    }
+
+    // Download selected rows as Excel or PDF
+    async function downloadSelected(format) {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            alert("Please select at least one row to download.");
             return;
         }
-        
-        if (!confirm("Are you sure you want to delete this data?")) return;
 
-        fetch(`/delete-data/${id}`, { method: 'DELETE' })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                fetchData(); // Refresh Table
-            })
-            .catch(error => console.error("Error deleting data:", error));
-    } 
+        const rows = Array.from(checkboxes).map(cb => {
+            try {
+                return JSON.parse(cb.dataset.row || "{}");
+            } catch (e) {
+                return {};
+            }
+        });
 
-     document.getElementById("downloadPDF").addEventListener("click", function () {
-  const { jsPDF } = window.jspdf;
-  const element = document.body; // ✅ capture whole page including navbar
+        const downloadMenu = document.getElementById("download-menu");
+        if (downloadMenu) downloadMenu.style.display = "none";
 
-  html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    onclone: (clonedDoc) => {
-      // Handle input & textarea values
-      const inputs = clonedDoc.querySelectorAll("input, textarea");
-      inputs.forEach(input => {
-        const text = clonedDoc.createElement("span");
-        text.textContent = input.value;
+        const keys = Object.keys(rows[0] || {}).filter(k => k !== "_id");
 
-        text.style.position = "absolute";
-        text.style.left = input.offsetLeft + "px";
-        text.style.top = input.offsetTop + "px";
-        text.style.width = input.offsetWidth + "px";
-        text.style.height = input.offsetHeight + "px";
-        text.style.lineHeight = input.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(input).font;
-        text.style.color = window.getComputedStyle(input).color;
+        if (format === "excel") {
+            const jsonData = rows.map(r => {
+                const obj = {};
+                keys.forEach(k => obj[k] = r[k] !== undefined ? r[k] : "");
+                return obj;
+            });
+            const ws = XLSX.utils.json_to_sheet(jsonData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Selected");
+            XLSX.writeFile(wb, "selected_rows.xlsx");
+        } else if (format === "pdf") {
+            const doc = new jsPDF("l", "mm", "a4");
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
 
-        clonedDoc.body.appendChild(text);
-        input.style.visibility = "hidden";
-      });
+            const marginX = 10;
+            const marginY = 15;
+            const lineHeight = 4;
+            const usableWidth = pageWidth - 2 * marginX;
+            const colWidth = usableWidth / keys.length;
 
-      // Handle select dropdowns (coal names)
-      const selects = clonedDoc.querySelectorAll("select");
-      selects.forEach(select => {
-        const selectedText = select.options[select.selectedIndex]?.text || "";
-        const text = clonedDoc.createElement("span");
-        text.textContent = selectedText;
+            doc.setFontSize(8);
+            doc.setFont(undefined, "normal");
 
-        text.style.position = "absolute";
-        text.style.left = select.offsetLeft + "px";
-        text.style.top = select.offsetTop + "px";
-        text.style.width = select.offsetWidth + "px";
-        text.style.height = select.offsetHeight + "px";
-        text.style.lineHeight = select.offsetHeight + "px";
-        text.style.textAlign = "center";
-        text.style.font = window.getComputedStyle(select).font;
-        text.style.color = window.getComputedStyle(select).color;
+            let y = marginY;
 
-        clonedDoc.body.appendChild(text);
-        select.style.visibility = "hidden";
-      });
+            function drawHeaderRow() {
+                doc.setFont(undefined, "bold");
+                keys.forEach((h, index) => {
+                    const x = marginX + index * colWidth;
+                    const headerLines = doc.splitTextToSize(String(h), colWidth - 2);
+                    let lineY = y;
+                    headerLines.forEach(line => {
+                        doc.text(line, x, lineY);
+                        lineY += lineHeight;
+                    });
+                });
+                doc.setFont(undefined, "normal");
+                y += lineHeight * 1.5;
+            }
+
+            function addNewPage() {
+                doc.addPage();
+                y = marginY;
+                drawHeaderRow();
+            }
+
+            drawHeaderRow();
+
+            rows.forEach((row) => {
+                const cellData = keys.map((k, index) => {
+                    const value = row[k] !== undefined && row[k] !== null ? String(row[k]) : "";
+                    const x = marginX + index * colWidth;
+                    const lines = doc.splitTextToSize(value, colWidth - 2);
+                    return { x, lines };
+                });
+
+                const maxLines = Math.max(...cellData.map(c => c.lines.length || 1));
+                const rowHeight = maxLines * lineHeight + 1;
+
+                if (y + rowHeight > pageHeight - 10) {
+                    addNewPage();
+                }
+
+                cellData.forEach(cell => {
+                    let lineY = y;
+                    cell.lines.forEach(line => {
+                        doc.text(line, cell.x, lineY);
+                        lineY += lineHeight;
+                    });
+                });
+
+                y += rowHeight;
+            });
+
+            doc.save("selected_rows.pdf");
+        } else {
+            alert("Unsupported download format: " + format);
+        }
     }
-  }).then(canvas => {
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
 
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+    function handleDownloadPDF() {
+        const element = document.body;
 
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // ensure navbar is in view
+        window.scrollTo(0, 0);
 
-    let heightLeft = imgHeight;
-    let position = 0;
+        html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            scrollY: -window.scrollY,
+            onclone: (clonedDoc) => {
+                // Render input values as text
+                const inputs = clonedDoc.querySelectorAll("input, textarea");
+                inputs.forEach(input => {
+                    const text = clonedDoc.createElement("span");
+                    text.textContent = input.value;
 
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+                    text.style.position = "absolute";
+                    text.style.left = input.offsetLeft + "px";
+                    text.style.top = input.offsetTop + "px";
+                    text.style.width = input.offsetWidth + "px";
+                    text.style.height = input.offsetHeight + "px";
+                    text.style.lineHeight = input.offsetHeight + "px";
+                    text.style.textAlign = "center";
+                    text.style.font = window.getComputedStyle(input).font;
+                    text.style.color = window.getComputedStyle(input).color;
 
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+                    clonedDoc.body.appendChild(text);
+                    input.style.visibility = "hidden";
+                });
+
+                // Render selects as text
+                const selects = clonedDoc.querySelectorAll("select");
+                selects.forEach(select => {
+                    const selectedText = select.options[select.selectedIndex]?.text || "";
+                    const text = clonedDoc.createElement("span");
+                    text.textContent = selectedText;
+
+                    text.style.position = "absolute";
+                    text.style.left = select.offsetLeft + "px";
+                    text.style.top = select.offsetTop + "px";
+                    text.style.width = select.offsetWidth + "px";
+                    text.style.height = select.offsetHeight + "px";
+                    text.style.lineHeight = select.offsetHeight + "px";
+                    text.style.textAlign = "center";
+                    text.style.font = window.getComputedStyle(select).font;
+                    text.style.color = window.getComputedStyle(select).color;
+
+                    clonedDoc.body.appendChild(text);
+                    select.style.visibility = "hidden";
+                });
+            }
+        }).then(canvas => {
+            const pdf = new jsPDF("p", "mm", "a4");
+            const imgData = canvas.toDataURL("image/png");
+
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save("Coal_Blending_Ratio.pdf");
+        });
     }
-
-    pdf.save("Coal_Blending_Ratio.pdf");
-  });
-});
 </script>
 </body>
 </html>
