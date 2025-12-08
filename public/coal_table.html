@@ -159,21 +159,22 @@
         .icon-btn:hover::after { opacity: 1; }
 
         /* Table wrapper
-           - allow horizontal scroll when needed
+           - horizontal scroll with visible scrollbar when needed
            - vertical scroll kept */
         .table-wrapper {
             margin-top: 20px;
             padding: 0 16px 16px;
-            overflow-x: auto;      /* horizontal scroll allowed when needed */
-            overflow-y: auto;      /* vertical scroll allowed */
-            max-height: calc(100vh - 220px); /* keeps header/toolbars visible; adjust if needed */
+            overflow-x: auto;      /* ⬅ horizontal scrollbar when needed */
+            overflow-y: auto;      /* vertical scroll */
+            max-height: calc(100vh - 220px);
+            box-sizing: border-box;
         }
 
         /* Dynamic column widths based on content */
         table {
             border-collapse: collapse;
             table-layout: auto;       /* let browser size columns based on content */
-            width: max-content;       /* table grows as needed */
+            width: max-content;       /* table can grow wider than container */
             min-width: 100%;          /* at least fill container width */
         }
 
@@ -181,7 +182,7 @@
             border: 1px solid black;
             padding: 8px;
             text-align: center;
-            white-space: nowrap;      /* keep names in one line */
+            white-space: nowrap;      /* keep headers / values on one line */
         }
 
         th { background-color: #f4f4f4; }
@@ -243,11 +244,9 @@
     <script>
         const { jsPDF } = window.jspdf;
 
-        // for selected-rows PDF header logo
         let pdfLogoDataUrl = null;
         let pdfLogoAspect = 0; // height / width
 
-        // Auth guard
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             alert('You must login first!');
             window.location.href = '/login.html';
@@ -356,7 +355,6 @@
             .catch(error => console.error("Error deleting data:", error));
         }
 
-        // Load logo into base64 for PDF header (correct aspect ratio)
         function loadPdfLogo() {
             const img = new Image();
             img.src = "/images/abhitech-logo.png";
@@ -378,7 +376,6 @@
             };
         }
 
-        // Clean up text for PDF (fix oxide names)
         function normalizeText(text) {
             if (text === undefined || text === null) return "";
             let t = String(text);
@@ -399,7 +396,6 @@
             return t;
         }
 
-        // Dropdown behaviour for "Download Selected"
         function setupDownloadDropdown() {
             const downloadBtn = document.getElementById("download-selected-btn");
             const downloadMenu = document.getElementById("download-menu");
@@ -420,7 +416,6 @@
             });
         }
 
-        // Download selected rows as Excel or PDF (now using AutoTable for proper grid)
         async function downloadSelected(format) {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
             if (checkboxes.length === 0) {
@@ -437,7 +432,6 @@
 
             const keys = Object.keys(rows[0] || {}).filter(k => k !== "_id");
 
-            /* ---------------------- EXCEL DOWNLOAD ---------------------- */
             if (format === "excel") {
                 const jsonData = rows.map(r => {
                     const obj = {};
@@ -451,7 +445,6 @@
                 return;
             }
 
-            /* ---------------------- PDF DOWNLOAD (AutoTable) ---------------------- */
             if (format === "pdf") {
                 const doc = new jsPDF("l", "mm", "a4");
                 const pageWidth = doc.internal.pageSize.getWidth();
@@ -459,7 +452,6 @@
                 const headerBarHeight = 20;
                 const marginY = headerBarHeight + 8;
 
-                // Header bar + logo
                 function drawPdfHeader() {
                     doc.setFillColor(2, 0, 138);
                     doc.rect(0, 0, pageWidth, headerBarHeight, "F");
@@ -499,7 +491,6 @@
 
                 drawPdfHeader();
 
-                // Prepare AutoTable data
                 const head = [keys.map(k => normalizeText(k))];
                 const body = rows.map(r => keys.map(k => normalizeText(r[k])));
 
@@ -507,7 +498,7 @@
                     head,
                     body,
                     startY: marginY,
-                    theme: "grid",   // full grid with borders
+                    theme: "grid",
                     styles: {
                         fontSize: 8,
                         cellPadding: 1.5,
@@ -530,7 +521,6 @@
             alert("Unsupported download format: " + format);
         }
 
-        // Full page PDF (with real navbar & logo via html2canvas)
         function handleDownloadPDF() {
             const element = document.body;
             window.scrollTo(0, 0);
