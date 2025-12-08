@@ -580,8 +580,9 @@
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
+            const headerBarHeight = 20;          // slightly taller bar
             const marginX = 10;
-            const marginY = 22;  // below blue header
+            const marginY = headerBarHeight + 8; // more space before table
             const lineHeight = 4;
             const usableWidth = pageWidth - 2 * marginX;
             const colWidth = usableWidth / keys.length;
@@ -589,26 +590,43 @@
             doc.setFontSize(8);
             doc.setFont(undefined, "normal");
 
-            /* ------ BLUE HEADER + LOGO ------ */
+            /* ------ BLUE HEADER + LOGO (SHRUNK, NOT STRETCHED) ------ */
             function drawPdfHeader() {
                 doc.setFillColor(2, 0, 138);
-                doc.rect(0, 0, pageWidth, 15, "F");
+                doc.rect(0, 0, pageWidth, headerBarHeight, "F");
 
                 let logoRightX = 5;
+
                 if (pdfLogoDataUrl) {
-                    const logoW = 22; // a bit wider, nicer aspect
-                    const logoH = pdfLogoAspect ? logoW * pdfLogoAspect : 8;
-                    doc.addImage(pdfLogoDataUrl, "PNG", 3, 3, logoW, logoH);
-                    logoRightX = 3 + logoW;
+                    // keep logo inside bar with padding
+                    const maxLogoHeight = headerBarHeight - 6; // vertical padding
+                    let logoH = Math.min(maxLogoHeight, 9);    // cap absolute size
+                    let logoW = logoH;
+
+                    if (pdfLogoAspect && pdfLogoAspect > 0) {
+                        // aspect = h / w  =>  w = h / aspect
+                        logoW = logoH / pdfLogoAspect;
+                    }
+
+                    const yPos = (headerBarHeight - logoH) / 2;
+                    const xPos = 6; // small left margin
+
+                    doc.addImage(pdfLogoDataUrl, "PNG", xPos, yPos, logoW, logoH);
+                    logoRightX = xPos + logoW;
                 }
 
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(12);
                 doc.setFont(undefined, "bold");
-                doc.text("Combustion Analyzer", logoRightX + 4, 10);
+                doc.text("Combustion Analyzer", logoRightX + 6, headerBarHeight / 2 + 3);
 
                 doc.setFontSize(10);
-                doc.text("Slagging Data Table - Selected Rows", pageWidth / 2, 10, { align: "center" });
+                doc.text(
+                    "Slagging Data Table - Selected Rows",
+                    pageWidth / 2,
+                    headerBarHeight / 2 + 3,
+                    { align: "center" }
+                );
 
                 doc.setTextColor(0, 0, 0);
                 doc.setFontSize(8);
@@ -642,7 +660,7 @@
                 doc.setFont(undefined, "normal");
 
                 // Full header height + a little extra gap
-                y += maxHeaderLines * lineHeight + 3;
+                y += maxHeaderLines * lineHeight + 4;
             }
 
             function addNewPage() {
