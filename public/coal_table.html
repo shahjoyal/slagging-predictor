@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Coal Data Table</title>
 
-    <!-- SheetJS for Excel sheet -->
+    <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <!-- jsPDF and html2canvas for PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -147,9 +147,14 @@
         .download-dropdown .dropdown-menu button:hover { background: #f3f4f6; transform: none; }
 
         /* Download PDF icon button */
-        #downloadPDF.icon-btn {
-            background: #02008a; color: #fff; border-radius: 50%; padding: 10px 12px; font-size: 18px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12); position: relative;
+        #downloadPDF.icon-btn,
+        #downloadPDF {
+            background: #02008a;
+            border-radius: 50%;
+            padding: 10px 12px;
+            color: #fff;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            position: relative;
         }
         .icon-btn::after {
             content: attr(title); position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
@@ -158,88 +163,40 @@
         }
         .icon-btn:hover::after { opacity: 1; }
 
-        /* Table wrapper
-           - horizontal scroll with visible scrollbar when needed
-           - vertical scroll kept */
+        /* ===================== TABLE STYLES (MATCHING REFERENCE) ===================== */
+
         .table-wrapper {
             margin-top: 20px;
             padding: 0 16px 16px;
-            overflow-x: auto;      /* ⬅ horizontal scrollbar when needed */
-            overflow-y: auto;      /* vertical scroll */
-            max-height: calc(100vh - 220px);
-            box-sizing: border-box;
+            overflow: auto;              /* both directions if ever needed */
         }
 
-        /* Dynamic column widths based on content */
         table {
+            width: 100%;
             border-collapse: collapse;
-            table-layout: auto;       /* let browser size columns based on content */
-            width: max-content;       /* table can grow wider than container */
-            min-width: 100%;          /* at least fill container width */
+            min-width: 800px;            /* same as your reference */
         }
 
         th, td {
             border: 1px solid black;
             padding: 8px;
             text-align: center;
-            white-space: nowrap;      /* keep headers / values on one line */
+            /* allow wrapping so there is no horizontal scrolling */
+            white-space: normal;
         }
 
-        th { background-color: #f4f4f4; }
+        th {
+            background-color: #f4f4f4;
+        }
 
+        /* Sticky first column */
         th:first-child, td:first-child {
             position: sticky;
             left: 0;
-            border: 1px solid black;
             background-color: white;
             z-index: 2;
         }
     </style>
-</head>
-<body>
-    <div class="navbar">
-        <img src="/images/abhitech-logo.png" alt="Company Logo">
-        <h1>Combustion Analyzer</h1>
-        <div class="nav-buttons">
-            <button onclick="window.location.href='model.html'">Model</button>
-            <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
-            <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
-            <button class="logout-btn" onclick="logoutUser()">Logout</button>
-        </div>
-    </div>
-
-    <h1 class="page-title">Slagging Data Table</h1>
-
-    <!-- CENTERED TOOLBAR -->
-    <div class="toolbar-wrapper">
-        <div class="toolbar">
-            <button class="btn-template" onclick="downloadExcel()">Download Template</button>
-
-            <label for="fileInput" class="btn-upload">📤 Upload New Data</label>
-            <input type="file" id="fileInput" accept=".xlsx, .xls">
-
-            <button id="delete-selected-btn">Delete Selected</button>
-
-            <div class="download-dropdown">
-                <button id="download-selected-btn" class="menu-btn">Download Selected ▾</button>
-                <div id="download-menu" class="dropdown-menu" aria-hidden="true">
-                    <button type="button" onclick="downloadSelected('excel')">Download as Excel</button>
-                    <button type="button" onclick="downloadSelected('pdf')">Download as PDF</button>
-                </div>
-            </div>
-
-            <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
-        </div>
-    </div>
-
-    <div class="table-wrapper">
-        <table id="data-table">
-            <thead>
-                <tr id="table-header"></tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
-    </div>
 
     <script>
         const { jsPDF } = window.jspdf;
@@ -247,6 +204,7 @@
         let pdfLogoDataUrl = null;
         let pdfLogoAspect = 0; // height / width
 
+        // Simple auth check
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             alert('You must login first!');
             window.location.href = '/login.html';
