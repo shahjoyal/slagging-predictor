@@ -19,6 +19,7 @@
             padding: 0;
             font-size: large;
             font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
         }
 
         /* Navbar Styling */
@@ -76,10 +77,20 @@
         .navbar .logout-btn:hover { background-color: darkred !important; }
 
         /* Heading below navbar */
-        h1.page-title { margin-top: 90px; text-align: center; }
+        h1.page-title { 
+            margin-top: 90px; 
+            text-align: center; 
+            font-size: 24px;
+            color: #111827;
+        }
 
         /* CENTERED TOOLBAR UNDER HEADING */
-        .toolbar-wrapper { width: 100%; display: flex; justify-content: center; margin-top: 10px; }
+        .toolbar-wrapper { 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            margin-top: 10px; 
+        }
         .toolbar {
             display: flex;
             justify-content: center;
@@ -102,10 +113,16 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.12);
             white-space: nowrap;
         }
-        button:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,0,0,0.18); }
+        button:hover { 
+            transform: translateY(-1px); 
+            box-shadow: 0 5px 12px rgba(0,0,0,0.18); 
+        }
 
         /* Download Template */
-        .btn-template { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+        .btn-template { 
+            background: linear-gradient(135deg, #22c55e, #16a34a); 
+            color: #fff; 
+        }
 
         /* Upload new data (label styled as button) */
         .btn-upload {
@@ -125,74 +142,213 @@
             transition: all 0.2s ease;
             text-decoration: none;
         }
-        .btn-upload:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-1px); }
+        .btn-upload:hover { 
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+            transform: translateY(-1px); 
+        }
 
         #fileInput { display: none; }
 
         /* Delete Selected button */
-        #delete-selected-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        #delete-selected-btn { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: #fff; 
+        }
         #delete-selected-btn:hover { background: #b91c1c; }
 
         /* Download Selected dropdown */
-        .download-dropdown { position: relative; display: inline-block; }
-        .download-dropdown .menu-btn { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; }
+        .download-dropdown { 
+            position: relative; 
+            display: inline-block; 
+        }
+        .download-dropdown .menu-btn { 
+            background: linear-gradient(135deg, #0ea5e9, #0284c7); 
+            color: #fff; 
+        }
         .download-dropdown .dropdown-menu {
-            position: absolute; top: calc(100% + 6px); left: 0; display: none; background: white;
-            min-width: 170px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.16); z-index: 2000; padding: 6px;
+            position: absolute; 
+            top: calc(100% + 6px); 
+            left: 0; 
+            display: none; 
+            background: white;
+            min-width: 170px; 
+            border-radius: 8px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.16); 
+            z-index: 2000; 
+            padding: 6px;
         }
         .download-dropdown .dropdown-menu button {
-            display: block; width: 100%; text-align: left; padding: 8px 10px; background: transparent;
-            border-radius: 6px; margin: 0; box-shadow: none; font-size: 14px; font-weight: 600;
+            display: block; 
+            width: 100%; 
+            text-align: left; 
+            padding: 8px 10px; 
+            background: transparent;
+            border-radius: 6px; 
+            margin: 0; 
+            box-shadow: none; 
+            font-size: 14px; 
+            font-weight: 600;
         }
-        .download-dropdown .dropdown-menu button:hover { background: #f3f4f6; transform: none; }
+        .download-dropdown .dropdown-menu button:hover { 
+            background: #f3f4f6; 
+            transform: none; 
+        }
 
         /* Download PDF icon button */
         #downloadPDF.icon-btn {
-            background: #02008a; color: #fff; border-radius: 50%; padding: 10px 12px; font-size: 18px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12); position: relative;
+            background: #02008a; 
+            color: #fff; 
+            border-radius: 50%; 
+            padding: 10px 12px; 
+            font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12); 
+            position: relative;
         }
         .icon-btn::after {
-            content: attr(title); position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
-            background: #000; color: #fff; font-size: 12px; padding: 5px 8px; border-radius: 6px;
-            opacity: 0; white-space: nowrap; pointer-events: none; transition: opacity 0.3s ease;
+            content: attr(title); 
+            position: absolute; 
+            bottom: -35px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #000; 
+            color: #fff; 
+            font-size: 12px; 
+            padding: 5px 8px; 
+            border-radius: 6px;
+            opacity: 0; 
+            white-space: nowrap; 
+            pointer-events: none; 
+            transition: opacity 0.3s ease;
         }
         .icon-btn:hover::after { opacity: 1; }
 
-        /* Table wrapper
-           - horizontal scroll with visible scrollbar when needed
-           - vertical scroll kept */
+        /* ==== ENHANCED TABLE UI ==== */
+
         .table-wrapper {
             margin-top: 20px;
-            padding: 0 16px 16px;
-            overflow-x: auto;      /* ⬅ horizontal scrollbar when needed */
-            overflow-y: auto;      /* vertical scroll */
-            max-height: calc(100vh - 220px);
+            padding: 0 24px 24px;
+            max-height: calc(100vh - 230px);
             box-sizing: border-box;
+            overflow-y: auto;         /* vertical scroll */
+            overflow-x: auto;         /* only shows if really needed */
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
         }
 
-        /* Dynamic column widths based on content */
-        table {
-            border-collapse: collapse;
-            table-layout: auto;       /* let browser size columns based on content */
-            width: max-content;       /* table can grow wider than container */
-            min-width: 100%;          /* at least fill container width */
+        /* Make table fill the width & wrap content to reduce horizontal scroll */
+        #data-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            table-layout: fixed;      /* distribute width across columns */
+            font-size: 13px;          /* slightly smaller for better fit */
+            color: #111827;
+        }
+
+        #data-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: linear-gradient(135deg, #02008a, #1d4ed8);
+            color: #f9fafb;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         th, td {
-            border: 1px solid black;
-            padding: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 8px 10px;
             text-align: center;
-            white-space: nowrap;      /* keep headers / values on one line */
+            white-space: normal;      /* allow wrapping */
+            word-break: break-word;   /* break long text */
         }
 
-        th { background-color: #f4f4f4; }
+        th {
+            font-weight: 600;
+            font-size: 12px;
+        }
 
-        th:first-child, td:first-child {
+        td {
+            font-weight: 400;
+            font-size: 12px;
+            background-color: #ffffff;
+        }
+
+        /* Zebra striping for body rows */
+        tbody tr:nth-child(even) td {
+            background-color: #f9fafb;
+        }
+
+        /* Hover effect */
+        tbody tr:hover td {
+            background-color: #e5f0ff;
+        }
+
+        /* Sticky first column */
+        th:first-child,
+        td:first-child {
             position: sticky;
             left: 0;
-            border: 1px solid black;
-            background-color: white;
-            z-index: 2;
+            z-index: 4;
+            background-color: #f3f4ff;
+            font-weight: 600;
+        }
+
+        /* Make the checkbox column compact */
+        #data-table th:last-child,
+        #data-table td:last-child {
+            width: 70px;
+        }
+
+        /* Round top corners of the header & left column */
+        #data-table thead th:first-child {
+            border-top-left-radius: 12px;
+        }
+        #data-table thead th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        /* Scrollbar styling (only visible when needed) */
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 999px;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 999px;
+        }
+
+        /* Responsive tweaks for smaller screens to reduce horizontal scroll */
+        @media (max-width: 1024px) {
+            #data-table {
+                font-size: 11px;
+            }
+            th, td {
+                padding: 6px 6px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .toolbar {
+                gap: 8px;
+            }
+            .navbar h1 {
+                font-size: 16px;
+            }
+            h1.page-title {
+                font-size: 20px;
+            }
+            #data-table {
+                font-size: 10px;
+            }
+            th, td {
+                padding: 4px 4px;
+            }
         }
     </style>
 </head>
