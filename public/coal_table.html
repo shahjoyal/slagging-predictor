@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Coal Data Table</title>
 
-    <!-- Excel export -->
+    <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
-    <!-- jsPDF + html2canvas for PDF -->
+    <!-- jsPDF and html2canvas for PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -59,16 +58,8 @@
             margin-right: 20px;
             font-weight: bold;
         }
-
-        .navbar button:hover {
-            background-color: #001cbb;
-        }
-
-        .navbar h1 {
-            margin-left: 0px;
-            font-size: 20px;
-            color: black;
-        }
+        .navbar button:hover { background-color: #001cbb; }
+        .navbar h1 { margin-left: 0px; font-size: 20px; color: black; }
 
         .navbar .logout-btn {
             padding: 10px 16px;
@@ -80,24 +71,13 @@
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        .navbar .logout-btn:hover {
-            background-color: darkred !important;
-        }
+        .navbar .logout-btn:hover { background-color: darkred !important; }
 
         /* Heading below navbar */
-        h1.page-title {
-            margin-top: 90px;
-            text-align: center;
-        }
+        h1.page-title { margin-top: 90px; text-align: center; }
 
         /* CENTERED TOOLBAR UNDER HEADING */
-        .toolbar-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
+        .toolbar-wrapper { width: 100%; display: flex; justify-content: center; margin-top: 10px; }
         .toolbar {
             display: flex;
             justify-content: center;
@@ -120,151 +100,93 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.12);
             white-space: nowrap;
         }
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
-        }
+        button:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,0,0,0.18); }
 
         /* Download Template */
-        .btn-template {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-        }
+        .btn-template { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
 
         /* Upload new data (label styled as button) */
         .btn-upload {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-
             padding: 10px 16px;
             border-radius: 8px;
             border: none;
-
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
-
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: #ffffff;
             box-shadow: 0 3px 8px rgba(0,0,0,0.12);
             transition: all 0.2s ease;
             text-decoration: none;
         }
-        .btn-upload:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        }
+        .btn-upload:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-1px); }
 
-        /* Hide actual file input */
-        #fileInput {
-            display: none;
-        }
+        #fileInput { display: none; }
 
         /* Delete Selected button */
-        #delete-selected-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-        }
-        #delete-selected-btn:hover {
-            background: #b91c1c;
-        }
+        #delete-selected-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        #delete-selected-btn:hover { background: #b91c1c; }
 
         /* Download Selected dropdown */
-        .download-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .download-dropdown .menu-btn {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: #fff;
-        }
+        .download-dropdown { position: relative; display: inline-block; }
+        .download-dropdown .menu-btn { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; }
         .download-dropdown .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            display: none;
-            background: white;
-            min-width: 170px;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.16);
-            z-index: 2000;
-            padding: 6px;
+            position: absolute; top: calc(100% + 6px); left: 0; display: none; background: white;
+            min-width: 170px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.16); z-index: 2000; padding: 6px;
         }
         .download-dropdown .dropdown-menu button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 8px 10px;
-            background: transparent;
-            border-radius: 6px;
-            margin: 0;
-            box-shadow: none;
-            font-size: 14px;
-            font-weight: 600;
+            display: block; width: 100%; text-align: left; padding: 8px 10px; background: transparent;
+            border-radius: 6px; margin: 0; box-shadow: none; font-size: 14px; font-weight: 600;
         }
-        .download-dropdown .dropdown-menu button:hover {
-            background: #f3f4f6;
-            transform: none;
-        }
+        .download-dropdown .dropdown-menu button:hover { background: #f3f4f6; transform: none; }
 
         /* Download PDF icon button */
         #downloadPDF.icon-btn {
-            background: #02008a;
-            color: #fff;
-            border-radius: 50%;
-            padding: 10px 12px;
-            font-size: 18px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-            position: relative;
+            background: #02008a; color: #fff; border-radius: 50%; padding: 10px 12px; font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12); position: relative;
         }
-
-        /* Tooltip for PDF icon */
         .icon-btn::after {
-            content: attr(title);
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            color: #fff;
-            font-size: 12px;
-            padding: 5px 8px;
-            border-radius: 6px;
-            opacity: 0;
-            white-space: nowrap;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            content: attr(title); position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; font-size: 12px; padding: 5px 8px; border-radius: 6px;
+            opacity: 0; white-space: nowrap; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .icon-btn:hover::after {
-            opacity: 1;
-        }
+        .icon-btn:hover::after { opacity: 1; }
 
-        /* Table wrapper under toolbar */
+        /* Table wrapper under toolbar
+           - NO horizontal scrolling (we wrap content)
+           - vertical scrolling kept */
         .table-wrapper {
             margin-top: 20px;
             padding: 0 16px 16px;
-            overflow: auto;
+            overflow-x: hidden;   /* hide horizontal scrolling; table will wrap */
+            overflow-y: auto;     /* vertical scroll allowed */
+            max-height: calc(100vh - 220px); /* keeps header/toolbars visible; adjust if needed */
         }
 
+        /* Use fixed layout so columns wrap instead of forcing horizontal scroll */
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            table-layout: fixed;   /* crucial to prevent horizontal scroll */
         }
 
         th, td {
             border: 1px solid black;
             padding: 8px;
-            min-width: 100px;
+            min-width: 80px;        /* reduce min width so wrapping kicks in earlier */
+            max-width: 220px;       /* prevents cells from growing too wide */
             text-align: center;
+            word-wrap: break-word;  /* allow long content to wrap */
+            white-space: normal;
+            overflow-wrap: anywhere;
         }
 
         th {
             background-color: #f4f4f4;
-            min-height: 20px;
         }
 
         th:first-child, td:first-child {
@@ -275,518 +197,485 @@
             z-index: 2;
         }
     </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="/images/abhitech-logo.png" alt="Company Logo">
+        <h1>Combustion Analyzer</h1>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='model.html'">Model</button>
+            <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
+            <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+
+    <h1 class="page-title">Slagging Data Table</h1>
+
+    <!-- CENTERED TOOLBAR -->
+    <div class="toolbar-wrapper">
+        <div class="toolbar">
+            <button class="btn-template" onclick="downloadExcel()">Download Template</button>
+
+            <label for="fileInput" class="btn-upload">📤 Upload New Data</label>
+            <input type="file" id="fileInput" accept=".xlsx, .xls">
+
+            <button id="delete-selected-btn">Delete Selected</button>
+
+            <div class="download-dropdown">
+                <button id="download-selected-btn" class="menu-btn">Download Selected ▾</button>
+                <div id="download-menu" class="dropdown-menu" aria-hidden="true">
+                    <button type="button" onclick="downloadSelected('excel')">Download as Excel</button>
+                    <button type="button" onclick="downloadSelected('pdf')">Download as PDF</button>
+                </div>
+            </div>
+
+            <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="data-table">
+            <thead>
+                <tr id="table-header"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
 
     <script>
-        // Auth check
+        const { jsPDF } = window.jspdf;
+
+        // for selected-rows PDF header logo
+        let pdfLogoDataUrl = null;
+        let pdfLogoAspect = 0; // height / width
+
+        // Basic auth guard (keeps from showing page if not logged in)
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             alert('You must login first!');
             window.location.href = '/login.html';
-        } else {
-            document.body.style.display = 'block';
         }
 
         function logoutUser() {
             localStorage.setItem('isLoggedIn', 'false');
             window.location.href = 'login.html';
         }
-    </script>
-</head>
-<body>
 
-<div class="navbar">
-    <img src="/images/abhitech-logo.png" alt="Company Logo">
-    <h1>Combustion Analyzer</h1>
-    <div class="nav-buttons">
-        <button onclick="window.location.href='model.html'">Model</button>
-        <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
-        <button onclick="window.location.href='coal_blend_simulation.html'">Coal Blend Simulation</button>
-        <button class="logout-btn" onclick="logoutUser()">Logout</button>
-    </div>
-</div>
+        function downloadExcel() { window.location.href = "/download-template"; }
 
-<h1 class="page-title">Slagging Data Table</h1>
-
-<!-- CENTERED TOOLBAR -->
-<div class="toolbar-wrapper">
-    <div class="toolbar">
-        <button class="btn-template" onclick="downloadExcel()">Download Template</button>
-
-        <label for="fileInput" class="btn-upload">
-            📤 Upload New Data
-        </label>
-        <input type="file" id="fileInput" accept=".xlsx, .xls">
-
-        <button id="delete-selected-btn">Delete Selected</button>
-
-        <!-- Download Selected dropdown -->
-        <div class="download-dropdown">
-            <button id="download-selected-btn" class="menu-btn">
-                Download Selected ▾
-            </button>
-            <div id="download-menu" class="dropdown-menu" aria-hidden="true">
-                <button type="button" onclick="downloadSelected('excel')">Download as Excel</button>
-                <button type="button" onclick="downloadSelected('pdf')">Download as PDF</button>
-            </div>
-        </div>
-
-        <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
-    </div>
-</div>
-
-<div class="table-wrapper">
-    <table id="data-table">
-        <thead>
-            <tr id="table-header"></tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-    </table>
-</div>
-
-<script>
-    const { jsPDF } = window.jspdf;
-
-    // for selected-rows PDF header logo
-    let pdfLogoDataUrl = null;
-    let pdfLogoAspect = 0; // height / width
-
-    function downloadExcel() {
-        window.location.href = "/download-template";
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        fetchData();
-        loadPdfLogo();
-
-        document.getElementById("fileInput").addEventListener("change", handleFileUpload);
-        document.getElementById("delete-selected-btn").addEventListener("click", handleDeleteSelected);
-        document.getElementById("downloadPDF").addEventListener("click", handleDownloadPDF);
-
-        setupDownloadDropdown();
-    });
-
-    function fetchData() {
-        fetch("/fetch-data")
-            .then(response => response.json())
-            .then(data => displayTable(data))
-            .catch(error => console.error("Error fetching data:", error));
-    }
-
-    function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        fetch("/upload-excel", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert("File uploaded successfully!");
-            window.location.reload();
-            displayTable(data);
-        })
-        .catch(error => console.error("Error uploading file:", error));
-    }
-
-    function displayTable(data) {
-        const tableHeader = document.getElementById("table-header");
-        const tableBody = document.getElementById("table-body");
-        tableHeader.innerHTML = "";
-        tableBody.innerHTML = "";
-
-        if (!data || data.length === 0) return;
-
-        const headers = Object.keys(data[0]).filter(header => header !== '_id');
-        headers.push("Select");
-
-        // Header row
-        headers.forEach((header) => {
-            let th = document.createElement("th");
-            th.textContent = header;
-            tableHeader.appendChild(th);
-        });
-
-        // Body rows
-        data.forEach(row => {
-            let tr = document.createElement("tr");
-
-            headers.slice(0, -1).forEach((header) => {
-                let td = document.createElement("td");
-                td.textContent = row[header] !== undefined ? row[header] : "";
-                tr.appendChild(td);
-            });
-
-            // Checkbox for Select
-            let checkboxTd = document.createElement("td");
-            let checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.setAttribute("data-id", row._id);
-            // store row data for downloadSelected
-            try {
-                checkbox.dataset.row = JSON.stringify(row);
-            } catch (e) {
-                checkbox.dataset.row = "{}";
-            }
-            checkboxTd.appendChild(checkbox);
-            tr.appendChild(checkboxTd);
-
-            tableBody.appendChild(tr);
-        });
-    }
-
-    function handleDeleteSelected() {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-        if (checkboxes.length === 0) {
-            alert("Please select at least one row to delete.");
-            return;
-        }
-
-        if (!confirm("Are you sure you want to delete the selected data?")) return;
-
-        const ids = Array.from(checkboxes).map(checkbox => checkbox.getAttribute("data-id"));
-
-        fetch("/delete-data", {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ ids: ids })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
+        document.addEventListener("DOMContentLoaded", () => {
             fetchData();
-        })
-        .catch(error => console.error("Error deleting data:", error));
-    }
+            loadPdfLogo();
 
-    // Load logo into base64 for PDF header (correct aspect ratio)
-    function loadPdfLogo() {
-        const img = new Image();
-        img.src = "/images/abhitech-logo.png";
-        img.crossOrigin = "anonymous";
+            document.getElementById("fileInput").addEventListener("change", handleFileUpload);
+            document.getElementById("delete-selected-btn").addEventListener("click", handleDeleteSelected);
+            document.getElementById("downloadPDF").addEventListener("click", handleDownloadPDF);
 
-        img.onload = function () {
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            pdfLogoDataUrl = canvas.toDataURL("image/png");
-            if (img.width) {
-                pdfLogoAspect = img.height / img.width;
-            }
-        };
-
-        img.onerror = function () {
-            console.warn("Could not load logo for PDF header");
-            pdfLogoDataUrl = null;
-        };
-    }
-
-    // Clean up text for PDF (fix oxide names)
-    function normalizeText(text) {
-        if (text === undefined || text === null) return "";
-        let t = String(text);
-
-        // replace subscript digits with normal digits
-        const subMap = {
-            '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
-            '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'
-        };
-        t = t.replace(/[₀-₉]/g, ch => subMap[ch] || '');
-
-        // fix some odd characters we've seen
-        t = t
-            .replace(/ƒ/g, 'f')
-            .replace(/‚/g, ',')
-            .replace(/„/g, '"')
-            .replace(/…/g, '...')
-            .replace(/−/g, '-');
-
-        // collapse multiple whitespace
-        t = t.replace(/\s+/g, ' ').trim();
-
-        // join split single-letter tokens: "S i O" -> "SiO"
-        t = t.replace(/(\b[A-Za-z])\s(?=[A-Za-z]\b)/g, '$1');
-
-        return t;
-    }
-
-    // Dropdown behaviour for "Download Selected"
-    function setupDownloadDropdown() {
-        const downloadBtn = document.getElementById("download-selected-btn");
-        const downloadMenu = document.getElementById("download-menu");
-        if (!downloadBtn || !downloadMenu) return;
-
-        downloadBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const visible = downloadMenu.style.display === "block";
-            downloadMenu.style.display = visible ? "none" : "block";
-            downloadMenu.setAttribute("aria-hidden", visible ? "true" : "false");
+            setupDownloadDropdown();
         });
 
-        document.addEventListener("click", (e) => {
-            if (!downloadMenu.contains(e.target) && e.target !== downloadBtn) {
-                downloadMenu.style.display = "none";
-                downloadMenu.setAttribute("aria-hidden", "true");
-            }
-        });
-    }
-
-    // Download selected rows as Excel or PDF (with dynamic header spacing and text normalization)
-    async function downloadSelected(format) {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-        if (checkboxes.length === 0) {
-            alert("Please select at least one row to download.");
-            return;
+        function fetchData() {
+            fetch("/fetch-data")
+                .then(response => response.json())
+                .then(data => displayTable(data))
+                .catch(error => console.error("Error fetching data:", error));
         }
 
-        const rows = Array.from(checkboxes).map(cb => {
-            try {
-                return JSON.parse(cb.dataset.row || "{}");
-            } catch (e) {
-                return {};
-            }
-        });
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-        const downloadMenu = document.getElementById("download-menu");
-        if (downloadMenu) downloadMenu.style.display = "none";
+            const formData = new FormData();
+            formData.append("file", file);
 
-        const keys = Object.keys(rows[0] || {}).filter(k => k !== "_id");
+            fetch("/upload-excel", { method: "POST", body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    alert("File uploaded successfully!");
+                    window.location.reload();
+                    displayTable(data);
+                })
+                .catch(error => console.error("Error uploading file:", error));
+        }
 
-        /* ---------------------- EXCEL DOWNLOAD ---------------------- */
-        if (format === "excel") {
-            const jsonData = rows.map(r => {
-                const obj = {};
-                keys.forEach(k => obj[k] = r[k] !== undefined ? r[k] : "");
-                return obj;
+        function displayTable(data) {
+            const tableHeader = document.getElementById("table-header");
+            const tableBody = document.getElementById("table-body");
+            tableHeader.innerHTML = "";
+            tableBody.innerHTML = "";
+
+            if (!data || data.length === 0) return;
+
+            const headers = Object.keys(data[0]).filter(header => header !== '_id');
+            headers.push("Select");
+
+            // Header row
+            headers.forEach((header) => {
+                let th = document.createElement("th");
+                th.textContent = header;
+                tableHeader.appendChild(th);
             });
-            const ws = XLSX.utils.json_to_sheet(jsonData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Selected");
-            XLSX.writeFile(wb, "selected_rows.xlsx");
-            return;
+
+            // Body rows
+            data.forEach(row => {
+                let tr = document.createElement("tr");
+
+                headers.slice(0, -1).forEach((header) => {
+                    let td = document.createElement("td");
+                    td.textContent = row[header] !== undefined ? row[header] : "";
+                    tr.appendChild(td);
+                });
+
+                // Checkbox for Select
+                let checkboxTd = document.createElement("td");
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.setAttribute("data-id", row._id || "");
+                try { checkbox.dataset.row = JSON.stringify(row); } catch (e) { checkbox.dataset.row = "{}"; }
+                checkboxTd.appendChild(checkbox);
+                tr.appendChild(checkboxTd);
+
+                tableBody.appendChild(tr);
+            });
         }
 
-        /* ---------------------- PDF DOWNLOAD ---------------------- */
-        if (format === "pdf") {
-            const doc = new jsPDF("l", "mm", "a4");
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
+        function handleDeleteSelected() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            if (checkboxes.length === 0) {
+                alert("Please select at least one row to delete.");
+                return;
+            }
+            if (!confirm("Are you sure you want to delete the selected data?")) return;
 
-            const headerBarHeight = 20;          // slightly taller bar
-            const marginX = 10;
-            const marginY = headerBarHeight + 8; // more space before table
-            const lineHeight = 4;
-            const usableWidth = pageWidth - 2 * marginX;
-            const colWidth = usableWidth / keys.length;
+            const ids = Array.from(checkboxes).map(checkbox => checkbox.getAttribute("data-id"));
 
-            doc.setFontSize(8);
-            doc.setFont(undefined, "normal");
+            fetch("/delete-data", {
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ ids: ids })
+            })
+            .then(response => response.json())
+            .then(data => { alert(data.message); fetchData(); })
+            .catch(error => console.error("Error deleting data:", error));
+        }
 
-            /* ------ BLUE HEADER + LOGO (SHRUNK, NOT STRETCHED) ------ */
-            function drawPdfHeader() {
-                doc.setFillColor(2, 0, 138);
-                doc.rect(0, 0, pageWidth, headerBarHeight, "F");
+        // Load logo into base64 for PDF header (correct aspect ratio)
+        function loadPdfLogo() {
+            const img = new Image();
+            img.src = "/images/abhitech-logo.png";
+            img.crossOrigin = "anonymous";
 
-                let logoRightX = 5;
+            img.onload = function () {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                pdfLogoDataUrl = canvas.toDataURL("image/png");
+                if (img.width) pdfLogoAspect = img.height / img.width;
+            };
 
-                if (pdfLogoDataUrl) {
-                    // keep logo inside bar with padding
-                    const maxLogoHeight = headerBarHeight - 2; // vertical padding
-                    let logoH = Math.min(maxLogoHeight, 14);    // cap absolute size
-                    let logoW = logoH;
+            img.onerror = function () {
+                console.warn("Could not load logo for PDF header");
+                pdfLogoDataUrl = null;
+            };
+        }
 
-                    if (pdfLogoAspect && pdfLogoAspect > 0) {
-                        // aspect = h / w  =>  w = h / aspect
-                        logoW = logoH / pdfLogoAspect;
-                    }
+        // Clean up text for PDF (fix oxide names)
+        function normalizeText(text) {
+            if (text === undefined || text === null) return "";
+            let t = String(text);
 
-                    const yPos = (headerBarHeight - logoH) / 2;
-                    const xPos = 6; // small left margin
+            // replace subscript digits with normal digits
+            const subMap = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+            t = t.replace(/[₀-₉]/g, ch => subMap[ch] || '');
 
-                    doc.addImage(pdfLogoDataUrl, "PNG", xPos, yPos, logoW, logoH);
-                    logoRightX = xPos + logoW;
+            // fix some odd characters we've seen
+            t = t.replace(/ƒ/g, 'f').replace(/‚/g, ',').replace(/„/g, '"').replace(/…/g, '...').replace(/−/g, '-');
+
+            // collapse multiple whitespace
+            t = t.replace(/\s+/g, ' ').trim();
+
+            // join split single-letter tokens: "S i O" -> "SiO"
+            t = t.replace(/(\b[A-Za-z])\s(?=[A-Za-z]\b)/g, '$1');
+
+            return t;
+        }
+
+        // Dropdown behaviour for "Download Selected"
+        function setupDownloadDropdown() {
+            const downloadBtn = document.getElementById("download-selected-btn");
+            const downloadMenu = document.getElementById("download-menu");
+            if (!downloadBtn || !downloadMenu) return;
+
+            downloadBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const visible = downloadMenu.style.display === "block";
+                downloadMenu.style.display = visible ? "none" : "block";
+                downloadMenu.setAttribute("aria-hidden", visible ? "true" : "false");
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!downloadMenu.contains(e.target) && e.target !== downloadBtn) {
+                    downloadMenu.style.display = "none";
+                    downloadMenu.setAttribute("aria-hidden", "true");
                 }
+            });
+        }
 
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(12);
-                doc.setFont(undefined, "bold");
-                doc.text("Combustion Analyzer", logoRightX + 6, headerBarHeight / 2 + 3);
+        // Download selected rows as Excel or PDF (with dynamic header spacing, borders and text normalization)
+        async function downloadSelected(format) {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            if (checkboxes.length === 0) {
+                alert("Please select at least one row to download.");
+                return;
+            }
 
-                doc.setFontSize(10);
-                doc.text(
-                    "Slagging Data Table - Selected Rows",
-                    pageWidth / 2,
-                    headerBarHeight / 2 + 3,
-                    { align: "center" }
-                );
+            const rows = Array.from(checkboxes).map(cb => {
+                try { return JSON.parse(cb.dataset.row || "{}"); } catch (e) { return {}; }
+            });
 
-                doc.setTextColor(0, 0, 0);
+            const downloadMenu = document.getElementById("download-menu");
+            if (downloadMenu) downloadMenu.style.display = "none";
+
+            const keys = Object.keys(rows[0] || {}).filter(k => k !== "_id");
+
+            /* ---------------------- EXCEL DOWNLOAD ---------------------- */
+            if (format === "excel") {
+                const jsonData = rows.map(r => {
+                    const obj = {};
+                    keys.forEach(k => obj[k] = r[k] !== undefined ? r[k] : "");
+                    return obj;
+                });
+                const ws = XLSX.utils.json_to_sheet(jsonData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Selected");
+                XLSX.writeFile(wb, "selected_rows.xlsx");
+                return;
+            }
+
+            /* ---------------------- PDF DOWNLOAD ---------------------- */
+            if (format === "pdf") {
+                const doc = new jsPDF("l", "mm", "a4");
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const headerBarHeight = 20;          // slightly taller bar
+                const marginX = 10;
+                const marginY = headerBarHeight + 8; // more space before table
+                const lineHeight = 4;
+                const usableWidth = pageWidth - 2 * marginX;
+                const colWidth = usableWidth / keys.length;
+
                 doc.setFontSize(8);
                 doc.setFont(undefined, "normal");
-            }
+                doc.setDrawColor(0);
+                doc.setLineWidth(0.25);
 
-            let y = marginY;
+                /* ------ BLUE HEADER + LOGO (SHRUNK, NOT STRETCHED) ------ */
+                function drawPdfHeader() {
+                    doc.setFillColor(2, 0, 138);
+                    doc.rect(0, 0, pageWidth, headerBarHeight, "F");
 
-            /* ------ DYNAMIC HEADER ROW HEIGHT + CLEAN TEXT ------ */
-            function drawHeaderRow() {
-                doc.setFont(undefined, "bold");
+                    let logoRightX = 5;
 
-                let maxHeaderLines = 1;
+                    if (pdfLogoDataUrl) {
+                        const maxLogoHeight = headerBarHeight - 2; // vertical padding
+                        let logoH = Math.min(maxLogoHeight, 14);    // cap absolute size
+                        let logoW = logoH;
+                        if (pdfLogoAspect && pdfLogoAspect > 0) logoW = logoH / pdfLogoAspect;
 
-                keys.forEach((h, index) => {
-                    const headerText = normalizeText(h);
-                    const x = marginX + index * colWidth;
-                    const headerLines = doc.splitTextToSize(headerText, colWidth - 2);
+                        const yPos = (headerBarHeight - logoH) / 2;
+                        const xPos = 6; // small left margin
 
-                    if (headerLines.length > maxHeaderLines) {
-                        maxHeaderLines = headerLines.length;
+                        doc.addImage(pdfLogoDataUrl, "PNG", xPos, yPos, logoW, logoH);
+                        logoRightX = xPos + logoW;
                     }
 
-                    let lineY = y;
-                    headerLines.forEach(line => {
-                        doc.text(line, x, lineY);
-                        lineY += lineHeight;
-                    });
-                });
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, "bold");
+                    doc.text("Combustion Analyzer", logoRightX + 6, headerBarHeight / 2 + 3);
 
-                doc.setFont(undefined, "normal");
+                    doc.setFontSize(10);
+                    doc.text("Slagging Data Table - Selected Rows", pageWidth / 2, headerBarHeight / 2 + 3, { align: "center" });
 
-                // Full header height + a little extra gap
-                y += maxHeaderLines * lineHeight + 4;
-            }
-
-            function addNewPage() {
-                doc.addPage();
-                drawPdfHeader();
-                y = marginY;
-                drawHeaderRow();
-            }
-
-            drawPdfHeader();
-            drawHeaderRow();
-
-            /* ------ BODY ROWS (with clean text) ------ */
-            rows.forEach((row) => {
-                const cellData = keys.map((k, index) => {
-                    const value = normalizeText(row[k]);
-                    const x = marginX + index * colWidth;
-                    const lines = doc.splitTextToSize(value, colWidth - 2);
-                    return { x, lines };
-                });
-
-                const maxLines = Math.max(...cellData.map(c => c.lines.length || 1));
-                const rowHeight = maxLines * lineHeight + 1;
-
-                if (y + rowHeight > pageHeight - 10) {
-                    addNewPage();
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(8);
+                    doc.setFont(undefined, "normal");
                 }
 
-                cellData.forEach(cell => {
-                    let lineY = y;
-                    cell.lines.forEach(line => {
-                        doc.text(line, cell.x, lineY);
-                        lineY += lineHeight;
+                let y = marginY;
+
+                /* ------ DYNAMIC HEADER ROW HEIGHT + CLEAN TEXT + BORDER DRAWING ------ */
+                function drawHeaderRow() {
+                    doc.setFont(undefined, "bold");
+
+                    let maxHeaderLines = 1;
+                    let headersPerColumn = []; // store lines per column
+
+                    keys.forEach((h, index) => {
+                        const headerText = normalizeText(h);
+                        const x = marginX + index * colWidth;
+                        const headerLines = doc.splitTextToSize(headerText, colWidth - 2);
+                        headersPerColumn[index] = headerLines;
+                        if (headerLines.length > maxHeaderLines) maxHeaderLines = headerLines.length;
                     });
+
+                    const headerTop = y;
+                    const headerHeight = maxHeaderLines * lineHeight + 3;
+
+                    // draw header text
+                    keys.forEach((h, index) => {
+                        const x = marginX + index * colWidth;
+                        const headerLines = headersPerColumn[index];
+                        let lineY = headerTop;
+                        headerLines.forEach(line => {
+                            doc.text(line, x, lineY);
+                            lineY += lineHeight;
+                        });
+                    });
+
+                    // draw borders for header cells
+                    for (let i = 0; i < keys.length; i++) {
+                        const rectX = marginX + i * colWidth - 0.6;
+                        const rectY = headerTop - 2;
+                        const rectW = colWidth + 1.2;
+                        const rectH = headerHeight + 4;
+                        doc.rect(rectX, rectY, rectW, rectH); // stroke
+                    }
+
+                    doc.setFont(undefined, "normal");
+                    // move y below header
+                    y += headerHeight + 6; // extra space to separate header and first row
+                }
+
+                function addNewPage() {
+                    doc.addPage();
+                    drawPdfHeader();
+                    y = marginY;
+                    drawHeaderRow();
+                }
+
+                drawPdfHeader();
+                drawHeaderRow();
+
+                /* ------ BODY ROWS (with clean text + borders) ------ */
+                rows.forEach((row) => {
+                    const cellData = keys.map((k, index) => {
+                        const value = normalizeText(row[k]);
+                        const x = marginX + index * colWidth;
+                        const lines = doc.splitTextToSize(value, colWidth - 2);
+                        return { x, lines };
+                    });
+
+                    const maxLines = Math.max(...cellData.map(c => c.lines.length || 1));
+                    const rowHeight = maxLines * lineHeight + 4;
+
+                    if (y + rowHeight > pageHeight - 10) {
+                        addNewPage();
+                    }
+
+                    // draw cell borders first
+                    for (let i = 0; i < keys.length; i++) {
+                        const rectX = marginX + i * colWidth - 0.6;
+                        const rectY = y - 3;
+                        const rectW = colWidth + 1.2;
+                        const rectH = rowHeight + 2;
+                        doc.rect(rectX, rectY, rectW, rectH);
+                    }
+
+                    // then draw text inside each cell
+                    cellData.forEach(cell => {
+                        let lineY = y;
+                        cell.lines.forEach(line => {
+                            doc.text(line, cell.x, lineY);
+                            lineY += lineHeight;
+                        });
+                    });
+
+                    y += rowHeight;
                 });
 
-                y += rowHeight;
-            });
+                doc.save("selected_rows.pdf");
+                return;
+            }
 
-            doc.save("selected_rows.pdf");
-            return;
+            /* ---------------------- FALLBACK ---------------------- */
+            alert("Unsupported download format: " + format);
         }
 
-        /* ---------------------- FALLBACK ---------------------- */
-        alert("Unsupported download format: " + format);
-    }
+        // Full page PDF (with real navbar & logo via html2canvas)
+        function handleDownloadPDF() {
+            const element = document.body;
+            window.scrollTo(0, 0);
 
-    // Full page PDF (with real navbar & logo via html2canvas)
-    function handleDownloadPDF() {
-        const element = document.body;
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                scrollY: -window.scrollY,
+                onclone: (clonedDoc) => {
+                    const inputs = clonedDoc.querySelectorAll("input, textarea");
+                    inputs.forEach(input => {
+                        const text = clonedDoc.createElement("span");
+                        text.textContent = input.value;
+                        text.style.position = "absolute";
+                        text.style.left = input.offsetLeft + "px";
+                        text.style.top = input.offsetTop + "px";
+                        text.style.width = input.offsetWidth + "px";
+                        text.style.height = input.offsetHeight + "px";
+                        text.style.lineHeight = input.offsetHeight + "px";
+                        text.style.textAlign = "center";
+                        text.style.font = window.getComputedStyle(input).font;
+                        text.style.color = window.getComputedStyle(input).color;
+                        clonedDoc.body.appendChild(text);
+                        input.style.visibility = "hidden";
+                    });
 
-        // ensure navbar is in view
-        window.scrollTo(0, 0);
+                    const selects = clonedDoc.querySelectorAll("select");
+                    selects.forEach(select => {
+                        const selectedText = select.options[select.selectedIndex]?.text || "";
+                        const text = clonedDoc.createElement("span");
+                        text.textContent = selectedText;
+                        text.style.position = "absolute";
+                        text.style.left = select.offsetLeft + "px";
+                        text.style.top = select.offsetTop + "px";
+                        text.style.width = select.offsetWidth + "px";
+                        text.style.height = select.offsetHeight + "px";
+                        text.style.lineHeight = select.offsetHeight + "px";
+                        text.style.textAlign = "center";
+                        text.style.font = window.getComputedStyle(select).font;
+                        text.style.color = window.getComputedStyle(select).color;
+                        clonedDoc.body.appendChild(text);
+                        select.style.visibility = "hidden";
+                    });
+                }
+            }).then(canvas => {
+                const pdf = new jsPDF("p", "mm", "a4");
+                const imgData = canvas.toDataURL("image/png");
 
-        html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            scrollY: -window.scrollY,
-            onclone: (clonedDoc) => {
-                // Render input values as text
-                const inputs = clonedDoc.querySelectorAll("input, textarea");
-                inputs.forEach(input => {
-                    const text = clonedDoc.createElement("span");
-                    text.textContent = input.value;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
 
-                    text.style.position = "absolute";
-                    text.style.left = input.offsetLeft + "px";
-                    text.style.top = input.offsetTop + "px";
-                    text.style.width = input.offsetWidth + "px";
-                    text.style.height = input.offsetHeight + "px";
-                    text.style.lineHeight = input.offsetHeight + "px";
-                    text.style.textAlign = "center";
-                    text.style.font = window.getComputedStyle(input).font;
-                    text.style.color = window.getComputedStyle(input).color;
+                const imgWidth = pageWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                    clonedDoc.body.appendChild(text);
-                    input.style.visibility = "hidden";
-                });
+                let heightLeft = imgHeight;
+                let position = 0;
 
-                // Render selects as text (if any)
-                const selects = clonedDoc.querySelectorAll("select");
-                selects.forEach(select => {
-                    const selectedText = select.options[select.selectedIndex]?.text || "";
-                    const text = clonedDoc.createElement("span");
-                    text.textContent = selectedText;
-
-                    text.style.position = "absolute";
-                    text.style.left = select.offsetLeft + "px";
-                    text.style.top = select.offsetTop + "px";
-                    text.style.width = select.offsetWidth + "px";
-                    text.style.height = select.offsetHeight + "px";
-                    text.style.lineHeight = select.offsetHeight + "px";
-                    text.style.textAlign = "center";
-                    text.style.font = window.getComputedStyle(select).font;
-                    text.style.color = window.getComputedStyle(select).color;
-
-                    clonedDoc.body.appendChild(text);
-                    select.style.visibility = "hidden";
-                });
-            }
-        }).then(canvas => {
-            const pdf = new jsPDF("p", "mm", "a4");
-            const imgData = canvas.toDataURL("image/png");
-
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-
-            const imgWidth = pageWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
                 pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
-            }
 
-            pdf.save("Coal_Blending_Ratio.pdf");
-        });
-    }
-</script>
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save("Coal_Blending_Ratio.pdf");
+            });
+        }
+    </script>
 </body>
 </html>
