@@ -508,7 +508,7 @@
         });
     }
 
-    // Download selected rows as Excel or PDF (with nice header)
+    // ✅ UPDATED: Download selected rows as Excel or PDF (with dynamic header spacing)
     async function downloadSelected(format) {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
@@ -529,6 +529,7 @@
 
         const keys = Object.keys(rows[0] || {}).filter(k => k !== "_id");
 
+        /* ---------------------- EXCEL DOWNLOAD ---------------------- */
         if (format === "excel") {
             const jsonData = rows.map(r => {
                 const obj = {};
@@ -539,13 +540,17 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Selected");
             XLSX.writeFile(wb, "selected_rows.xlsx");
-        } else if (format === "pdf") {
+            return;
+        }
+
+        /* ---------------------- PDF DOWNLOAD ---------------------- */
+        if (format === "pdf") {
             const doc = new jsPDF("l", "mm", "a4");
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
             const marginX = 10;
-            const marginY = 22;      // below header bar
+            const marginY = 22;  // below blue header
             const lineHeight = 4;
             const usableWidth = pageWidth - 2 * marginX;
             const colWidth = usableWidth / keys.length;
@@ -553,9 +558,8 @@
             doc.setFontSize(8);
             doc.setFont(undefined, "normal");
 
-            // HEADER with blue bar + logo + titles
+            /* ------ BLUE HEADER + LOGO ------ */
             function drawPdfHeader() {
-                // blue bar
                 doc.setFillColor(2, 0, 138);
                 doc.rect(0, 0, pageWidth, 15, "F");
 
@@ -582,19 +586,31 @@
 
             let y = marginY;
 
+            /* ------ DYNAMIC HEADER ROW HEIGHT ------ */
             function drawHeaderRow() {
                 doc.setFont(undefined, "bold");
+
+                let maxHeaderLines = 1;
+
                 keys.forEach((h, index) => {
                     const x = marginX + index * colWidth;
                     const headerLines = doc.splitTextToSize(String(h), colWidth - 2);
+
+                    if (headerLines.length > maxHeaderLines) {
+                        maxHeaderLines = headerLines.length;
+                    }
+
                     let lineY = y;
                     headerLines.forEach(line => {
                         doc.text(line, x, lineY);
                         lineY += lineHeight;
                     });
                 });
+
                 doc.setFont(undefined, "normal");
-                y += lineHeight * 1.5;
+
+                // Full header height + a little extra gap
+                y += maxHeaderLines * lineHeight + 3;
             }
 
             function addNewPage() {
@@ -607,6 +623,7 @@
             drawPdfHeader();
             drawHeaderRow();
 
+            /* ------ BODY ROWS ------ */
             rows.forEach((row) => {
                 const cellData = keys.map((k, index) => {
                     const value = row[k] !== undefined && row[k] !== null ? String(row[k]) : "";
@@ -634,9 +651,11 @@
             });
 
             doc.save("selected_rows.pdf");
-        } else {
-            alert("Unsupported download format: " + format);
+            return;
         }
+
+        /* ---------------------- FALLBACK ---------------------- */
+        alert("Unsupported download format: " + format);
     }
 
     // Full page PDF (with real navbar & logo via html2canvas)
