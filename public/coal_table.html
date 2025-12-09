@@ -350,6 +350,59 @@
                 padding: 4px 4px;
             }
         }
+
+        /* make columns size to content so long headers get adequate width */
+#data-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    table-layout: auto;      /* <-- changed from fixed */
+    font-size: 13px;
+    color: #111827;
+}
+
+/* header styling: prevent wrapping, ellipsis, tooltip, and a cap on width */
+#data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: linear-gradient(135deg, #02008a, #1d4ed8);
+    color: #f9fafb;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    white-space: nowrap;         /* don't wrap header text */
+    overflow: hidden;           /* required for text-overflow */
+    text-overflow: ellipsis;    /* show "..." for overflow */
+    max-width: 220px;           /* cap width so huge headers don't blow layout */
+    padding: 8px 12px;          /* give headers a touch more padding */
+    box-sizing: border-box;
+}
+
+/* Keep cells wrapable but prevent extremely long tokens from breaking layout */
+th, td {
+    border: 1px solid #e5e7eb;
+    padding: 8px 10px;
+    text-align: center;
+
+    /* body cells can wrap normally */
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Responsive: reduce header max-width and font-size on smaller screens */
+@media (max-width: 1024px) {
+    #data-table thead th { max-width: 140px; font-size: 11px; }
+    #data-table { font-size: 11px; }
+    th, td { padding: 6px; }
+}
+
+@media (max-width: 640px) {
+    #data-table thead th { max-width: 100px; font-size: 10px; }
+    #data-table { font-size: 10px; }
+    th, td { padding: 4px; }
+}
+
     </style>
 </head>
 <body>
