@@ -513,46 +513,69 @@ td.numeric { text-align: right; padding-right: 12px; }
                 .catch(error => console.error("Error uploading file:", error));
         }
 
-        function displayTable(data) {
-            const tableHeader = document.getElementById("table-header");
-            const tableBody = document.getElementById("table-body");
-            tableHeader.innerHTML = "";
-            tableBody.innerHTML = "";
+       function displayTable(data) {
+    const tableHeader = document.getElementById("table-header");
+    const tableBody = document.getElementById("table-body");
+    tableHeader.innerHTML = "";
+    tableBody.innerHTML = "";
 
-            if (!data || data.length === 0) return;
+    if (!data || data.length === 0) return;
 
-            const headers = Object.keys(data[0]).filter(header => header !== '_id');
-            headers.push("Select");
+    const headers = Object.keys(data[0]).filter(header => header !== '_id');
+    headers.push("Select");
 
-            // Header row
-            headers.forEach((header) => {
-                let th = document.createElement("th");
-                th.textContent = header;
-                tableHeader.appendChild(th);
-            });
+    // Header row with tooltip
+    headers.forEach((header) => {
+        let th = document.createElement("th");
+        th.textContent = header;
+        th.setAttribute("title", header);
+        tableHeader.appendChild(th);
+    });
 
-            // Body rows
-            data.forEach(row => {
-                let tr = document.createElement("tr");
+    // define which headers are numeric (adjust to match your actual field names)
+    const numericColumns = new Set([
+      "SiO2", "AL2O3", "FE2O3", "CAO", "MGO", "NA2O", "K2O", "TIO2", "SO3",
+      "P2O5", "MN3O4", "SULPHUR (S)", "GCV", "GC V", "GCV (kcal/kg)" // add variants you use
+    ]);
 
-                headers.slice(0, -1).forEach((header) => {
-                    let td = document.createElement("td");
-                    td.textContent = row[header] !== undefined ? row[header] : "";
-                    tr.appendChild(td);
-                });
+    data.forEach(row => {
+        let tr = document.createElement("tr");
 
-                // Checkbox for Select
-                let checkboxTd = document.createElement("td");
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.setAttribute("data-id", row._id || "");
-                try { checkbox.dataset.row = JSON.stringify(row); } catch (e) { checkbox.dataset.row = "{}"; }
-                checkboxTd.appendChild(checkbox);
-                tr.appendChild(checkboxTd);
+        headers.slice(0, -1).forEach((header) => {
+            let td = document.createElement("td");
+            let raw = row[header];
 
-                tableBody.appendChild(tr);
-            });
-        }
+            // normalize & format numeric values
+            if (numericColumns.has(header)) {
+                // try to coerce to number
+                const num = parseFloat(String(raw).replace(/,/g, '')); // remove commas
+                if (Number.isFinite(num)) {
+                    // format - change 2 to desired decimals
+                    td.textContent = num.toFixed(2).replace(/\.00$/, ""); // remove .00 if you prefer
+                } else {
+                    td.textContent = raw !== undefined ? raw : "";
+                }
+                td.classList.add("numeric");
+            } else {
+                td.textContent = raw !== undefined ? raw : "";
+            }
+
+            tr.appendChild(td);
+        });
+
+        // Checkbox for Select
+        let checkboxTd = document.createElement("td");
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.setAttribute("data-id", row._id || "");
+        try { checkbox.dataset.row = JSON.stringify(row); } catch (e) { checkbox.dataset.row = "{}"; }
+        checkboxTd.appendChild(checkbox);
+        tr.appendChild(checkboxTd);
+
+        tableBody.appendChild(tr);
+    });
+}
+
 
         function handleDeleteSelected() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
