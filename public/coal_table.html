@@ -402,6 +402,16 @@ th, td {
     #data-table { font-size: 10px; }
     th, td { padding: 4px; }
 }
+/* prevent numbers from breaking and optionally ellipsize if too long */
+td.numeric {
+  white-space: nowrap;    /* don't wrap numbers */
+  word-break: normal;     /* avoid breaking inside numbers */
+  overflow: hidden;
+  text-overflow: ellipsis; /* if column is too narrow show "..." instead */
+}
+
+/* optionally make numeric cells right-aligned (conventional for numbers) */
+td.numeric { text-align: right; padding-right: 12px; }
 
     </style>
 </head>
