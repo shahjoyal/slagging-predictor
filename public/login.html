@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Abhitech Energycon Limited</title>
-<link rel="icon" href="images/abhitech-logo.png">
+<title>Login - Combustion Analyzer</title>
 <style>
     * {
         box-sizing: border-box;
@@ -92,10 +91,10 @@
 
     /* Floating Logo */
  .login-logo {
-    width: 130px;      
-    height: 130px;      
+    width: 120px;      
+    height: 120px;      
     position: absolute;
-    top: -10px;         
+    top: -40px;         
     left: 50%;
     transform: translateX(-50%);
     animation: floatLogo 2s ease-in-out infinite;
@@ -225,7 +224,7 @@
 const loginForm = document.getElementById('loginForm');
 const message = document.getElementById('message');
 
-loginForm.addEventListener('submit', async function(e) {
+loginForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -236,32 +235,18 @@ loginForm.addEventListener('submit', async function(e) {
         return;
     }
 
-    try {
-      const res = await fetch('/auth/login', {
-        method: 'POST',
-        credentials: 'include', // important to store session cookie
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        message.style.color = 'red';
-        message.textContent = data.error || 'Login failed';
-        return;
-      }
-      message.style.color = 'green';
-      message.textContent = 'Login successful! Redirecting...';
-       localStorage.setItem('isLoggedIn', 'true');
-      // Redirect to your main app page (adjust path as necessary)
-      setTimeout(()=> window.location.href = '/slagging_coal_page.html', 400);
-    } catch (err) {
-      console.error(err);
-      message.style.color = 'red';
-      message.textContent = 'Network error';
-    }
-});
+        // Dummy login validation
+        if(email === 'coalblend@abhitech.com' && password === 'password123') {
+            message.style.color = 'green';
+            message.textContent = 'Login successful!';
+            // Redirect to homepage
+            window.location.href = '/slagging_coal_page.html';
+        } else {
+            message.style.color = 'red';
+            message.textContent = 'Invalid email or password.';
+        }
+    });
 </script>
-
 
 </body>
 </html>

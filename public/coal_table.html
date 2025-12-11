@@ -1,560 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Abhitech Energycon Limited</title>
-    <link rel="icon" href="images/abhitech-logo.png">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coal Data Table</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <style>
-        :root {
-            --primary-1: #0b3bff;
-            --primary-2: #02008a;
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: large;
+            font-family: Arial, sans-serif;
         }
-        body { margin:0; padding:0; font-family: Arial, sans-serif; font-size:14px; color:#111827; }
-        .navbar{ position:fixed; top:0; left:0; right:0; height:72px; padding:10px 22px; display:flex; align-items:center; justify-content:space-between; background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,251,255,0.86)); box-shadow:0 10px 30px rgba(9,20,46,0.06); z-index:1100; }
-        .navbar img{ height:46px; object-fit:contain; margin-right:12px; }
-        .navbar h1{ font-weight:700; font-size:18px; color:var(--primary-2); margin:0 14px; }
-        .nav-buttons{ display:flex; gap:10px; align-items:center; }
-        .nav-buttons button{ padding:8px 14px; border-radius:999px; border:none; font-weight:600; cursor:pointer; background: linear-gradient(180deg,var(--primary-1),var(--primary-2)); color:#fff; }
-        .nav-buttons .logout-btn{ background: linear-gradient(180deg,#ff4b4b,#e32d2d); }
 
-        h1.page-title { margin-top:100px; text-align:center; font-size:20px; }
+         /* Navbar Styling */
+         .navbar {
+            display: flex;
+            justify-content: space-between; /* or space-evenly */
+            width: 100%;
+            background-color: #f7f8fa;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 65px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-        .toolbar-wrapper { margin-top: 18px; padding: 0 16px; display:flex; justify-content:center; }
-        .toolbar { width:100%; max-width:1100px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+        .navbar img {
+            height: 95px;
+            margin-right: 10px;
+            margin-left: 0px;
+        }
+        .nav-buttons {
+        display: flex;
+            gap: 10px; /* Use 'gap' for spacing between flex items */
+            margin-right: 20px;
+            
+        }
+        .navbar button {
+            padding: 10px 15px;
+            background-color: #02008a;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        
+        .navbar button:hover {
+            background-color: #001cbb;
+        }
 
-        .left-group, .right-group { display:flex; gap:5px; align-items:center; }
+        .navbar h1 {
+            margin-left: 0px;
+            font-size: 20px; /* Adjust font size as needed */
+            color: black;
+            
+        }
 
-        button { padding: 10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; box-shadow:0 3px 8px rgba(0,0,0,0.08); transition:all .12s; background:#e5e7eb; }
-        button:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+        
+        .container {
+            margin: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-right: 15px;
+            margin: 10px;
+            
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            min-width: 100px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+            min-height: 20px;
 
-        .btn-template { background: linear-gradient(135deg, #22c55e, #16a34a); color:#fff; }
-        .btn-upload { background: linear-gradient(135deg, #3b82f6, #2563eb); color:#fff; }
-        .btn-delete { background: linear-gradient(135deg, #ef4444, #dc2626); color:#fff; }
-        .btn-download { background: linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; }
+        }
 
-        .table-wrapper { margin: 16px; padding: 12px; border-radius:10px; overflow-x:auto; background: linear-gradient(180deg, rgba(2,0,138,0.02), transparent 40%); }
-        table { width:100%; border-collapse:collapse; min-width:900px; background:white; border-radius:8px; overflow:hidden; box-shadow:0 4px 18px rgba(2,6,23,0.04); }
-        thead th { background-color: var(--primary-2); color:#fff; padding:12px 10px; text-align:center; font-weight:700; white-space:nowrap; }
-        tbody td { padding:10px 12px; text-align:center; border-bottom:1px solid #eef2f7; }
-        tbody tr:nth-child(even){ background:#fbfdff; }
-        tbody tr:hover{ background:#f1f5f9; }
-
-        /* Keep first column sticky (Coal ID) */
-         tbody td:first-child {
+        th:first-child, td:first-child {
             position: sticky;
             left: 0;
-            background: linear-gradient(90deg,#ffffff,#ffffff);
-            z-index:3;
-            box-shadow: 2px 0 6px rgba(0,0,0,0.04);
-            font-weight:700;
+            border: 1px solid black;   
+            background-color: white; /* Ensure it doesn't become transparent */
+            z-index: 2;
+        }
+        .btn {
+            margin-left: 20%;
+            margin-top: 25px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-upload {
+            background-color: blue;
         }
 
-        /* make checkbox column narrower */
-        thead th:last-child, tbody td:last-child { width:86px; min-width:86px; max-width:130px; }
+        #delete-selected-btn {
+            background-color: #02008a;
+            color: white;
+            border: none;
+            margin-left: 50px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+          }
+          
+          #delete-selected-btn:hover {
+            background-color: #0300b5;
+          }
 
-        @media (max-width:900px) {
-            table { min-width:760px; font-size:13px; }
-            .toolbar { padding:0 8px; }
-        }
+        
 
-        #fileInput { display:none; }
-        .download-dropdown { position:relative; }
-        .download-dropdown .dropdown-menu { position:absolute; top: calc(100% + 6px); left:0; display:none; background:#fff; padding:6px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.12); z-index:2000; min-width:170px; }
-        .download-dropdown .dropdown-menu button { display:block; width:100%; text-align:left; background:transparent; border-radius:6px; padding:8px 10px; }
-     /* keep toolbar centered but make groups hug ends of it */
-.toolbar { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:1100px; }
-
-.right-group { margin-left: auto; }
-
-.toolbar-wrapper { display:flex; justify-content:center; padding: 0 16px; } 
-.toolbar {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    width: calc(100% - 32px); 
-    max-width: none;          
-}
-
-.left-group, .right-group { display:flex; align-items:center; gap:8px; }
-
-   </style>
+        
+    </style>
 </head>
 <body>
-    <!-- Navbar commented (we added common navbar at bottom) -->
 
-    <h1 class="page-title">Slagging Data Table</h1>
-
-    <div class="toolbar-wrapper">
-        <div class="toolbar">
-            <div class="left-group">
-                <button class="btn-template" id="btn-download-template">Download Template</button>
-
-                <button id="btn-upload" class="btn-upload" type="button">📤 Upload New Data</button>
-                <input type="file" id="fileInput" accept=".xlsx,.xls">
-
-            </div>
-
-            <div class="right-group">
-                <div class="download-dropdown">
-                    <button id="download-selected-btn" class="btn-download" disabled>Download Selected ▾</button>
-                    <div id="download-menu" class="dropdown-menu" aria-hidden="true">
-                        <button type="button" onclick="downloadSelected('excel')">Download as Excel</button>
-                        <button type="button" onclick="downloadSelected('pdf')">Download as PDF</button>
-                    </div>
-                </div>
-
-                <button id="delete-selected-btn" class="btn-delete" disabled>Delete Selected</button>
-
-                <button id="downloadWholePDFBtn" class="btn-download">Download whole page as PDF</button>
-            </div>
-        </div>
+<div class="navbar">
+    <img src="/images/abhitech-logo.png" alt="Company Logo">
+    <h1>Combustion Analyzer</h1> 
+     <div class="nav-buttons">
+            <button onclick="window.location.href='model.html'">Model</button>
+            <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
+           
     </div>
+</div>
 
-    <div class="table-wrapper">
-        <table id="data-table" role="table" aria-label="coal data table">
-            <thead>
-                <tr id="table-header"></tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
-    </div>
+<h1>Slagging Data Table</h1>
 
-<script>
-    // Simple auth check (kept)
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        // keep but don't aggressively block in case of testing
-        // alert('You must login first!');
-        // window.location.href = '/login.html';
-    }
+<div class="container">
+    <button class="btn" onclick="downloadExcel()">Download Template</button>
+    <input type="file" id="fileInput" accept=".xlsx, .xls" class="btn btn-upload">
+    <button id="delete-selected-btn" style="background-color: #02008a; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px;">Delete Selected</button>
+</div>
 
-    // ---------- helpers ----------
-    function formatCellValue(value) {
-        if (value === null || value === undefined) return "";
-        if (typeof value === "number" && isFinite(value)) return value.toFixed(2);
-        if (typeof value === "string") {
-            const t = value.trim();
-            if (t === "") return "";
-            const n = Number(t.replace(/,/g,'')); // allow thousand separators
-            if (!isNaN(n) && isFinite(n)) return n.toFixed(2);
-            return value;
-        }
-        try { return JSON.stringify(value); } catch(e) { return String(value); }
-    }
-
-    // ---------- fetch and render ----------
-    function fetchData() {
-        fetch("/fetch-data")
-            .then(r => r.json())
-            .then(data => displayTable(data))
-            .catch(err => console.error("fetch error", err));
-    }
-
-    // prefer explicit coalId field for the first column (Coal ID)
-    function getCoalIdFromRow(r) {
-        if (!r) return '';
-        if (r.coalId !== undefined && r.coalId !== null && String(r.coalId).trim() !== '') return String(r.coalId);
-        if (r['Coal ID'] !== undefined && r['Coal ID'] !== null && String(r['Coal ID']).trim() !== '') return String(r['Coal ID']);
-        // fallback only if absolutely necessary
-        if (r._id) return String(r._id);
-        return '';
-    }
-
-    function displayTable(data) {
-        const headerRow = document.getElementById('table-header');
-        const tbody = document.getElementById('table-body');
-        headerRow.innerHTML = ''; tbody.innerHTML = '';
-
-        if (!data || data.length === 0) {
-            headerRow.innerHTML = '<th>No data</th>';
-            return;
-        }
-
-        // Collect all keys present across rows (exclude __v)
-        const keySet = new Set();
-        data.forEach(d => Object.keys(d).forEach(k => { if (k !== '__v') keySet.add(k); }));
-
-        // Preferred order; we'll show "Coal ID" as first visible column always
-        const preferred = ['coal','name','SiO2','Al2O3','Fe2O3','CaO','MgO','Na2O','K2O','TiO2','SO3','P2O5','Mn3O4','Sulphur','GCV','cost','Transport ID','shipmentDate'];
-        const keys = [];
-        keys.push('Coal ID'); // visible first header
-
-        // Add preferred keys if present
-        preferred.forEach(p => {
-            if (keySet.has(p) && !keys.includes(p)) {
-                keys.push(p);
-                keySet.delete(p);
-            }
-        });
-
-        // Add remaining keys (excluding internal and coalId/_id since we used Coal ID above)
-        Array.from(keySet).filter(k => k !== 'coalId' && k !== '_id' && k !== '__v').forEach(k => keys.push(k));
-
-        // final column is Select
-        keys.push('Select');
-
-        // build header cells
-        keys.forEach(k => {
-            const th = document.createElement('th');
-            th.textContent = k;
-            headerRow.appendChild(th);
-        });
-
-        // render rows
-        data.forEach(row => {
-            const tr = document.createElement('tr');
-
-            // Coal ID cell (prefer coalId)
-            const coalIdVal = getCoalIdFromRow(row);
-            const tdId = document.createElement('td');
-            tdId.textContent = coalIdVal;
-            tr.appendChild(tdId);
-
-            // Build other columns in same order as header (skip first, skip last)
-            const headerKeys = Array.from(headerRow.children).map(th => th.textContent);
-            for (let i = 1; i < headerKeys.length - 1; i++) {
-                const key = headerKeys[i];
-                let raw = '';
-                // direct property
-                if (row[key] !== undefined) raw = row[key];
-                else if (row[key.replace(/\s+/g,'')] !== undefined) raw = row[key.replace(/\s+/g,'')];
-                else {
-                    // fallbacks for common names
-                    if ((key === 'coal' || key === 'Coal' || key === 'name') && !raw) raw = row.coal || row.name || row['Coal'];
-                    if ((key === 'GCV' || key === 'gcv') && raw === undefined) raw = row.GCV || row.gcv;
-                }
-                const td = document.createElement('td');
-                td.textContent = formatCellValue(raw);
-                tr.appendChild(td);
-            }
-
-            // select checkbox column
-            const cbTd = document.createElement('td');
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-
-            // primary id for client actions should be coalId (not mongo _id) — fallback if missing
-            const primaryId = (row.coalId !== undefined && row.coalId !== null && String(row.coalId).trim() !== '') ? String(row.coalId) : (row._id ? String(row._id) : '');
-            if (primaryId) {
-                cb.setAttribute('data-id', primaryId);
-            } else {
-                cb.setAttribute('data-id', '');
-            }
-            if (row._id) cb.setAttribute('data-oid', String(row._id)); // keep original mongo id if needed
-
-            // store original row for downloads
-            try { cb.dataset.row = JSON.stringify(row); } catch(e) { cb.dataset.row = "{}"; }
-            cb.addEventListener('change', updateSelectionButtons);
-            cbTd.appendChild(cb);
-            tr.appendChild(cbTd);
-
-            tbody.appendChild(tr);
-        });
-
-        updateSelectionButtons();
-    }
-
-    // ---------- file upload ----------
-    document.getElementById('btn-upload').addEventListener('click', function() {
-        const fi = document.getElementById('fileInput');
-        if (fi) fi.click();
-    });
-
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const fd = new FormData();
-        fd.append('file', file);
-
-        fetch('/upload-excel', { method:'POST', body: fd })
-            .then(r => r.json())
-            .then(data => {
-                alert(data.message || 'Upload finished');
-                fetchData();
-            })
-            .catch(err => {
-                console.error('upload err', err);
-                alert('Upload failed');
-            })
-            .finally(() => { e.target.value = ''; });
-    });
-
-    // ---------- download template ----------
-    document.getElementById('btn-download-template').addEventListener('click', function(){
-        window.location.href = "/download-template";
-    });
-
-    // ---------- selection / button enable logic ----------
-    function updateSelectionButtons() {
-        const checked = document.querySelectorAll('input[type="checkbox"]:checked');
-        const deleteBtn = document.getElementById('delete-selected-btn');
-        const downloadBtn = document.getElementById('download-selected-btn');
-
-        const any = checked.length > 0;
-        if (deleteBtn) deleteBtn.disabled = !any;
-        if (downloadBtn) downloadBtn.disabled = !any;
-    }
-
-    document.getElementById('delete-selected-btn').addEventListener('click', function(){
-        const checked = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'));
-        if (checked.length === 0) { alert('Select rows first'); return; }
-        if (!confirm('Are you sure you want to delete selected rows?')) return;
-        // collect primary ids (coalId preferred)
-        const ids = checked.map(cb => cb.getAttribute('data-id')).filter(Boolean);
-
-        fetch('/delete-data', {
-            method:'DELETE',
-            headers: { 'Content-Type':'application/json' },
-            body: JSON.stringify({ ids })
-        })
-        .then(r => r.json())
-        .then(resp => {
-            alert(resp.message || 'Deleted');
-            fetchData();
-        })
-        .catch(err => { console.error(err); alert('Delete failed'); });
-    });
-
-    // download dropdown toggle
-    function setupDownloadDropdown() {
-        const downloadBtn = document.getElementById('download-selected-btn');
-        const menu = document.getElementById('download-menu');
-        if (!downloadBtn || !menu) return;
-        downloadBtn.addEventListener('click', function(e){
-            e.stopPropagation();
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-            menu.setAttribute('aria-hidden', menu.style.display === 'block' ? 'false' : 'true');
-        });
-        document.addEventListener('click', function(e){
-            if (!menu.contains(e.target) && e.target !== downloadBtn) {
-                menu.style.display = 'none';
-            }
-        });
-    }
-
-    // ---------- download selected (excel / pdf) ----------
-    async function downloadSelected(format) {
-        const checked = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'));
-        if (checked.length === 0) { alert('Select rows first'); return; }
-
-        const rows = checked.map(cb => {
-            try { return JSON.parse(cb.dataset.row || "{}"); } catch(e) { return {}; }
-        });
-
-        if (format === 'excel') {
-            const jsonData = rows.map(r => {
-                const obj = {};
-                Object.keys(r).forEach(k => {
-                    if (k === '_id') return;
-                    obj[k] = (r[k] === null || r[k] === undefined) ? "" : (typeof r[k] === 'number' ? r[k].toFixed(2) : r[k]);
-                });
-                return obj;
-            });
-            const ws = XLSX.utils.json_to_sheet(jsonData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Selected");
-            XLSX.writeFile(wb, "selected_rows.xlsx");
-        } else if (format === 'pdf') {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF("l", "mm", "a4");
-            doc.setFontSize(10);
-            let y = 10;
-            rows.forEach((r, idx) => {
-                const line = Object.entries(r).filter(([k])=> k !== '_id').map(([k,v]) => `${k}: ${formatCellValue(v)}`).join('  |  ');
-                doc.text(`${idx+1}. ${line}`, 10, y);
-                y += 6;
-                if (y > doc.internal.pageSize.getHeight() - 10) { doc.addPage(); y = 10; }
-            });
-            doc.save('selected_rows.pdf');
-        }
-        const menu = document.getElementById('download-menu'); if (menu) menu.style.display = 'none';
-    }
-
-    // ---------- download whole page as PDF ----------
-    document.getElementById('downloadWholePDFBtn').addEventListener('click', function(){
-        const element = document.body;
-        window.scrollTo(0,0);
-        html2canvas(element, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf || window;
-            const pdf = new jsPDF('p','mm','a4');
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-
-            const imgWidth = pageWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            let position = 0;
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-
-            let heightLeft = imgHeight - pageHeight;
-            while (heightLeft > 0) {
-                position = -heightLeft;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-
-            pdf.save('Coal_Blending_Ratio.pdf');
-        }).catch(err => {
-            console.error('PDF generation failed', err);
-            alert('Failed to create PDF of page. Try resizing or use browser print to save as PDF.');
-        });
-    });
-
-    // ---------- init ----------
-    document.addEventListener('DOMContentLoaded', () => {
-        setupDownloadDropdown();
-        fetchData();
-    });
-
-    function logoutUser() { localStorage.setItem('isLoggedIn','false'); window.location.href='/login.html'; }
-</script>
-</body>
-
-<!-- ====== START: COMMON NAVBAR (paste into each HTML file, right after <body>) ====== -->
-<style>
-/* Common navbar override (will replace previous styles visually) */
-:root{
-  --nav-h: 90px;
-  --nav-bg-start: rgba(255,255,255,0.96);
-  --nav-bg-end: rgba(245,247,255,0.88);
-  --nav-blue-1: #02126e;
-  --nav-blue-2: #0027a7;
-  --nav-text: #071a52;
-  --nav-btn-radius: 999px;
-}
-
-/* Strongly scoped to override older rules */
-.common-navbar-wrapper { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 1300; }
-.common-navbar {
-  box-sizing: border-box;
-  height: 100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  padding: 8px 20px;
-  background: linear-gradient(180deg, var(--nav-bg-start), var(--nav-bg-end));
-  box-shadow: 0 8px 30px rgba(9,20,46,0.06);
-  border-bottom: 1px solid rgba(2,18,110,0.04);
-  backdrop-filter: blur(4px) saturate(1.02);
-  font-family: Inter, Arial, Helvetica, sans-serif;
-}
-
-/* Left: logo + title */
-.common-navbar .brand { display:flex; align-items:center; gap:12px; }
-.common-navbar .brand img { height:46px; width:auto; object-fit:contain; display:block; }
-.common-navbar .brand .title { font-weight:700; color:var(--nav-text); font-size:18px; margin:0; }
-
-/* Center/right: nav buttons */
-.common-navbar .nav-buttons { display:flex; gap:10px; align-items:center; margin-left:12px; }
-.common-navbar .nav-buttons button{
-  padding:8px 14px;
-  border-radius:var(--nav-btn-radius);
-  border: none;
-  font-weight:600;
-  cursor:pointer;
-  background: linear-gradient(180deg,var(--nav-blue-1),var(--nav-blue-2));
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(2,18,110,0.07);
-  transition: transform .12s ease, box-shadow .12s ease, opacity .12s;
-}
-.common-navbar .nav-buttons button:hover{ transform: translateY(-2px); }
-.common-navbar .nav-buttons button.logout-btn{
-  background: linear-gradient(180deg,#ff4b4b,#e32d2d) !important;
-  box-shadow: 0 8px 20px rgba(227,45,45,0.07);
-}
-
-/* Active page visual (different contrast + subtle outline) */
-.common-navbar .nav-buttons button.active {
-  background: linear-gradient(180deg,#ffffff, #f1f6ff) !important;
-  color: var(--nav-blue-2) !important;
-  box-shadow: 0 6px 18px rgba(2,18,110,0.06) !important;
-  border: 1px solid rgba(2,18,110,0.12);
-  transform: translateY(-1px) !important;
-}
-
-/* Mobile: make buttons smaller/wrapping */
-@media (max-width: 720px) {
-  .common-navbar { padding:10px 14px; }
-  .common-navbar .brand .title { font-size:15px; }
-  .common-navbar .nav-buttons { gap:6px; }
-  .common-navbar .nav-buttons button { padding:7px 10px; font-size:13px; }
-}
-
-/* push page content below navbar (only added if page doesn't already do it) */
-html body { --navbar-height: var(--nav-h); }
-</style>
-
-<div class="common-navbar-wrapper" role="navigation" aria-label="Main navigation">
-  <nav class="common-navbar">
-    <div class="brand" aria-hidden="false">
-      <img src="/images/abhitech-logo.png" alt="Abhitech logo">
-      <h1 class="title">Combustion Analyzer</h1>
-    </div>
-
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div class="nav-buttons" role="menubar" aria-label="Primary">
-        <button data-target="coal_table.html" title="Coal Properties">Coal Properties</button>
-        <button data-target="slagging_coal_page.html" title="Calculation">Calculation</button>
-        <button data-target="model.html" title="Model">Model</button>
-      </div>
-
-      <div style="width:8px;"></div>
-
-      <div class="nav-buttons" aria-hidden="false">
-        <button class="logout-btn" id="common-logout-btn" title="Logout">Logout</button>
-      </div>
-    </div>
-  </nav>
+<div class="table-container">
+    <table id="data-table">
+        <thead>
+            <tr id="table-header"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
 </div>
 
 <script>
-(function(){
-  const navBtns = Array.from(document.querySelectorAll('.common-navbar .nav-buttons button'))
-    .filter(b => b.dataset && b.dataset.target);
-
-  const path = (location.pathname || '').split('/').pop().toLowerCase();
-  let matched = false;
-  navBtns.forEach(btn => {
-    const target = (btn.dataset.target || '').toLowerCase();
-    btn.addEventListener('click', () => { if (target) location.href = target; });
-    if ((path && path === target) || (!path && target === 'model.html')) {
-      btn.classList.add('active');
-      matched = true;
-    } else {
-      btn.classList.remove('active');
+    function downloadExcel() {
+        window.location.href = "/download-template";
     }
-  });
 
-  if (!matched) {
-    const pageHints = ['coal', 'slag', 'model'];
-    for (const btn of navBtns) {
-      const t = btn.dataset.target || '';
-      for (const h of pageHints) {
-        if (t.indexOf(h) !== -1 && document.body.innerText.toLowerCase().includes(h)) {
-          btn.classList.add('active'); matched = true; break;
-        }
-      }
-      if (matched) break;
+    document.addEventListener("DOMContentLoaded", fetchData);
+
+    function fetchData() {
+        fetch("/fetch-data")
+            .then(response => response.json())
+            
+            .then(data => displayTable(data))
+            .catch(error => console.error("Error fetching data:", error));
     }
-  }
-
-  const logoutBtn = document.getElementById('common-logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      try { localStorage.setItem('isLoggedIn','false'); } catch(e) {}
-      window.location.href = '/login.html';
+    
+    document.getElementById("fileInput").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+    
+        const formData = new FormData();
+        formData.append("file", file);
+    
+        fetch("/upload-excel", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("File uploaded successfully!");
+            window.location.reload();
+            displayTable(data);
+        })
+        .catch(error => console.error("Error uploading file:", error));
     });
-  }
-})();
-</script>
-<!-- ====== END: COMMON NAVBAR ====== -->
+    
+    function displayTable(data) {
+        const tableHeader = document.getElementById("table-header");
+        const tableBody = document.getElementById("table-body");
+        tableHeader.innerHTML = "";
+        tableBody.innerHTML = "";
 
+        if (data.length === 0) return;
+
+        const headers = Object.keys(data[0]).filter(header => header !== '_id');
+        headers.push("Select"); // Add Select header
+
+        // Create table headers
+        headers.forEach((header) => {
+            let th = document.createElement("th");
+            th.textContent = header;
+            if (header === headers[0]) th.style.position = "sticky"; // Fix first column
+            tableHeader.appendChild(th);
+        });
+
+        // Create table rows
+        data.forEach(row => {
+            let tr = document.createElement("tr");
+
+            headers.slice(0, -1).forEach((header) => {
+                let td = document.createElement("td");
+                td.textContent = row[header];
+                if (header === headers[0]) td.style.position = "sticky"; // Fix first column
+                tr.appendChild(td);
+            });
+
+            // Add Checkbox
+            let checkboxTd = document.createElement("td");
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.setAttribute("data-id", row._id); // Store _id
+            checkboxTd.appendChild(checkbox);
+            tr.appendChild(checkboxTd);
+
+            tableBody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("delete-selected-btn").addEventListener("click", function() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            alert("Please select at least one row to delete.");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete the selected data?")) return;
+
+        const ids = Array.from(checkboxes).map(checkbox => checkbox.getAttribute("data-id"));
+
+        fetch("/delete-data", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ids: ids })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchData(); // Refresh Table
+        })
+        .catch(error => console.error("Error deleting data:", error));
+    });
+
+    // Delete Data Function (for single delete, if needed)
+    function deleteData(id) {
+        if (!id) {
+            console.error("Invalid ID for deletion.");
+            return;
+        }
+        
+        if (!confirm("Are you sure you want to delete this data?")) return;
+
+        fetch(`/delete-data/${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchData(); // Refresh Table
+            })
+            .catch(error => console.error("Error deleting data:", error));
+    } 
+</script>
+</body>
 </html>
