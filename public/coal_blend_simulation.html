@@ -2,80 +2,297 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Coal Blending Ratio — light theme</title>
-    <style>
-/* =========================
-   Variables
-   ========================= */
-:root{
-  --bg: #F7F8FA;
-  --card: #FFFFFF;
-  --muted: #6b7280;
-  --text: #111827;
-  --accent: #b71c1c;    /* red colour */
-  --green: #16a34a;
-  --border: #E5E7EB;
-  --input-border: #D1D5DB;
-  --accent-btn: #0f4db2;
-  --color-blue-800: oklch(.424 .199 265.638);
+  <title>Abhitech Energycon Limited</title>
+  <link rel="icon" href="images/abhitech-logo.png">
+     <style>
+    :root{
+      --bg: #F7F8FA;        
+      --card: #FFFFFF;      
+      --muted: #6b7280;     
+      --text: #111827;      
+      --accent: #b71c1c;    /* red */
+      --green: #16a34a;     /* green */
+      --border: #E5E7EB;    
+      --input-border: #D1D5DB; 
+      --accent-btn: #0f4db2;
+      --color-blue-800: oklch(.424 .199 265.638);
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 90px 14px 8px; /* top padding increased for navbar */
+    }
+
+    h1 {
+      color: var(--text);
+      margin: 8px 0;
+      font-size: 1.3rem;
+      text-align: left;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      background: #02008a;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 6px 3px;
+      border: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      font-size: 0.85rem;
+    }
+
+    .main-container {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      max-width: 900px;
+      align-items:flex-start;
+    }
+
+    .mills-grid {
+      display: grid;
+      grid-template-columns: 140px repeat(8, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+      align-items: center;
+      font-size: 0.8rem;
+      width: 100%;
+    }
+
+    .mill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      text-align: center;
+      padding: 6px;
+      color: var(--text);
+      min-height: 34px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+      border-radius: 6px;
+    }
+
+    /* red state (when sum == 100) */
+    .mill.red {
+      background: var(--accent);
+      color: #fff;
+      font-weight:700;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* green state (default when sum < 100) */
+    .mill.green {
+      background: var(--green);
+      color: #fff;
+      font-weight:700;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .mill.coal-flow,
+    .mill.gcv,
+    .mill.aft-head,
+    .mill.cost-head {
+      background: #02008a;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .dropdown {
+      width: 105%;
+      padding:8px;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 0.8rem;
+    }
+
+    .percentage-input, .flow-input, .cost-input, .generation-input {
+      width: 88%;
+      padding:6px;
+      background: #fff;
+      border:1px solid var(--input-border);
+      color: var(--text);
+      text-align:center;
+      border-radius: 4px;
+      box-sizing: border-box;
+      outline: none;
+      font-size: 0.8rem;
+    }
+
+    .percentage-input{
+      border:2px solid #02008a
+    }
+
+    .percentage-input::placeholder, .flow-input::placeholder, .cost-input::placeholder {
+      color: var(--muted);
+    }
+.flow-input{
+  border:2px solid #F1C40F
 }
 
-/* =========================
-   Base / layout
-   ========================= */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  /* final padding preserved from your file */
-  padding: 80px 6px 6px;
-  /* Note: this prevents page scrolling; remove if content gets clipped */
-  overflow: hidden;
+.generation-input{
+  border:2px solid #F1C40F
 }
+    .cost-input { border:2px solid #F1C40F; background:#fff; }
 
-h1 {
-  color: var(--text);
-  margin: 8px 0;
-  font-size: 1.3rem;
-  text-align: left;
-}
+    .gcv-box {
+      width: 92%;
+      padding:6px;
+      text-align:center;
+      font-weight:700;
+      background:#F3F4F6;
+      border:1px solid var(--input-border);
+      color: var(--text);
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 0.8rem;
+    }
 
-/* =========================
-   Navbar & header controls
-   ========================= */
-.navbar {
-  width: 100%;
-  background-color: #f7f8fa;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  color: white;
+    .aft { min-height: 28px; color: var(--text); }
+
+    .summary-table {
+      display: grid;
+      grid-template-columns: 140px 110px;
+      gap:6px;
+      width:280px;
+      margin-bottom:14px;
+      font-size: 0.8rem;
+    }
+
+    .summary-cell {
+      background: var(--card);
+      border:1px solid var(--border);
+      padding:8px;
+      color:var(--text);
+      text-align:center;
+      border-radius:6px;
+    }
+
+    .summary-header {
+      background:#F3F4F6;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .summary-cell.summary-header {
+      background: #02008a;
+      font-weight: 700;
+      color: #fff;
+    }
+
+   .navbar {
+            
+            width: 100%;
+            background-color: #f7f8fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 65px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar img {
+            height: 95px;
+            margin-right: 10px;
+            margin-left: 0px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px; /* Use 'gap' for spacing between flex items */
+            margin-right: 20px;
+            
+        }
+
+        .navbar h1 {
+            margin-left: 0px;
+            font-size: 20px; /* Adjust font size as needed */
+            color: black;
+            
+        }
+
+       .navbar button {
+            padding: 10px 15px;
+            background-color: #02008a;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        
+        .navbar button:hover {
+            background-color: #001cbb;
+        }
+    /* compact adjustments to avoid scrolling */
+    body {
+      padding: 80px 6px 6px; /* reduce padding */
+    }
+
+    .mills-grid {
+      gap: 4px;
+      font-size: 0.72rem;
+    }
+
+    .mill {
+      padding: 4px;
+      min-height: 28px;
+      font-size: 0.72rem;
+    }
+
+    .dropdown,
+    .percentage-input,
+    .flow-input,
+    .cost-input,
+    .gcv-box,
+    .generation-input {
+      font-size: 0.72rem;
+      padding: 4px;
+    }
+    .dropdown {
+  font-size:0.6rem;
+    }
+       #downloadPDF {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 65px;
-  z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-.navbar img { height: 95px; margin-right: 10px; margin-left: 0; }
-.navbar h1 { margin-left: 0; font-size: 20px; color: black; }
-.nav-buttons { display: flex; gap: 10px; margin-right: 20px; }
-.navbar button {
-  padding: 10px 15px;
-  background-color: #02008a;
+  top: 100px;
+  right: 20px;
+  background: #02008a; 
   color: #fff;
   border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 5px;
-  margin-right: 20px;
-  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  z-index: 9999; /* keeps it above everything */
 }
-.navbar button:hover { background-color: #001cbb; }
+
+#downloadPDF:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
 .navbar .logout-btn {
   padding: 10px 16px;
   background-color: red !important;
@@ -86,28 +303,12 @@ h1 {
   font-weight: bold;
   transition: all 0.3s ease;
 }
-.navbar .logout-btn:hover { background-color: darkred !important; }
 
-/* =========================
-   Buttons & small controls
-   ========================= */
-.upload-btn {
-  display: inline-block;
-  background: #02008a;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  margin: 6px 3px;
-  border: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  font-size: 0.85rem;
+.navbar .logout-btn:hover {
+  background-color: darkred !important;
 }
-
-/* small circular icon button (download PDF, etc.) */
-.icon-btn {
-  background: #02008a;
+        .icon-btn {
+  background: #02008a;  /* same as navbar */
   color: #fff;
   border: none;
   padding: 12px;
@@ -118,7 +319,9 @@ h1 {
   position: relative;
   box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
-/* Tooltip for icon-btn */
+
+
+/* Tooltip */
 .icon-btn::after {
   content: attr(title);
   position: absolute;
@@ -135,426 +338,19 @@ h1 {
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
-.icon-btn:hover::after { opacity: 1; }
 
-/* fixed download button */
-#downloadPDF {
-  position: fixed;
-  top: 100px;
-  right: 20px;
-  background: #02008a;
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  transition: all 0.3s ease;
-  z-index: 9999;
-}
-#downloadPDF:hover {
-  background: #1e40af;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-
-/* loader */
-#loader { display: none; color: var(--muted); margin-top: 4px; font-size: 0.8rem; }
-
-/* =========================
-   Grid / main layout
-   ========================= */
-.main-container {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 900px;
-  align-items: flex-start;
-  flex: 1; /* keep final intent (take remaining width) */
-}
-
-/* mills grid */
-.mills-grid {
-  display: grid;
-  grid-template-columns: 140px repeat(8, 1fr);
-  gap: 4px;            /* preserved final smaller gap */
-  margin: 8px 0;
-  align-items: center;
-  font-size: 0.72rem;  /* preserved final smaller font */
-  width: 100%;
-}
-
-/* cell styling */
-.mill {
-  background: var(--card);
-  border: 1px solid var(--border);
-  text-align: center;
-  padding: 4px;
-  color: var(--text);
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 2px rgba(16,24,40,0.03);
-  border-radius: 6px;
-  font-size: 0.72rem;
-}
-
-/* header states */
-.mill.red {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
-  border: 1px solid rgba(0,0,0,0.08);
-}
-.mill.green {
-  background: var(--green);
-  color: #fff;
-  font-weight: 700;
-  border: 1px solid rgba(0,0,0,0.06);
-}
-
-/* special headers */
-.mill.coal-flow,
-.mill.gcv,
-.mill.aft-head,
-.mill.cost-head { background: #02008a; color: #fff; font-weight: 600; }
-
-/* Inputs / selects */
-.dropdown {
-  width: 105%;
-  padding: 4px;
-  background: #fff;
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 0.6rem; /* preserved the final (smaller) dropdown font */
-}
-
-.percentage-input,
-.flow-input,
-.cost-input,
-.generation-input {
-  width: 88%;
-  padding: 4px;
-  background: #fff;
-  border: 1px solid var(--input-border);
-  color: var(--text);
-  text-align: center;
-  border-radius: 4px;
-  box-sizing: border-box;
-  outline: none;
-  font-size: 0.72rem;
-}
-
-/* borders from your file (preserved) */
-.percentage-input { border: 2px solid #02008a; }
-.flow-input       { border: 2px solid #F1C40F; }
-.generation-input { border: 2px solid #F1C40F; }
-.cost-input       { border: 2px solid #F1C40F; background: #fff; }
-
-.percentage-input::placeholder,
-.flow-input::placeholder,
-.cost-input::placeholder { color: var(--muted); }
-
-.gcv-box {
-  width: 92%;
-  padding: 6px;
-  text-align: center;
-  font-weight: 700;
-  background: #F3F4F6;
-  border: 1px solid var(--input-border);
-  color: var(--text);
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 0.8rem;
-}
-
-/* aft cell */
-.aft { min-height: 28px; color: var(--text); }
-
-/* =========================
-   Diagram / bunker visuals
-   ========================= */
-.layout { position: relative; transform-origin: top left; }
-
-/* bunker grid */
-.bunkers-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 18px;
-  align-items: end;
-}
-
-.bunker {
-  width: 100%;
-  max-width: 120px;
-  height: 160px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.bunker svg { width: 100%; height: 120px; }
-.bunker path { fill: none; stroke: black; stroke-width: 2; }
-
-.label { text-align: center; margin-top: -6px; font-weight: bold; }
-
-/* diagram (top line + arrows) when inside .layout (overview diagram row) */
-.layout .top-line {
-  position: absolute;
-  top: 0;
-  left: -10px;         /* start a bit earlier than first arrow */
-  width: 520px;        /* adjusted to span above all bunkers */
-  height: 2px;
-  background: black;
-}
-
-.layout .top-lines {
-  position: absolute;
-  top: 0;
-  left: -10px;         /* start a bit earlier than first arrow */
-  width: 50px;        /* adjusted to span above all bunkers */
-  height: 2px;
-  background: black;
-}
-.layout .arrow {
-  position: absolute;
-  width: 2px;
-  background: black;
-}
-.layout .arrow::after {
-  content: '';
-  position: absolute;
-  left: -6px;
-  bottom: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-top: 10px solid black;
-}
-
-/* the container inside the grid so diagram aligns with columns 2..7 */
-.diagram-in-grid { grid-column: 2 / 8; padding: 6px; }
-
-/* =========================
-   Single-bunker (the standalone view) - keeps final values from file
-   ========================= */
-.single-bunker-wrapper {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  /* final vertical spacing preserved (you had two values; final one kept) */
-  padding-top: 236px;
-  height: 100%;
-}
-
-/* single-bunker specific top-line + arrow so it doesn't collide with .layout rules */
-.single-bunker-wrapper .top-line {
-  position: absolute;
-  top: 108px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
-  background: #000;
-  z-index: 10;
-}
-.single-bunker-wrapper .arrow {
-  position: absolute;
-  top: 110px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 64px;
-  background: #000;
-  z-index: 11;
-}
-.single-bunker-wrapper .arrow::after {
-  content: '';
-  position: absolute;
-  left: -7px;
-  top: 100%;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-top: 10px solid #000;
-}
-
-/* enlarge bunker in single view (kept final transform) */
-.single-bunker-wrapper .bunker { transform: scale(1.8); transform-origin: center; }
-
-/* =========================
-   Summary table (kept final - fixed to right)
-   ========================= */
-.summary-table {
-  position: fixed;
-  top: 160px;
-  right: 20px;
-  width: 220px;
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 6px;
-  font-size: 0.8rem;
-  background: white;
-  padding: 8px;
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-.summary-cell {
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 8px;
-  color: var(--text);
-  text-align: center;
-  border-radius: 6px;
-}
-.summary-cell.summary-header { background: #02008a; font-weight: 700; color: #fff; }
-
-/* =========================
-   Tabs / sidebar
-   ========================= */
-.tab-btn {
-  width: 100%;
-  background: #02008a;
-  border: none;
-  color: #fff;
-  font-weight: 600;
-  padding: 10px 0;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.22s, box-shadow 0.22s;
-  box-shadow: 0 2px 8px rgba(67,108,194,0.05);
-  outline: none;
-}
-.tab-btn.active {
-  background: linear-gradient(90deg, #00bcd4 8%, #2442ba 92%);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(0,188,212,0.22);
-}
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/* sidebar sizing (kept your reduced value) */
-#tabSidebar { min-width: 160px; max-width: 160px; padding: 16px 8px; }
-
-#bunker1Tab[style*="display: block"] {
-  display: flex !important;
-  justify-content: flex-start;   /* start from left */
-  align-items: flex-start;       /* start from top */
-  min-height: 80vh;
-  position: relative;            /* allow positioning inside */
-}
-
-#bunker1Tab[style*="display: block"] .main-container {
-  transform: scale(1.2);
-  transform-origin: top left;    /* scaling starts from top-left */
-  position: absolute;            /* now you can control with top/left/right */
-  top: -10px;                     /* adjust top gap */
-  left: 120px;                    /* adjust left gap */
-  /* or use right: 50px; if you want to push from right */
-}
-
-#bunker2Tab[style*="display: block"] {
-  display: flex !important;
-  justify-content: flex-start;   /* start from left */
-  align-items: flex-start;       /* start from top */
-  min-height: 80vh;
-  position: relative;            /* allow positioning inside */
-}
-
-#bunker2Tab[style*="display: block"] .main-container {
-  transform: scale(1.2);
-  transform-origin: top left;    /* scaling starts from top-left */
-  position: absolute;            /* now you can control with top/left/right */
-  top: -10px;                     /* adjust top gap */
-  left: 380px;                    /* adjust left gap */
-  /* or use right: 50px; if you want to push from right */
-}
-
-#bunker3Tab[style*="display: block"] {
-  display: flex !important;
-  justify-content: flex-start;   /* start from left */
-  align-items: flex-start;       /* start from top */
-  min-height: 80vh;
-  position: relative;            /* allow positioning inside */
-}
-
-#bunker3Tab[style*="display: block"] .main-container {
-  transform: scale(1.2);
-  transform-origin: top left;    /* scaling starts from top-left */
-  position: absolute;            /* now you can control with top/left/right */
-  top: -10px;                     /* adjust top gap */
-  left: 380px;                    /* adjust left gap */
-  /* or use right: 50px; if you want to push from right */
-}
-/* Layout only for bunker tabs */
-.tab-panel .bunker-layout .diagram-container {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;   /* push to right */
-  align-items: flex-start;     /* move upwards */
-  transform: scale(4);
-  transform-origin: top right; /* scaling from top-right corner */
-  position: relative;          /* enable top/right shifting */
-  top: -250px;                  /* adjust vertical position */
-  right: -1800px;                /* adjust horizontal position */
-}
-
-.diagram-container, .bunker svg {
-  pointer-events: none;
+.icon-btn:hover::after {
+  opacity: 1;
 }
 
 
-
-
-/* =========================
-   Responsive adjustments
-   ========================= */
-@media (max-width: 900px) {
-  body { padding: 80px 6px 6px; } /* preserved */
-  .main-container { max-width: 100%; }
-  .mills-grid {
-    grid-template-columns: 1fr; /* stack columns vertically */
-    gap: 6px;
-    font-size: 0.72rem;
-  }
-  .mill { width: 100%; min-height: 28px; font-size: 0.72rem; padding: 4px; }
-  .dropdown,
-  .percentage-input,
-  .flow-input,
-  .cost-input,
-  .gcv-box,
-  .generation-input {
-    width: 100%; font-size: 0.72rem; padding: 4px;
-  }
-  /* diagram -> full width */
-  .diagram-in-grid { grid-column: 1 / -1; }
-  .diagram-in-grid .layout { transform: scale(0.9); }
-  .diagram-row { flex-direction: column; gap: 12px; }
-  .diagram-row .layout { transform: scale(0.7); width: 100%; }
-  .diagram-row .summary-table { width: 100%; position: static; }
-  .layout .top-line { width: 100%; left: 0; }
-  /* center arrows in small screens */
-  .layout .arrow, .arrow { left: auto !important; margin-left: calc(50% - 1px); }
-  #downloadPDF { top: auto; bottom: 20px; right: 10px; }
-  .navbar img { height: 60px; }
-  .navbar h1 { font-size: 16px; }
-  .nav-buttons { flex-direction: column; gap: 6px; margin-right: 0; }
-}
-</style>
-
+    #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script>
-     if(localStorage.getItem('isLoggedIn') !== 'true') {
+  <script>
+if(localStorage.getItem('isLoggedIn') !== 'true') {
     alert('You must login first!');
     window.location.href = '/login.html'; 
 } else {
@@ -565,8 +361,7 @@ h1 {
   window.location.href = 'login.html'; 
 }
 
-  </script>
-
+</script>
 </head>
 <body>
  <div class="navbar">
@@ -588,1110 +383,484 @@ h1 {
 
   <div id="loader">Loading... please wait</div>
 <button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
+  <div class="main-container">
+    <div class="mills-grid" id="millsGrid">
+      <!-- header row -->
+      <div></div>
+      <!-- START: changed headers to green by default -->
+      <div class="mill green">MILL-A</div>
+      <div class="mill green">MILL-B</div>
+      <div class="mill green">MILL-C</div>
+      <div class="mill green">MILL-D</div>
+      <div class="mill green">MILL-E</div>
+      <div class="mill green">MILL-F</div>
+      <!-- END -->
+      <div class="mill gcv">GCV(Kcal/kg)</div>
+      <div class="mill cost-head">Cost/MT</div>
 
-<!-- Tabs Sidebar and Main Content -->
-<div style="display: flex; width: 100%; align-items: flex-start; margin-top: 32px;">
-  <!-- Sidebar (Tabs) -->
-  <div id="tabSidebar" style="min-width: 210px; background: #fff; border-radius: 12px; margin-right: 24px; padding: 22px 12px; box-shadow: 0 3px 16px rgba(23,32,41,0.06);">
-    <div style="font-weight: bold; font-size: 1.1rem; color: #02008a; margin-bottom: 34px; text-align: center;">Select Section</div>
-    <button class="tab-btn" data-tab="overview">Overview</button>
-    <button class="tab-btn" data-tab="bunker1">Bunker 1</button>
-    <button class="tab-btn" data-tab="bunker2">Bunker 2</button>
-    <button class="tab-btn" data-tab="bunker3">Bunker 3</button>
-    <button class="tab-btn" data-tab="bunker4">Bunker 4</button>
-    <button class="tab-btn" data-tab="bunker5">Bunker 5</button>
-    <button class="tab-btn" data-tab="bunker6">Bunker 6</button>
+      <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
+      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="1" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="2" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="3" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="4" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="5" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
+
+      <!-- Row 2: Coal selection 2 -->
+      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="1" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="2" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="3" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="4" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="5" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
+
+      <!-- Row 3: Coal selection 3 -->
+      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="1" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="2" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="3" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="4" placeholder="%"></div>
+      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="5" placeholder="%"></div>
+      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
+      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
+
+      <!-- Row 4: Coal Flow -->
+      <div class="mill coal-flow">Coal Flow(TPH)</div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="1" placeholder="TPH"></div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="2" placeholder="TPH"></div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="3" placeholder="TPH"></div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="4" placeholder="TPH"></div>
+      <div class="mill"><input type="text" class="flow-input" data-mill="5" placeholder="TPH"></div>
+      <div></div>
+      <div></div>
+
+      <!-- Row 5: AFT (calculated per mill) -->
+      <div class="mill aft-head">AFT(°C)</div>
+      <div class="mill aft" data-mill="0">--</div>
+      <div class="mill aft" data-mill="1">--</div>
+      <div class="mill aft" data-mill="2">--</div>
+      <div class="mill aft" data-mill="3">--</div>
+      <div class="mill aft" data-mill="4">--</div>
+      <div class="mill aft" data-mill="5">--</div>
+      <div></div>
+      <div></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-table" aria-hidden="false">
+      <div class="summary-cell summary-header">Generation (MW)</div>
+      <div class="summary-cell"><input id="generation" class="generation-input" placeholder="MW" /></div>
+
+      <div class="summary-cell summary-header">Total Coal Flow(TPH)</div>
+      <div class="summary-cell" id="totalFlow">0</div>
+
+      <div class="summary-cell summary-header">Average GCV(Kcal/kg)</div>
+      <div class="summary-cell" id="avgGCV">0</div>
+
+      <div class="summary-cell summary-header">Average AFT(°C)</div>
+      <div class="summary-cell" id="avgAFT">--</div>
+
+      <div class="summary-cell summary-header">Heat Rate(Kcal/kWh)</div>
+      <div class="summary-cell" id="heatRate">--</div>
+      
+      <div class="summary-cell summary-header">Cost/MT</div>
+      <div class="summary-cell" id="COSTRATE">--</div>
+    </div>
   </div>
 
-  <!-- Main Tab Content -->
-  <div id="tabContent" style="flex: 1; background: #fff; border-radius: 13px; box-shadow: 0 1px 8px rgba(34,53,65,0.10); padding: 28px; min-height: 680px;">
-
-    <!-- Overview Panel -->
-    <div id="overviewTab" class="tab-panel" style="display:none;">
-      <div class="overview-wrapper"></div>
-
-      <div class="main-container">
-        <div class="mills-grid" id="millsGrid">
-          <!-- header row -->
-          <div></div>
-          <!-- changed headers to BUNKER 1..6 -->
-          <div class="mill green">BUNKER 1</div>
-          <div class="mill green">BUNKER 2</div>
-          <div class="mill green">BUNKER 3</div>
-          <div class="mill green">BUNKER 4</div>
-          <div class="mill green">BUNKER 5</div>
-          <div class="mill green">BUNKER 6</div>
-          <div class="mill gcv">GCV(Kcal/kg)</div>
-          <div class="mill cost-head">Cost/MT</div>
-
-          <!-- Row 1: Coal selection 1 (first cell = dropdown, columns 2-7 = % under mills) -->
-          <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="1" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="2" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="3" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="4" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="5" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-
-          <!-- Row 2: Coal selection 2 -->
-          <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="1" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="2" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="3" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="4" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="5" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-
-          <!-- Row 3: Coal selection 3 -->
-          <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="1" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="2" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="3" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="4" placeholder="%"></div>
-          <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="5" placeholder="%"></div>
-          <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-          <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-
-          <!-- NEW: Diagram row placed inside the grid so it aligns with Bunker 1..6 columns -->
-          <div></div>
-          <div class="diagram-in-grid" style="padding:8px;">
-            <div class="layout">
-              <div class="top-line"></div>
-              <div class="arrow" style="height:60px; left:40px;"></div>
-              <div class="arrow" style="height:60px; left:130px;"></div>
-              <div class="arrow" style="height:60px; left:230px;"></div>
-              <div class="arrow" style="height:60px; left:320px;"></div>
-              <div class="arrow" style="height:60px; left:415px;"></div>
-              <div class="arrow" style="height:60px; left:510px;"></div>
-
-              <div class="bunkers-grid">
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 1</div>
-                </div>
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 2</div>
-                </div>
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 3</div>
-                </div>
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 4</div>
-                </div>
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 5</div>
-                </div>
-                <div class="bunker">
-                  <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                    <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-                  </svg>
-                  <div class="label">Bunker 6</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 4: Coal Flow (moved down because diagram inserted above) -->
-          <div class="mill coal-flow">Coal Flow(TPH)</div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="1" placeholder="TPH"></div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="2" placeholder="TPH"></div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="3" placeholder="TPH"></div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="4" placeholder="TPH"></div>
-          <div class="mill"><input type="text" class="flow-input" data-mill="5" placeholder="TPH"></div>
-          <div></div>
-          <div></div>
-
-          <!-- Row 5: AFT (calculated per mill) -->
-          <div class="mill aft-head">AFT(°C)</div>
-          <div class="mill aft" data-mill="0">--</div>
-          <div class="mill aft" data-mill="1">--</div>
-          <div class="mill aft" data-mill="2">--</div>
-          <div class="mill aft" data-mill="3">--</div>
-          <div class="mill aft" data-mill="4">--</div>
-          <div class="mill aft" data-mill="5">--</div>
-          <div></div>
-          <div></div>
-        </div> <!-- end mills-grid -->
-      </div> <!-- end main-container -->
-
-      <!-- Summary moved out of diagram-row; class name preserved but it is fixed to the right side -->
-      <div class="summary-table" aria-hidden="false">
-        <div class="summary-cell summary-header">Generation (MW)</div>
-        <div class="summary-cell"><input id="generation" class="generation-input" placeholder="MW" /></div>
-
-        <div class="summary-cell summary-header">Total Coal Flow(TPH)</div>
-        <div class="summary-cell" id="totalFlow">0</div>
-
-        <div class="summary-cell summary-header">Average GCV(Kcal/kg)</div>
-        <div class="summary-cell" id="avgGCV">0</div>
-
-        <div class="summary-cell summary-header">Average AFT(°C)</div>
-        <div class="summary-cell" id="avgAFT">--</div>
-
-        <div class="summary-cell summary-header">Heat Rate(Kcal/kWh)</div>
-        <div class="summary-cell" id="heatRate">--</div>
-
-        <div class="summary-cell summary-header">Cost/MT</div>
-        <div class="summary-cell" id="COSTRATE">--</div>
-      </div>
-    </div> <!-- end overviewTab -->
-
-    <!-- Bunker 1 Panel -->
-   <div id="bunker1Tab" class="tab-panel" style="display: none;">
-  <div class="bunker-layout">
-    
-    <!-- LEFT SIDE: TABLE -->
-    <div class="mills-grid" id="millsGrid">
-      <!-- header row -->
-      <div></div>
-      <div class="mill green">BUNKER 1</div>
-      <div class="mill gcv">GCV(Kcal/kg)</div>
-      <div class="mill cost-head">Cost/MT</div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 1 -->
-      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 2 -->
-      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 3 -->
-      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 4: Coal Flow -->
-      <div class="mill coal-flow">Coal Flow(TPH)</div>
-      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 5: AFT -->
-      <div class="mill aft-head">AFT(°C)</div>
-      <div class="mill aft" data-mill="0">--</div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div> <!-- end mills-grid -->
-
-    <!-- RIGHT SIDE: DIAGRAM -->
-    <div class="diagram-container">
-      <div class="layout">
-        <div class="top-lines"></div>
-        <div class="arrow" style="height:60px; left:40px;"></div>
-        <div class="bunkers-grid">
-          <div class="bunker">
-            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-            </svg>
-            <div class="label">Bunker 1</div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end diagram-container -->
-
-  </div> <!-- end bunker-layout -->
-</div>
-
-
-    <!-- Bunker 2 Panel -->
-    <div id="bunker2Tab" class="tab-panel" style="display:none;">
-<div class="bunker-layout">
-    
-    <!-- LEFT SIDE: TABLE -->
-    <div class="mills-grid" id="millsGrid">
-      <!-- header row -->
-      <div></div>
-      <div class="mill green">BUNKER 2</div>
-      <div class="mill gcv">GCV(Kcal/kg)</div>
-      <div class="mill cost-head">Cost/MT</div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 1 -->
-      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 2 -->
-      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 3 -->
-      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 4: Coal Flow -->
-      <div class="mill coal-flow">Coal Flow(TPH)</div>
-      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 5: AFT -->
-      <div class="mill aft-head">AFT(°C)</div>
-      <div class="mill aft" data-mill="0">--</div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div> <!-- end mills-grid -->
-
-    <!-- RIGHT SIDE: DIAGRAM -->
-    <div class="diagram-container">
-      <div class="layout">
-        <div class="top-lines"></div>
-        <div class="arrow" style="height:60px; left:40px;"></div>
-        <div class="bunkers-grid">
-          <div class="bunker">
-            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-            </svg>
-            <div class="label">Bunker 2</div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end diagram-container -->
-
-  </div> <!-- end bunker-layout -->
-    </div>
-
-    <!-- Bunker 3 Panel -->
-    <div id="bunker3Tab" class="tab-panel" style="display:none;">
-<div class="bunker-layout">
-    
-    <!-- LEFT SIDE: TABLE -->
-    <div class="mills-grid" id="millsGrid">
-      <!-- header row -->
-      <div></div>
-      <div class="mill green">BUNKER 3</div>
-      <div class="mill gcv">GCV(Kcal/kg)</div>
-      <div class="mill cost-head">Cost/MT</div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 1 -->
-      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 2 -->
-      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 3 -->
-      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 4: Coal Flow -->
-      <div class="mill coal-flow">Coal Flow(TPH)</div>
-      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 5: AFT -->
-      <div class="mill aft-head">AFT(°C)</div>
-      <div class="mill aft" data-mill="0">--</div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div> <!-- end mills-grid -->
-
-    <!-- RIGHT SIDE: DIAGRAM -->
-    <div class="diagram-container">
-      <div class="layout">
-        <div class="top-lines"></div>
-        <div class="arrow" style="height:60px; left:40px;"></div>
-        <div class="bunkers-grid">
-          <div class="bunker">
-            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-            </svg>
-            <div class="label">Bunker 3</div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end diagram-container -->
-
-  </div> <!-- end bunker-layout -->
-    </div>
-
-    <!-- Bunker 4 Panel -->
-    <div id="bunker4Tab" class="tab-panel" style="display:none;">
-    <div class="bunker-layout">
-    
-    <!-- LEFT SIDE: TABLE -->
-    <div class="mills-grid" id="millsGrid">
-      <!-- header row -->
-      <div></div>
-      <div class="mill green">BUNKER 4</div>
-      <div class="mill gcv">GCV(Kcal/kg)</div>
-      <div class="mill cost-head">Cost/MT</div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 1 -->
-      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 2 -->
-      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 3 -->
-      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 4: Coal Flow -->
-      <div class="mill coal-flow">Coal Flow(TPH)</div>
-      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 5: AFT -->
-      <div class="mill aft-head">AFT(°C)</div>
-      <div class="mill aft" data-mill="0">--</div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div> <!-- end mills-grid -->
-
-    <!-- RIGHT SIDE: DIAGRAM -->
-    <div class="diagram-container">
-      <div class="layout">
-        <div class="top-lines"></div>
-        <div class="arrow" style="height:60px; left:40px;"></div>
-        <div class="bunkers-grid">
-          <div class="bunker">
-            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-            </svg>
-            <div class="label">Bunker 4</div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end diagram-container -->
-
-  </div> <!-- end bunker-layout -->
-    </div>
-
-    <!-- Bunker 5 Panel -->
-    <div id="bunker5Tab" class="tab-panel" style="display:none;">
-<div class="bunker-layout">
-    
-    <!-- LEFT SIDE: TABLE -->
-    <div class="mills-grid" id="millsGrid">
-      <!-- header row -->
-      <div></div>
-      <div class="mill green">BUNKER 5</div>
-      <div class="mill gcv">GCV(Kcal/kg)</div>
-      <div class="mill cost-head">Cost/MT</div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 1 -->
-      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 2 -->
-      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 3 -->
-      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 4: Coal Flow -->
-      <div class="mill coal-flow">Coal Flow(TPH)</div>
-      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 5: AFT -->
-      <div class="mill aft-head">AFT(°C)</div>
-      <div class="mill aft" data-mill="0">--</div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div> <!-- end mills-grid -->
-
-    <!-- RIGHT SIDE: DIAGRAM -->
-    <div class="diagram-container">
-      <div class="layout">
-        <div class="top-lines"></div>
-        <div class="arrow" style="height:60px; left:40px;"></div>
-        <div class="bunkers-grid">
-          <div class="bunker">
-            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-            </svg>
-            <div class="label">Bunker 5</div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end diagram-container -->
-
-  </div> <!-- end bunker-layout -->
-    </div>
-
-    <!-- Bunker 6 Panel -->
-    <div id="bunker6Tab" class="tab-panel" style="display:none;">
-<div class="bunker-layout">
-    
-    <!-- LEFT SIDE: TABLE -->
-    <div class="mills-grid" id="millsGrid">
-      <!-- header row -->
-      <div></div>
-      <div class="mill green">BUNKER 6</div>
-      <div class="mill gcv">GCV(Kcal/kg)</div>
-      <div class="mill cost-head">Cost/MT</div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 1 -->
-      <div class="mill"><select class="dropdown" id="coalDrop1"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="1" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox1" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox1" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 2 -->
-      <div class="mill"><select class="dropdown" id="coalDrop2"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="2" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox2" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox2" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 3 -->
-      <div class="mill"><select class="dropdown" id="coalDrop3"></select></div>
-      <div class="mill"><input type="text" class="percentage-input" data-row="3" data-mill="0" placeholder="%"></div>
-      <div class="mill"><div id="gcvBox3" class="gcv-box">--</div></div>
-      <div class="mill"><input type="text" id="costBox3" class="cost-input" placeholder="Cost/MT"></div>
-      <div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 4: Coal Flow -->
-      <div class="mill coal-flow">Coal Flow(TPH)</div>
-      <div class="mill"><input type="text" class="flow-input" data-mill="0" placeholder="TPH"></div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-
-      <!-- Row 5: AFT -->
-      <div class="mill aft-head">AFT(°C)</div>
-      <div class="mill aft" data-mill="0">--</div>
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div> <!-- end mills-grid -->
-
-    <!-- RIGHT SIDE: DIAGRAM -->
-    <div class="diagram-container">
-      <div class="layout">
-        <div class="top-lines"></div>
-        <div class="arrow" style="height:60px; left:40px;"></div>
-        <div class="bunkers-grid">
-          <div class="bunker">
-            <svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-              <path d="M10 10 V100 L45 140 M55 140 L90 100 V10" />
-            </svg>
-            <div class="label">Bunker 6</div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- end diagram-container -->
-
-  </div> <!-- end bunker-layout -->
-    </div>
-
-  </div> <!-- end tabContent -->
-</div> <!-- end outer flex container -->
-
 <script>
-/* ---------- shared state ---------- */
-let excelData = [];
+  let excelData = [];
+//GCV (kcal/kg)
+//Heat rate (kcal/kWh)
+  // load excel and populate dropdowns
+  document.getElementById("excelFile").addEventListener("change", handleFile, false);
+  function handleFile(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    document.getElementById("loader").style.display = "block";
+    const reader = new FileReader();
+    reader.onload = function(event){
+      setTimeout(() => {
+        try {
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          excelData = XLSX.utils.sheet_to_json(worksheet, { defval: null });
 
-/* ---------- small helpers ---------- */
-function safeTrim(v){ return (v===undefined || v===null) ? "" : String(v).trim(); }
-function asNumber(v){ if(v===undefined || v===null || v==="") return 0; const n = Number(v); return isNaN(n) ? 0 : n; }
-function findKeyIgnoreCase(obj, candidates){
-  if(!obj) return null;
-  const keys = Object.keys(obj);
-  for(const c of candidates){
-    const lower = c.toLowerCase();
-    const found = keys.find(k => k.toLowerCase() === lower);
-    if(found) return found;
-  }
-  for(const c of candidates){
-    const lower = c.toLowerCase();
-    const found = keys.find(k => k.toLowerCase().includes(lower));
-    if(found) return found;
-  }
-  return null;
-}
+          // get unique coal names
+          const coalValues = [...new Set(excelData.map(r => r["Coal"]).filter(v => v))];
 
-/* ---------- Excel upload handling ---------- */
-const excelInput = document.getElementById('excelFile');
-if(excelInput){
-  excelInput.addEventListener('change', handleFile, false);
-}
+          [1,2,3].forEach(i=>{
+            const drop = document.getElementById("coalDrop"+i);
+            drop.innerHTML = "";
+            const empty = document.createElement("option");
+            empty.value = ""; empty.textContent = "-- Select Coal --";
+            drop.appendChild(empty);
+            coalValues.forEach(c=>{
+              const opt = document.createElement("option");
+              opt.value = c; opt.textContent = c;
+              drop.appendChild(opt);
+            });
+          });
 
-function handleFile(e){
-  const file = e?.target?.files?.[0];
-  if(!file) return;
-  try { document.getElementById('loader')?.style && (document.getElementById('loader').style.display = 'block'); } catch(e){}
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    try {
-      const data = new Uint8Array(ev.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      excelData = XLSX.utils.sheet_to_json(worksheet, { defval: null });
-
-      // populate dropdowns & boxes for all panels (force populate cost/gcv from sheet)
-      const panels = Array.from(document.querySelectorAll('.tab-panel'));
-      panels.forEach(panel => {
-        if (excelData && excelData.length) populateDropdownsForPanel(panel);
-        panel._excelLoaded = true;
-        if (panel._inited) {
-          updateGCVCostBoxes(panel, true); // FORCE using excel values when loading file
-          calculateBlended(panel);
-          validateMillPercentages(panel);
-          updateBunkerColors(panel);
+          attachAutoUpdate();
+        } catch(err){
+          console.error(err);
+          alert("Error reading file.");
+        } finally {
+          document.getElementById("loader").style.display = "none";
         }
+      }, 250);
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // helper: lookup numeric cell for a coal
+  function findRowForCoal(coalName){
+    if(!coalName) return null;
+    return excelData.find(r => {
+      const c = r["Coal"];
+      return (c !== undefined && c !== null && String(c) === String(coalName));
+    }) || null;
+  }
+  function getValue(coalName, key){
+    const row = findRowForCoal(coalName);
+    if(!row) return 0;
+    const v = row[key];
+    if(v === null || v === undefined || v === "") return 0;
+    return Number(v) || 0;
+  }
+
+  // AFT formula exactly as provided (returns a number)
+  function calcAFT(ox){
+    const total = Object.values(ox).reduce((a,b)=>a+b,0);
+    if(total === 0) return 0;
+    const sum = (ox["SiO₂"]||0) + (ox["Al₂O₃"]||0);
+    let aft = 0;
+    if(sum < 55){
+      aft = 1245 + (1.1*(ox["SiO₂"]||0)) + (0.95*(ox["Al₂O₃"]||0)) - (2.5*(ox["Fe₂O₃"]||0)) - (2.98*(ox["CaO"]||0)) - (4.5*(ox["MgO"]||0)) - (7.89*((ox["Na₂O"]||0) + (ox["K₂O"]||0))) - (1.7*(ox["SO₃"]||0)) - (0.63*(ox["TiO₂"]||0));
+    } else if(sum < 75){
+      aft = 1323 + (1.45*(ox["SiO₂"]||0)) + (0.683*(ox["Al₂O₃"]||0)) - (2.39*(ox["Fe₂O₃"]||0)) - (3.1*(ox["CaO"]||0)) - (4.5*(ox["MgO"]||0)) - (7.49*((ox["Na₂O"]||0) + (ox["K₂O"]||0))) - (2.1*(ox["SO₃"]||0)) - (0.63*(ox["TiO₂"]||0));
+    } else {
+      aft = 1395 + (1.2*(ox["SiO₂"]||0)) + (0.9*(ox["Al₂O₃"]||0)) - (2.5*(ox["Fe₂O₃"]||0)) - (3.1*(ox["CaO"]||0)) - (4.5*(ox["MgO"]||0)) - (7.2*((ox["Na₂O"]||0) + (ox["K₂O"]||0))) - (1.7*(ox["SO₃"]||0)) - (0.63*(ox["TiO₂"]||0));
+    }
+    return Number(aft);
+  }
+//gcv - Kcal
+//cost per MT
+//AFT degree celcius
+//coal flow TPH
+//heat rate Kcal per KWH
+  // update GCV & Cost boxes (the 3 boxes in GCV & Cost columns)
+  function updateGCVCostBoxes(){
+    const c1 = document.getElementById("coalDrop1").value;
+    const c2 = document.getElementById("coalDrop2").value;
+    const c3 = document.getElementById("coalDrop3").value;
+
+    const r1 = findRowForCoal(c1);
+    const r2 = findRowForCoal(c2);
+    const r3 = findRowForCoal(c3);
+
+    document.getElementById("gcvBox1").innerText = r1 ? ( (r1["GCV"]!==undefined && r1["GCV"]!==null && r1["GCV"]!=="") ? Number(r1["GCV"]).toFixed(2) : "--") : "--";
+    document.getElementById("gcvBox2").innerText = r2 ? ( (r2["GCV"]!==undefined && r2["GCV"]!==null && r2["GCV"]!=="") ? Number(r2["GCV"]).toFixed(2) : "--") : "--";
+    document.getElementById("gcvBox3").innerText = r3 ? ( (r3["GCV"]!==undefined && r3["GCV"]!==null && r3["GCV"]!=="") ? Number(r3["GCV"]).toFixed(2) : "--") : "--";
+
+    function extractCost(row){
+      if(!row) return "";
+      if(row["Cost"] !== undefined) return String(row["Cost"]);
+      if(row["COST"] !== undefined) return String(row["COST"]);
+      if(row["Price"] !== undefined) return String(row["Price"]);
+      return "";
+    }
+    document.getElementById("costBox1").value = extractCost(r1);
+    document.getElementById("costBox2").value = extractCost(r2);
+    document.getElementById("costBox3").value = extractCost(r3);
+  }
+
+  // main calculations: per-mill blended GCV, per-mill AFT, totals & averages
+  function calculateBlended(){
+    const coal1 = document.getElementById("coalDrop1").value;
+    const coal2 = document.getElementById("coalDrop2").value;
+    const coal3 = document.getElementById("coalDrop3").value;
+
+    const oxKeys = ["SiO₂","Al₂O₃","Fe₂O₃","CaO","MgO","Na₂O","K₂O","SO₃","TiO₂"];
+
+    let totalFlow = 0;
+    let weightedGCV = 0;
+    let weightedAFT = 0;
+
+    for(let m = 0; m < 6; m++){
+      const p1 = parseFloat( document.querySelector(`.percentage-input[data-row="1"][data-mill="${m}"]`)?.value ) || 0;
+      const p2 = parseFloat( document.querySelector(`.percentage-input[data-row="2"][data-mill="${m}"]`)?.value ) || 0;
+      const p3 = parseFloat( document.querySelector(`.percentage-input[data-row="3"][data-mill="${m}"]`)?.value ) || 0;
+
+      const gcv1 = getValue(coal1, "GCV");
+      const gcv2 = getValue(coal2, "GCV");
+      const gcv3 = getValue(coal3, "GCV");
+
+      const blendedGCV = (gcv1 * (p1/100)) + (gcv2 * (p2/100)) + (gcv3 * (p3/100));
+
+      let ox = {};
+      oxKeys.forEach(k => {
+        ox[k] = (getValue(coal1, k) * (p1/100)) + (getValue(coal2, k) * (p2/100)) + (getValue(coal3, k) * (p3/100));
       });
 
-      // ensure overview summary is updated if visible
-      const overview = document.getElementById('overviewTab');
-      if (overview) {
-        updateGCVCostBoxes(overview, true);
-        calculateBlended(overview);
-        validateMillPercentages(overview);
-        updateBunkerColors(overview);
-      }
-    } catch(err){
-      console.error(err);
-      alert('Error reading Excel. See console.');
-    } finally {
-      try { document.getElementById('loader')?.style && (document.getElementById('loader').style.display = 'none'); } catch(e){}
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
+      const aftVal = calcAFT(ox);
 
-/* ---------- helpers to read excel rows ---------- */
-function findRowForCoal(coalName) {
-  if (!coalName) return null;
-  return excelData.find(r => {
-    const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
-    const val = key ? r[key] : undefined;
-    return (val !== undefined && val !== null && String(val).trim() === String(coalName).trim());
-  }) || null;
-}
-function getValue(coalName, key) {
-  const row = findRowForCoal(coalName);
-  if (!row) return 0;
-  const v = row[key];
-  if (v === null || v === undefined || v === "") return 0;
-  return Number(v) || 0;
-}
+      const aftCell = document.querySelector(`.aft[data-mill="${m}"]`);
+      if(aftCell) aftCell.innerText = isFinite(aftVal) ? Number(aftVal).toFixed(2) : "--";
 
-/* ---------- populate dropdowns ---------- */
-function populateDropdownsForPanel(panel) {
-  if (!panel) return;
-  const dropdowns = panel.querySelectorAll('.dropdown');
-  dropdowns.forEach(drop => {
-    drop.innerHTML = '';
-    const empty = document.createElement('option');
-    empty.value = '';
-    empty.textContent = '-- Select Coal --';
-    drop.appendChild(empty);
-    const set = new Set();
-    excelData.forEach(r => {
-      const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
-      if (key && r[key] && String(r[key]).trim()) set.add(String(r[key]).trim());
-    });
-    Array.from(set).forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v;
-      opt.textContent = v;
-      drop.appendChild(opt);
-    });
-  });
-}
+      const flow = parseFloat( document.querySelector(`.flow-input[data-mill="${m}"]`)?.value ) || 0;
 
-/* ---------- update GCV & cost boxes inside a panel ---------- */
-/* NOTE: 'force' param: when true, overwrite cost inputs from sheet; otherwise preserve user-entered costs */
-function updateGCVCostBoxes(panel, force = false) {
-  if (!panel) return;
-  const drops = Array.from(panel.querySelectorAll('.dropdown'));
-  // scope gcv boxes and cost inputs to this panel
-  const gcvBoxes = Array.from(panel.querySelectorAll('.gcv-box'));
-  const costInputs = Array.from(panel.querySelectorAll('.cost-input'));
-  for(let i=0;i<3;i++){
-    const coalName = drops[i]?.value || '';
-    const row = excelData.find(r => {
-      const key = findKeyIgnoreCase(r, ['Coal','coal','COAL']);
-      return key && safeTrim(r[key]) === coalName;
-    });
-    // fill gcv box from sheet (this represents the coal's GCV from sheet)
-    if (gcvBoxes[i]) {
-      const gcvKey = findKeyIgnoreCase(row, ['GCV','gcv','Gcv','G.C.V']);
-      gcvBoxes[i].innerText = row && gcvKey ? (safeTrim(row[gcvKey]) !== '' ? Number(row[gcvKey]).toFixed(2) : '--') : '--';
-    }
-    // cost input: only overwrite if force OR empty
-    if (costInputs[i]) {
-      const c = row ? (row.Cost ?? row.COST ?? row.Price ?? '') : '';
-      if (force || String(costInputs[i].value).trim() === '') {
-        costInputs[i].value = c !== undefined ? String(c) : '';
+      if(flow > 0){
+        totalFlow += flow;
+        weightedGCV += (flow * blendedGCV);
+        weightedAFT += (flow * aftVal);
       }
     }
-  }
-}
 
-/* ---------- AFT calculation ---------- */
-function calcAFT(ox){
-  const total = Object.values(ox).reduce((a,b)=>a+b,0);
-  if(total === 0) return 0;
-  const sum = (ox["SiO₂"]||0) + (ox["Al₂O₃"]||0);
-  let aft = 0;
-  if(sum < 55){
-    aft = 1245 + (1.1*(ox["SiO₂"]||0)) + (0.95*(ox["Al₂O₃"]||0)) - (2.5*(ox["Fe₂O₃"]||0)) - (2.98*(ox["CaO"]||0)) - (4.5*(ox["MgO"]||0)) - (7.89*((ox["Na₂O"]||0) + (ox["K₂O"]||0))) - (1.7*(ox["SO₃"]||0)) - (0.63*(ox["TiO₂"]||0));
-  } else if(sum < 75){
-    aft = 1323 + (1.45*(ox["SiO₂"]||0)) + (0.683*(ox["Al₂O₃"]||0)) - (2.39*(ox["Fe₂O₃"]||0)) - (3.1*(ox["CaO"]||0)) - (4.5*(ox["MgO"]||0)) - (7.49*((ox["Na₂O"]||0) + (ox["K₂O"]||0))) - (2.1*(ox["SO₃"]||0)) - (0.63*(ox["TiO₂"]||0));
-  } else {
-    aft = 1395 + (1.2*(ox["SiO₂"]||0)) + (0.9*(ox["Al₂O₃"]||0)) - (2.5*(ox["Fe₂O₃"]||0)) - (3.1*(ox["CaO"]||0)) - (4.5*(ox["MgO"]||0)) - (7.2*((ox["Na₂O"]||0) + (ox["K₂O"]||0))) - (1.7*(ox["SO₃"]||0)) - (0.63*(ox["TiO₂"]||0));
-  }
-  return Number(aft);
-}
+    const avgGCV = totalFlow > 0 ? (weightedGCV / totalFlow) : 0;
+    const avgAFT = totalFlow > 0 ? (weightedAFT / totalFlow) : 0;
 
-/* ---------- calculate blended (panel-scoped) ---------- */
-/* IMPORTANT: This function computes blended values per mill and updates AFT & per-mill results.
-   It NO LONGER writes into '.gcv-box' (that element shows the coal's own GCV and must be maintained
-   by updateGCVCostBoxes). Removing that overwrite fixes the GCV-misalignment bug. */
-function calculateBlended(panel) {
-  if (!panel) return;
-  const drops = Array.from(panel.querySelectorAll('.dropdown'));
-  const coal1 = drops[0]?.value || '';
-  const coal2 = drops[1]?.value || '';
-  const coal3 = drops[2]?.value || '';
-  const oxKeys = ["SiO₂","Al₂O₃","Fe₂O₃","CaO","MgO","Na₂O","K₂O","SO₃","TiO₂"];
+    document.getElementById("totalFlow").innerText = Number(totalFlow).toFixed(2);
+    document.getElementById("avgGCV").innerText = totalFlow>0 ? Number(avgGCV).toFixed(2) : 0;
+    document.getElementById("avgAFT").innerText = totalFlow>0 ? Number(avgAFT).toFixed(2) : "--";
 
-  // per-mill blended & AFT and flows (for overview summary later)
-  const blendedGCVs = new Array(6).fill(0);
-  const aftVals = new Array(6).fill(0);
-  const flows = new Array(6).fill(0);
+    const generation = parseFloat(document.getElementById("generation").value) || 0;
+    if(generation > 0 && totalFlow > 0){
+      const heatRate = (totalFlow * avgGCV) / generation;
+      document.getElementById("heatRate").innerText = Number(heatRate).toFixed(2);
+    } else {
+      document.getElementById("heatRate").innerText = "--";
+    }
 
+function getCoalQty(rowIndex) {
+  let total = 0;
   for (let m = 0; m < 6; m++) {
-    // read percentages for this mill (for overview). In bunker-single-view the 1 local column has data-mill="0"
-    const p1 = parseFloat(panel.querySelector(`.percentage-input[data-row="1"][data-mill="${m}"]`)?.value) || 0;
-    const p2 = parseFloat(panel.querySelector(`.percentage-input[data-row="2"][data-mill="${m}"]`)?.value) || 0;
-    const p3 = parseFloat(panel.querySelector(`.percentage-input[data-row="3"][data-mill="${m}"]`)?.value) || 0;
-
-    const gcv1 = getValue(coal1, "GCV"), gcv2 = getValue(coal2, "GCV"), gcv3 = getValue(coal3, "GCV");
-    const blendedGCV = (gcv1*(p1/100)) + (gcv2*(p2/100)) + (gcv3*(p3/100));
-    let ox = {};
-    oxKeys.forEach(k => {
-      ox[k] = (getValue(coal1,k)*(p1/100)) + (getValue(coal2,k)*(p2/100)) + (getValue(coal3,k)*(p3/100));
-    });
-    const aftVal = calcAFT(ox);
-
-    // write AFT cell for this mill (if panel contains it)
-    const aftCell = panel.querySelector(`.aft[data-mill="${m}"]`);
-    if (aftCell) aftCell.innerText = isFinite(aftVal) && aftVal>0 ? Number(aftVal).toFixed(2) : '--';
-
-    // store values for overview aggregate calculation
-    blendedGCVs[m] = blendedGCV;
-    aftVals[m] = aftVal;
-    const flowVal = parseFloat(panel.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
-    flows[m] = flowVal;
+    const perc = parseFloat(document.querySelector(`.percentage-input[data-row="${rowIndex}"][data-mill="${m}"]`)?.value) || 0;
+    total += perc; 
   }
-
-  // cost rate calculation for this panel (works same as before)
-  const costInputs = panel.querySelectorAll('.cost-input');
-  const c1 = parseFloat(costInputs[0]?.value) || 0;
-  const c2 = parseFloat(costInputs[1]?.value) || 0;
-  const c3 = parseFloat(costInputs[2]?.value) || 0;
-
-  function getCoalQty(rowIndex) {
-    let total = 0;
-    for (let mm = 0; mm < 6; mm++) {
-      total += parseFloat(panel.querySelector(`.percentage-input[data-row="${rowIndex}"][data-mill="${mm}"]`)?.value) || 0;
-    }
-    return total;
-  }
-  const q1 = getCoalQty(1), q2 = getCoalQty(2), q3 = getCoalQty(3);
-  const totalCost = (q1*c1) + (q2*c2) + (q3*c3);
-  const totalQty = q1+q2+q3;
-  const costRate = totalQty>0 ? (totalCost/totalQty) : 0;
-  if (panel.id === 'overviewTab') {
-    const costEl = document.getElementById('COSTRATE');
-    if (costEl) costEl.innerText = costRate.toFixed(2);
-    // update the visible overview summary (reads blendedGCVs/flows/AFT from the DOM)
-    updateOverviewSummaryFromOverviewPanel();
-  }
+  return total;
 }
 
-/* ---------- compute overview summary reading values from the overview panel DOM ---------- */
-function updateOverviewSummaryFromOverviewPanel(){
-  const overview = document.getElementById('overviewTab');
-  if(!overview) return;
 
-  let totalFlow = 0;
-  let weightedGCV = 0;
-  let weightedAFT = 0;
+const cost1 = parseFloat(document.getElementById("costBox1").value) || 0;
+const cost2 = parseFloat(document.getElementById("costBox2").value) || 0;
+const cost3 = parseFloat(document.getElementById("costBox3").value) || 0;
 
-  for(let m=0;m<6;m++){
-    // blendedGCVs were not stored in elements; instead use the gcv-values computed earlier per mill if you have cells
-    // In your layout we have AFT cells per mill and flow inputs; blendedGCV for the mill is calculated in memory by calculateBlended when overview was last run.
-    // To be robust, recompute blendedGCV for summary here using current drop selections & percentages:
-    const drops = Array.from(overview.querySelectorAll('.dropdown'));
-    const coal1 = drops[0]?.value || '';
-    const coal2 = drops[1]?.value || '';
-    const coal3 = drops[2]?.value || '';
-    const gcv1 = getValue(coal1, "GCV"), gcv2 = getValue(coal2, "GCV"), gcv3 = getValue(coal3, "GCV");
-    const p1 = parseFloat(overview.querySelector(`.percentage-input[data-row="1"][data-mill="${m}"]`)?.value) || 0;
-    const p2 = parseFloat(overview.querySelector(`.percentage-input[data-row="2"][data-mill="${m}"]`)?.value) || 0;
-    const p3 = parseFloat(overview.querySelector(`.percentage-input[data-row="3"][data-mill="${m}"]`)?.value) || 0;
-    const blendedGCV = (gcv1*(p1/100)) + (gcv2*(p2/100)) + (gcv3*(p3/100));
+const qty1 = getCoalQty(1);
+const qty2 = getCoalQty(2);
+const qty3 = getCoalQty(3);
 
-    const aftVal = parseFloat(overview.querySelector(`.aft[data-mill="${m}"]`)?.innerText) || 0;
-    const flow = parseFloat(overview.querySelector(`.flow-input[data-mill="${m}"]`)?.value) || 0;
-    if(flow > 0){
-      totalFlow += flow;
-      weightedGCV += flow * blendedGCV;
-      weightedAFT += flow * aftVal;
-    }
-  }
+const totalCost = (qty1 * cost1) + (qty2 * cost2) + (qty3 * cost3);
+const totalQty  = qty1 + qty2 + qty3;
+const costRate  = totalQty > 0 ? (totalCost / totalQty) : 0;
 
-  const avgGCV = totalFlow > 0 ? (weightedGCV/totalFlow) : 0;
-  const avgAFT = totalFlow > 0 ? (weightedAFT/totalFlow) : 0;
-  const generation = parseFloat(document.getElementById('generation')?.value) || 0;
-  const heatRate = (generation > 0 && totalFlow > 0 && avgGCV > 0) ? ((totalFlow * avgGCV) / generation) : null;
+document.getElementById("COSTRATE").innerText = costRate.toFixed(2);
 
-  // write to DOM (IDs used in your HTML)
-  const tfEl = document.getElementById('totalFlow'); if(tfEl) tfEl.innerText = totalFlow ? Number(totalFlow).toFixed(2) : '0';
-  const gcvEl = document.getElementById('avgGCV'); if(gcvEl) gcvEl.innerText = avgGCV>0 ? Number(avgGCV).toFixed(2) : '--';
-  const aftEl = document.getElementById('avgAFT'); if(aftEl) aftEl.innerText = avgAFT>0 ? Number(avgAFT).toFixed(2) : '--';
-  const hrEl = document.getElementById('heatRate'); if(hrEl) hrEl.innerText = heatRate !== null ? Number(heatRate).toFixed(2) : '--';
-  // COSTRATE is updated in calculateBlended when overview triggers it
+
+if(generation > 0 && totalFlow > 0){
+  const heatRate = (totalFlow * avgGCV) / generation;
+  document.getElementById("heatRate").innerText = Number(heatRate).toFixed(2);
+} else {
+  document.getElementById("heatRate").innerText = "--";
 }
 
-/* ---------- validate mill percentages & header color ---------- */
-function validateMillPercentages(panel) {
-  if (!panel) return;
-
-  const isBunkerPanel = /^bunker\d+Tab$/.test(panel.id);
-  let bunkerIndex = null;
-  if (isBunkerPanel) {
-    const numMatch = panel.id.match(/\d+/);
-    bunkerIndex = numMatch ? (Number(numMatch[0]) - 1) : null;
   }
 
-  const millsToCheck = isBunkerPanel ? [bunkerIndex] : [0,1,2,3,4,5];
-
-  for (const m of millsToCheck) {
-    if (m === null || m === undefined) continue;
+  // new: validate sums and update header colors
+  function validateMillPercentages() {
+  for (let m = 0; m < 6; m++) {
     let hasPercent = false;
-    for (let r = 1; r <= 3; r++){
-      const sel = isBunkerPanel ? `.percentage-input[data-row="${r}"][data-mill="0"]` : `.percentage-input[data-row="${r}"][data-mill="${m}"]`;
-      const v = parseFloat(panel.querySelector(sel)?.value) || 0;
-      if (v > 0) { hasPercent = true; break; }
-    }
-    const flowSel = isBunkerPanel ? `.flow-input[data-mill="0"]` : `.flow-input[data-mill="${m}"]`;
-    const flow = parseFloat(panel.querySelector(flowSel)?.value) || 0;
 
-    const header = Array.from(panel.querySelectorAll('.mill'))
-      .find(el => {
-        const txt = (el.textContent || '').replace(/\s+/g,' ').trim().toUpperCase();
-        return txt.startsWith(`BUNKER ${m + 1}`);
-      });
+    // check if any percent input > 0 for this mill
+    for (let r = 1; r <= 3; r++) {
+      const val = parseFloat(
+        document.querySelector(`.percentage-input[data-row="${r}"][data-mill="${m}"]`)?.value
+      ) || 0;
+      if (val > 0) {
+        hasPercent = true;
+        break;
+      }
+    }
+
+    // check the coal flow for this mill
+    const flow = parseFloat(
+      document.querySelector(`.flow-input[data-mill="${m}"]`)?.value
+    ) || 0;
+
+    // find the mill header (MILL-A ... MILL-F)
+    const letter = String.fromCharCode(65 + m); // A..F
+    const header = Array.from(document.querySelectorAll(".mills-grid > .mill"))
+      .find(el => el.textContent.includes(`MILL-${letter}`));
 
     if (!header) continue;
-    header.classList.remove('red','green');
-    if (hasPercent && flow > 0) header.classList.add('red');
-    else header.classList.add('green');
+
+    // reset
+    header.classList.remove("red", "green");
+
+    if (hasPercent && flow > 0) {
+      header.classList.add("red");
+    } else {
+      header.classList.add("green");
+    }
   }
 }
 
-/* ---------- update bunker visuals ---------- */
-function updateBunkerColors(panel) {
-  if (!panel) return;
-  const coalColors = ['#f39c12','#3498db','#2ecc71'];
-  const bunkers = Array.from(panel.querySelectorAll('.bunker'));
-  const svgWidth = 100, topY=10, midY=100, bottomY=140, usableH = bottomY-topY;
-  const outlinePath = `M10 ${topY} L10 ${midY} L45 ${bottomY} L55 ${bottomY} L90 ${midY} L90 ${topY} Z`;
-  bunkers.forEach((bunker, idx) => {
-    const svg = bunker.querySelector('svg');
-    if (!svg) return;
-    const p1 = parseFloat(panel.querySelector(`.percentage-input[data-row="1"][data-mill="${idx}"]`)?.value) || 0;
-    const p2 = parseFloat(panel.querySelector(`.percentage-input[data-row="2"][data-mill="${idx}"]`)?.value) || 0;
-    const p3 = parseFloat(panel.querySelector(`.percentage-input[data-row="3"][data-mill="${idx}"]`)?.value) || 0;
-    const clipId = `clip-${panel.id}-${idx}`;
-    let inner = `<defs><clipPath id="${clipId}"><path d="${outlinePath}" /></clipPath></defs>`;
-    let cum=0;
-    [p1,p2,p3].forEach((pct,i) => {
-      if (pct<=0) return;
-      const h = (pct/100)*usableH;
-      const y = bottomY - (cum + h);
-      cum += h;
-      inner += `<rect x="0" y="${y}" width="${svgWidth}" height="${h}" fill="${coalColors[i]}" clip-path="url(#${clipId})" />`;
-    });
-    inner += `<path d="M10 ${topY} L10 ${midY}" stroke="black" fill="none" stroke-width="2" />`;
-    inner += `<path d="M90 ${topY} L90 ${midY}" stroke="black" fill="none" stroke-width="2" />`;
-    inner += `<path d="M10 ${midY} L45 ${bottomY}" stroke="black" fill="none" stroke-width="2" />`;
-    inner += `<path d="M90 ${midY} L55 ${bottomY}" stroke="black" fill="none" stroke-width="2" />`;
-    svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgWidth * 1.5}`);
-    svg.innerHTML = inner;
-  });
-}
+  function attachAutoUpdate(){
+    // add focus + input handlers for percentage inputs to track previous value and validate
+    document.querySelectorAll(".percentage-input").forEach(inp => {
+      // store initial prev value
+      inp.dataset.prev = inp.value || "";
 
-/* ---------- Overview -> Bunker sync helpers ---------- */
-function syncOverviewToBunker(bunkerIndex) {
-  const overview = document.getElementById('overviewTab');
-  const bunkerPanel = document.getElementById(`bunker${bunkerIndex}Tab`);
-  if (!overview || !bunkerPanel) return;
+      inp.addEventListener("focus", function(e){
+        // store previous value before editing
+        this.dataset.prev = this.value;
+      });
 
-  // copy dropdowns
-  const overviewDrops = Array.from(overview.querySelectorAll('.dropdown'));
-  const bunkerDrops = Array.from(bunkerPanel.querySelectorAll('.dropdown'));
-  overviewDrops.forEach((d,i)=> { if(bunkerDrops[i]) bunkerDrops[i].value = d.value || ''; });
+      inp.addEventListener("input", function(e){
+        // ensure only numeric and optionally decimal and limit accidental characters
+        // allow empty (treat as 0)
+        const raw = this.value.trim();
+        // allow partial inputs like ".", so only parseFloat when needed
+        let num = parseFloat(raw);
+        if (raw === "" || isNaN(num)) num = 0;
 
-  // map overview[data-mill = bunkerIndex] -> bunker[data-mill = 0]
-  for (let row=1; row<=3; row++){
-    const src = overview.querySelector(`.percentage-input[data-row="${row}"][data-mill="${bunkerIndex-1}"]`);
-    const dst = bunkerPanel.querySelector(`.percentage-input[data-row="${row}"][data-mill="0"]`);
-    if (src && dst) dst.value = src.value || '';
-  }
-
-  // flow
-  const srcFlow = overview.querySelector(`.flow-input[data-mill="${bunkerIndex-1}"]`);
-  const dstFlow = bunkerPanel.querySelector(`.flow-input[data-mill="0"]`);
-  if (srcFlow && dstFlow) dstFlow.value = srcFlow.value || '';
-
-  // costs: copy overview's cost inputs to bunker
-  const srcCosts = overview.querySelectorAll('.cost-input');
-  const dstCosts = bunkerPanel.querySelectorAll('.cost-input');
-  srcCosts.forEach((c,i)=> { if(dstCosts[i]) dstCosts[i].value = c.value || ''; });
-
-  // recalc this bunker panel (will not affect overview)
-  updateGCVCostBoxes(bunkerPanel);
-  calculateBlended(bunkerPanel);
-  validateMillPercentages(bunkerPanel);
-  updateBunkerColors(bunkerPanel);
-}
-
-function propagateOverviewToAllBunkers() {
-  for (let i=1;i<=6;i++) syncOverviewToBunker(i);
-  // after copying, re-run overview summary to keep it guaranteed up-to-date
-  const overview = document.getElementById('overviewTab');
-  if (overview) {
-    updateGCVCostBoxes(overview);
-    calculateBlended(overview);
-    validateMillPercentages(overview);
-    updateBunkerColors(overview);
-    updateOverviewSummaryFromOverviewPanel();
-  }
-}
-
-/* ---------- init panel once (attach handlers) ---------- */
-function initPanel(panel) {
-  if (!panel) return;
-  if (panel._inited) return;
-  if (excelData && excelData.length) populateDropdownsForPanel(panel);
-
-  // percentage inputs
-  panel.querySelectorAll('.percentage-input').forEach(inp => {
-    inp.dataset.prev = inp.value || '';
-    inp.addEventListener('focus', ()=> inp.dataset.prev = inp.value);
-    inp.addEventListener('input', function(){
-      const millIndex = Number(this.dataset.mill);
-      let sum = 0;
-      const checkMill = this.dataset.mill;
-      for (let r=1;r<=3;r++){
-        sum += parseFloat(panel.querySelector(`.percentage-input[data-row="${r}"][data-mill="${checkMill}"]`)?.value) || 0;
-      }
-      if (sum > 100) {
-        this.value = this.dataset.prev || '';
-        alert(`Total for Mill ${String.fromCharCode(65 + (parseInt(checkMill)||0))} cannot exceed 100%`);
-        calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
-        return;
-      }
-      this.dataset.prev = this.value;
-      calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
-      if (panel.id === 'overviewTab') propagateOverviewToAllBunkers();
-    });
-  });
-
-  // flow & cost inputs
-  panel.querySelectorAll('.flow-input, .cost-input').forEach(inp => {
-    inp.addEventListener('input', () => {
-      calculateBlended(panel); validateMillPercentages(panel); updateBunkerColors(panel);
-      if (panel.id === 'overviewTab') propagateOverviewToAllBunkers();
-    });
-  });
-
-  // dropdown changes
-  panel.querySelectorAll('.dropdown').forEach(d => {
-    d.addEventListener('change', () => {
-      updateGCVCostBoxes(panel);
-      calculateBlended(panel);
-      validateMillPercentages(panel);
-      updateBunkerColors(panel);
-      if (panel.id === 'overviewTab') propagateOverviewToAllBunkers();
-    });
-  });
-
-  panel._inited = true;
-  updateGCVCostBoxes(panel);
-  calculateBlended(panel);
-  validateMillPercentages(panel);
-  updateBunkerColors(panel);
-}
-
-/* ---------- tab show logic ---------- */
-document.addEventListener('DOMContentLoaded', () => {
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const panels = document.querySelectorAll('.tab-panel');
-
-  function hideAll(){
-    panels.forEach(p => p.style.display = 'none');
-    tabBtns.forEach(b => b.classList.remove('active'));
-  }
-
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabName = btn.dataset.tab;
-      const panel = document.getElementById(tabName + 'Tab');
-      if (!panel) return;
-      const isOpen = panel.style.display === 'block';
-      if (isOpen) { panel.style.display = 'none'; btn.classList.remove('active'); }
-      else {
-        hideAll();
-        panel.style.display = 'block';
-        btn.classList.add('active');
-
-        // if opening bunker, sync latest overview state into it
-        if (tabName.startsWith('bunker')) {
-          const bunkerNum = Number(tabName.replace('bunker','')) || null;
-          if (bunkerNum) syncOverviewToBunker(bunkerNum);
+        // compute new sum for this mill
+        const millIndex = Number(this.dataset.mill);
+        let sum = 0;
+        for (let r = 1; r <=3; r++){
+          const v = parseFloat(document.querySelector(`.percentage-input[data-row="${r}"][data-mill="${millIndex}"]`)?.value) || 0;
+          sum += v;
         }
 
-        initPanel(panel);
-      }
-    });
-  });
-
-  // init overview if visible by default
-  const overview = document.getElementById('overviewTab');
-  if (overview && overview.style.display === 'block') initPanel(overview);
-
-  // attach download PDF handler (if present)
-  const downloadBtn = document.getElementById('downloadPDF');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', function () {
-      const { jsPDF } = window.jspdf;
-      const element = document.body;
-      html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        onclone: (clonedDoc) => {
-          const inputs = clonedDoc.querySelectorAll("input, textarea");
-          inputs.forEach(input => {
-            const text = clonedDoc.createElement("span");
-            text.textContent = input.value;
-            const style = window.getComputedStyle(input);
-            text.style.position = "absolute";
-            text.style.left = (input.offsetLeft) + "px";
-            text.style.top = (input.offsetTop) + "px";
-            text.style.width = input.offsetWidth + "px";
-            text.style.height = input.offsetHeight + "px";
-            text.style.font = style.font;
-            text.style.color = style.color;
-            text.style.lineHeight = style.lineHeight;
-            text.style.textAlign = style.textAlign;
-            input.parentElement.appendChild(text);
-            input.style.display = "none";
-          });
-
-          const selects = clonedDoc.querySelectorAll("select");
-          selects.forEach(select => {
-            const selectedText = select.options[select.selectedIndex]?.text || "";
-            const text = clonedDoc.createElement("span");
-            text.textContent = selectedText;
-            const style = window.getComputedStyle(select);
-            text.style.position = "absolute";
-            text.style.left = (select.offsetLeft) + "px";
-            text.style.top = (select.offsetTop) + "px";
-            text.style.width = select.offsetWidth + "px";
-            text.style.height = select.offsetHeight + "px";
-            text.style.font = style.font;
-            text.style.color = style.color;
-            text.style.lineHeight = style.lineHeight;
-            text.style.textAlign = style.textAlign;
-            select.parentElement.appendChild(text);
-            select.style.display = "none";
-          });
+        if (sum > 100) {
+          // revert to previous value and notify
+          const prev = this.dataset.prev ?? "";
+          this.value = prev;
+          alert(`Total for Mill ${String.fromCharCode(65+millIndex)} cannot exceed 100%.`);
+          // update blended calculations and header colors after revert
+          calculateBlended();
+          validateMillPercentages();
+          return;
         }
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'pt', 'a4');
-        const pdfW = pdf.internal.pageSize.getWidth();
-        const pdfH = (canvas.height * pdfW) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
-        pdf.save('page.pdf');
-      }).catch(err => {
-        console.error('PDF generation error', err);
-        alert('Failed to generate PDF (see console).');
+
+        // valid, save as prev
+        this.dataset.prev = this.value;
+        // update calculations & visuals
+        calculateBlended();
+        validateMillPercentages();
       });
     });
+
+    // existing inputs that affect calculation
+    document.querySelectorAll(".flow-input, #generation, .cost-input").forEach(inp => {
+      inp.addEventListener("input", () => { calculateBlended(); validateMillPercentages(); });
+    });
+
+    ["coalDrop1","coalDrop2","coalDrop3"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.addEventListener("change", () => { updateGCVCostBoxes(); calculateBlended(); validateMillPercentages(); });
+    });
+
+    // initial update
+    updateGCVCostBoxes();
+    calculateBlended();
+    validateMillPercentages();
   }
+
+  // allow the upload button to work like a label (no extra handler needed)
+  document.querySelector(".upload-btn").addEventListener("click", ()=>{ /* no-op */ });
+
+  attachAutoUpdate();
+
+ document.getElementById("downloadPDF").addEventListener("click", function () {
+  const { jsPDF } = window.jspdf;
+  const element = document.body; // ✅ capture whole page including navbar
+
+  html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    onclone: (clonedDoc) => {
+      // Handle input & textarea values
+      const inputs = clonedDoc.querySelectorAll("input, textarea");
+      inputs.forEach(input => {
+        const text = clonedDoc.createElement("span");
+        text.textContent = input.value;
+
+        text.style.position = "absolute";
+        text.style.left = input.offsetLeft + "px";
+        text.style.top = input.offsetTop + "px";
+        text.style.width = input.offsetWidth + "px";
+        text.style.height = input.offsetHeight + "px";
+        text.style.lineHeight = input.offsetHeight + "px";
+        text.style.textAlign = "center";
+        text.style.font = window.getComputedStyle(input).font;
+        text.style.color = window.getComputedStyle(input).color;
+
+        clonedDoc.body.appendChild(text);
+        input.style.visibility = "hidden";
+      });
+
+      // Handle select dropdowns (coal names)
+      const selects = clonedDoc.querySelectorAll("select");
+      selects.forEach(select => {
+        const selectedText = select.options[select.selectedIndex]?.text || "";
+        const text = clonedDoc.createElement("span");
+        text.textContent = selectedText;
+
+        text.style.position = "absolute";
+        text.style.left = select.offsetLeft + "px";
+        text.style.top = select.offsetTop + "px";
+        text.style.width = select.offsetWidth + "px";
+        text.style.height = select.offsetHeight + "px";
+        text.style.lineHeight = select.offsetHeight + "px";
+        text.style.textAlign = "center";
+        text.style.font = window.getComputedStyle(select).font;
+        text.style.color = window.getComputedStyle(select).color;
+
+        clonedDoc.body.appendChild(text);
+        select.style.visibility = "hidden";
+      });
+    }
+  }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("Coal_Blending_Ratio.pdf");
+  });
 });
+
+
+
 </script>
-
-
-
-
-
 </body>
 </html>

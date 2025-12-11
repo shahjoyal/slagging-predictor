@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Combustion Analyzer</title>
+<title>Abhitech Energycon Limited</title>
+<link rel="icon" href="images/abhitech-logo.png">
 <style>
     * {
         box-sizing: border-box;
@@ -91,10 +92,10 @@
 
     /* Floating Logo */
  .login-logo {
-    width: 125px;      
-    height: 125px;      
+    width: 130px;      
+    height: 130px;      
     position: absolute;
-    top: -15px;         
+    top: -10px;         
     left: 50%;
     transform: translateX(-50%);
     animation: floatLogo 2s ease-in-out infinite;
@@ -218,14 +219,13 @@
         <button type="submit">Login</button>
     </form>
     <p id="message"></p>
-    <div class="footer">© 2025 Abhitech Energycon Limited</div>
 </div>
 
 <script>
 const loginForm = document.getElementById('loginForm');
 const message = document.getElementById('message');
 
-loginForm.addEventListener('submit', function(e) {
+loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -236,19 +236,32 @@ loginForm.addEventListener('submit', function(e) {
         return;
     }
 
-        // Dummy login validation
-        if(email === 'coalblend@abhitech.com' && password === 'password123') {
-           localStorage.setItem('isLoggedIn', 'true'); 
-           message.style.color = 'green';
-            message.textContent = 'Login successful!';
-            // Redirect to homepage
-            window.location.href = '/slagging_coal_page.html';
-        } else {
-            message.style.color = 'red';
-            message.textContent = 'Invalid email or password.';
-        }
-    });
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        credentials: 'include', // important to store session cookie
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        message.style.color = 'red';
+        message.textContent = data.error || 'Login failed';
+        return;
+      }
+      message.style.color = 'green';
+      message.textContent = 'Login successful! Redirecting...';
+       localStorage.setItem('isLoggedIn', 'true');
+      // Redirect to your main app page (adjust path as necessary)
+      setTimeout(()=> window.location.href = '/slagging_coal_page.html', 400);
+    } catch (err) {
+      console.error(err);
+      message.style.color = 'red';
+      message.textContent = 'Network error';
+    }
+});
 </script>
+
 
 </body>
 </html>
