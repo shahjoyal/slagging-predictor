@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Coal Blending Ratio — light theme</title>
+  <title>Abhitech Energycon Limited</title>
+  <link rel="icon" href="images/abhitech-logo.png">
      <style>
     :root{
       --bg: #F7F8FA;        
@@ -270,11 +271,97 @@
     .dropdown {
   font-size:0.6rem;
     }
+       #downloadPDF {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: #02008a; 
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  z-index: 9999; /* keeps it above everything */
+}
+
+#downloadPDF:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+.navbar .logout-btn {
+  padding: 10px 16px;
+  background-color: red !important;
+  color: #fff !important;
+  border: none;
+  cursor: pointer;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.navbar .logout-btn:hover {
+  background-color: darkred !important;
+}
+        .icon-btn {
+  background: #02008a;  /* same as navbar */
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+
+/* Tooltip */
+.icon-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.icon-btn:hover::after {
+  opacity: 1;
+}
+
+
     #loader { display:none; color:var(--muted); margin-top:4px; font-size:0.8rem; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+if(localStorage.getItem('isLoggedIn') !== 'true') {
+    alert('You must login first!');
+    window.location.href = '/login.html'; 
+} else {
+    document.body.style.display = 'block';
+}
+    function logoutUser() {
+  localStorage.setItem('isLoggedIn', 'false'); 
+  window.location.href = 'login.html'; 
+}
+
+</script>
 </head>
 <body>
  <div class="navbar">
@@ -284,7 +371,9 @@
       <button onclick="window.location.href='slagging_coal_page.html'">Calculation</button>
       <button onclick="window.location.href='coal_table.html'">Coal Properties</button>
       <button onclick="window.location.href='model.html'">Model</button>
-      <button id="downloadPDF">Download PDF</button>
+      <button class="logout-btn" onclick="logoutUser()">Logout</button>
+
+      
     </div>
   </div>
   <div style="margin-top:8px;">
@@ -293,7 +382,7 @@
   </div>
 
   <div id="loader">Loading... please wait</div>
-
+<button id="downloadPDF" class="icon-btn" title="Download page as PDF">⬇️</button>
   <div class="main-container">
     <div class="mills-grid" id="millsGrid">
       <!-- header row -->
